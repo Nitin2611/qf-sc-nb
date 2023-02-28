@@ -1094,20 +1094,16 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
 
 
     handleAddPage() {
-        console.log('total pages--------->' + this.PageList.length);
-        console.log('handle add page............');
-        this.isModalOpen1 = true;
-        // createPage({totalPages:this.PageList.length, formId:this.ParentMessage}).then(result=>{
-        //     this.FieldList = result.fieldList;
-        //     console.log('inside the result in page break-->');
-        //     console.log(result);
-        //     this.PageList = result.pageList;
-        //     this.setPageField(result.fieldList);
-        //     this.showToast('Form Page create Successfully','success');
-        // }).catch(err=>{
-        //     console.log({err});
-        // })
+        try {
+            console.log('total pages--------->' + this.PageList.length);
+            console.log('handle add page............');
+            this.isModalOpen1 = true;
+        } catch (error) {
+            console.log("In the catch block ==> Method :** handleAddPage ** || LWC:** formBuilder ** ==>", { error });
+            console.log('above error ==>' + error);
+        }
     }
+
     pageeeee
     @track pagetitle;
     @track pagenumber;
@@ -1202,18 +1198,22 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
     }
 
     handleValidation1() {
-        let nameCmp1 = this.template.querySelector(".nameCls1");
-        if (!nameCmp1.value || nameCmp1.value.trim().length == 0) {
-            console.log('test for form titel');
-            nameCmp1.setCustomValidity("Page Title is required");
-        } else {
-            nameCmp1.setCustomValidity(""); // clear previous value
-            // this.formdetails = false;
-            // this.objectselection = true;
-            this.handlecreatePage();
+        try {
+            let nameCmp1 = this.template.querySelector(".nameCls1");
+            if (!nameCmp1.value || nameCmp1.value.trim().length == 0) {
+                console.log('test for form titel');
+                nameCmp1.setCustomValidity("Page Title is required");
+            } else {
+                nameCmp1.setCustomValidity(""); // clear previous value
+                // this.formdetails = false;
+                // this.objectselection = true;
+                this.handlecreatePage();
+            }
+            nameCmp1.reportValidity();
+        } catch (error) {
+            console.log("In the catch block ==> Method :** handleValidation1 ** || LWC:** formBuilder ** ==>", { error });
+            console.log('above error ==>' + error);
         }
-        nameCmp1.reportValidity();
-
     }
 
     handleValidation2() {
@@ -1231,25 +1231,31 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
     }
 
     handlecreatePage() {
-        console.log('total pages--------->' + this.PageList.length);
-        createPage({ pageNumber: this.pagenumber, totalPages: this.PageList.length, formId: this.ParentMessage, pagename: this.pagetitle }).then(result => {
-            this.FieldList = result.fieldList;
-            console.log('inside the result in page break-->');
-            console.log(result);
-            this.PageList = result.pageList;
-            this.setPageField(result.fieldList);
-            // this.showToast('Form Page create Successfully','success');
-            let toast_error_msg = 'Form Page create Successfully';
-            this.error_toast = true;
-            this.template.querySelector('c-toast-component').showToast('success', toast_error_msg, 3000);
-        }).catch(err => {
-            console.log({ err });
-            let toast_error_msg = 'Error while creating page, Please try again later';
-            this.error_toast = true;
-            this.template.querySelector('c-toast-component').showToast('error', toast_error_msg, 3000);
-        })
-        this.isModalOpen1 = false;
-        this.handleModalClose();
+        try {
+            console.log('total pages--------->' + this.PageList.length);
+            createPage({ pageNumber: this.pagenumber, totalPages: this.PageList.length, formId: this.ParentMessage, pagename: this.pagetitle }).then(result => {
+                this.FieldList = result.fieldList;
+                console.log('inside the result in page break-->');
+                console.log(result);
+                this.PageList = result.pageList;
+                this.setPageField(result.fieldList);
+                // this.showToast('Form Page create Successfully','success');
+                let toast_error_msg = 'Form Page create Successfully';
+                this.error_toast = true;
+                this.template.querySelector('c-toast-component').showToast('success', toast_error_msg, 3000);
+            }).catch(err => {
+                console.log({ err });
+                let toast_error_msg = 'Error while creating page, Please try again later';
+                this.error_toast = true;
+                this.template.querySelector('c-toast-component').showToast('error', toast_error_msg, 3000);
+            })
+            this.isModalOpen1 = false;
+            this.handleModalClose();
+            
+        } catch (error) {
+            console.log("In the catch block ==> Method :** handlecreatePage ** || LWC:** formBuilder ** ==>", { error });
+            console.log('above error ==>' + error);
+        }
     }
 
     handleModalClose() {
@@ -1500,7 +1506,7 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
         this.activeNotification = false;
         this.activethankyou = false;
         this.template.querySelector('.fieldvalidationdiv').style = "display:none;";
-        this.connectedCallback();
+        // this.connectedCallback();
 
     }
 }

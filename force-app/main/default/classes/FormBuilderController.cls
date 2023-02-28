@@ -842,7 +842,7 @@ public with sharing class FormBuilderController {
                 }
                 update updateList;
 
-                formFields=[SELECT Id,Name,Form__c,Form_Page__c,Field_Order__c FROM Form_Fields__c ORDER BY Field_Order__c ASC];
+                formFields=[SELECT Id,Name,Form__c,Form_Page__c,Field_Order__c, Field_Validations__c FROM Form_Fields__c ORDER BY Field_Order__c ASC];
                 pageWrapper pw = new pageWrapper();
                 pw.fieldList = formFields;
                 pw.pageList = [SELECT Id, Name, Page_Number__c FROM Form_Page__c WHERE Form__c=:FormId ORDER BY Page_Number__c ASC];
@@ -911,6 +911,8 @@ public with sharing class FormBuilderController {
             List<Form_Page__c> AllFormPages = [SELECT ID From Form_Page__c where Form__c =: FormDetail.Id ORDER BY Page_Number__c] ;
             boolean hasRequiredField = false;
             List<Form_Fields__c> fieldContainsRequireCheck = [SELECT Name From Form_Fields__c where Form_Page__c=:AllFormPages.get(0).Id];
+            List<Form_Fields__c> allFieldsOfForm = [SELECT Name, Form__c, Form_Page__c FROM Form_Fields__c WHERE Form__c =: FormDetail.Id];
+
             for(Form_Fields__c it: fieldContainsRequireCheck){
                 List<String> temp=  it.Name.split(',');
                 if (temp.size()==3) {
@@ -919,40 +921,39 @@ public with sharing class FormBuilderController {
                     }
                 }
             }
+
             if(hasRequiredField == false){
-                Integer iteration=0;
-                List<Form_Fields__c> Fields = new List<Form_Fields__c>();
-                for (String type : types) {
-                    Position = 0;
-                    Form_Page__c page_Id = AllFormPages.get(iteration);
-                    Map<String, Schema.SObjectType> schemaMap = Schema.getGlobalDescribe();
-                    Schema.SObjectType leadSchema = schemaMap.get(type);
-                    Map<String, Schema.SObjectField> fieldMap = leadSchema.getDescribe().fields.getMap();
-                    for (String fieldName: fieldMap.keySet()) {
-                        if (fieldMap.get(fieldName).getDescribe().isUpdateable()){
-                            
-                            
-                            if( fieldMap.get(fieldName).getDescribe().isNillable()==false){
-                                Position=Position+1;
-                                System.debug('##Field API Name='+fieldName);
-                                Form_Fields__c field = new Form_Fields__c();
-                                //requiredFieldList.add(fieldMap.get(fieldName).getDescribe().getLabel()+'./.'+ fieldMap.get(fieldName).getDescribe().getType());
-                                field.Mapped_Obj__c = type;
-                                field.Field_Mapping__c = fieldName;
-                                field.Name= fieldMap.get(fieldName).getDescribe().getLabel()+','+fieldMap.get(fieldName).getDescribe().getType()+',isrequired';
-                                field.Form__c =  FormDetail.Id;
-                                field.Form_Page__c = page_Id.Id;
-                                field.Field_Order__c = Position+1;
-                                field.Field_Validations__c = 'isLabel:true?$`~isRequired:true?$`~Label:'+ fieldName.split(',')[0];
-                                Fields.add(field);
+                if (allFieldsOfForm.size() == 0) {
+                    Integer iteration=0;
+                    List<Form_Fields__c> Fields = new List<Form_Fields__c>();
+                    for (String type : types) {
+                        Position = 0;
+                        Form_Page__c page_Id = AllFormPages.get(iteration);
+                        Map<String, Schema.SObjectType> schemaMap = Schema.getGlobalDescribe();
+                        Schema.SObjectType leadSchema = schemaMap.get(type);
+                        Map<String, Schema.SObjectField> fieldMap = leadSchema.getDescribe().fields.getMap();
+                        for (String fieldName: fieldMap.keySet()) {
+                            if (fieldMap.get(fieldName).getDescribe().isUpdateable()){
+                                if( fieldMap.get(fieldName).getDescribe().isNillable()==false){
+                                    Position=Position+1;
+                                    System.debug('##Field API Name='+fieldName);
+                                    Form_Fields__c field = new Form_Fields__c();
+                                    //requiredFieldList.add(fieldMap.get(fieldName).getDescribe().getLabel()+'./.'+ fieldMap.get(fieldName).getDescribe().getType());
+                                    field.Mapped_Obj__c = type;
+                                    field.Field_Mapping__c = fieldName;
+                                    field.Name= fieldMap.get(fieldName).getDescribe().getLabel()+','+fieldMap.get(fieldName).getDescribe().getType()+',isrequired';
+                                    field.Form__c =  FormDetail.Id;
+                                    field.Form_Page__c = page_Id.Id;
+                                    field.Field_Order__c = Position+1;
+                                    field.Field_Validations__c = 'isLabel:true?$`~isRequired:true?$`~Label:'+ fieldName.split(',')[0];
+                                    Fields.add(field);
+                                }
                             }
-                            
                         }
+                        iteration=iteration+1;
                     }
-                    iteration=iteration+1;
+                    insert Fields;
                 }
-            
-                insert Fields;
             }
             // List<Form_Fields__c> fieldList=[SELECT Id,Name,Form__c,Form_Page__c,Field_Order__c, Field_Validations__c FROM Form_Fields__c];
             // return fieldList;
@@ -1016,7 +1017,7 @@ public with sharing class FormBuilderController {
                 
             }
             List<Form_Fields__c> latestFieldList = new List<Form_Fields__c>();
-            latestFieldList = [SELECT Id,Name,Form__c,Form_Page__c,Field_Order__c FROM Form_Fields__c WHERE Form__c =: cuurentField.Form__c ORDER BY Field_Order__c ASC];
+            latestFieldList = [SELECT Id,Name,Form__c,Form_Page__c,Field_Order__c,Field_Validations__c FROM Form_Fields__c WHERE Form__c =: cuurentField.Form__c ORDER BY Field_Order__c ASC];
             return latestFieldList;
         } catch (Exception e) {
             System.debug('Error Line Number ==>' + e.getLineNumber() + ' Error Message ==>'+ e.getMessage());
@@ -1043,7 +1044,7 @@ public with sharing class FormBuilderController {
                     newFormPage.Page_Number__c = totalPages + 1;
                 }
             insert newFormPage;
-            List<Form_Fields__c> formFields=[SELECT Id,Name,Form__c,Form_Page__c,Field_Order__c FROM Form_Fields__c ORDER BY Field_Order__c ASC];
+            List<Form_Fields__c> formFields=[SELECT Id,Name,Form__c,Form_Page__c,Field_Order__c, Field_Validations__c FROM Form_Fields__c ORDER BY Field_Order__c ASC];
             pageWrapper pw = new pageWrapper();
             pw.fieldList = formFields;
             pw.pageList = [SELECT Id, Name, Page_Number__c FROM Form_Page__c WHERE Form__c=:FormId ORDER BY Page_Number__c ASC];
@@ -1095,7 +1096,7 @@ public with sharing class FormBuilderController {
             pagesToUpdate.add(updatedPage);
             pagesToUpdate.addAll(pagesAfter);
             update pagesToUpdate;
-            List<Form_Fields__c> formFields = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c FROM Form_Fields__c ORDER BY Field_Order__c ASC];
+            List<Form_Fields__c> formFields = [SELECT Id, Name, Form__c, Form_Page__c, Field_Validations__c, Field_Order__c FROM Form_Fields__c ORDER BY Field_Order__c ASC];
             pageWrapper pw = new pageWrapper();
             pw.fieldList = formFields;
             pw.pageList = [SELECT Id, Name, Page_Number__c FROM Form_Page__c WHERE Form__c = :formId ORDER BY Page_Number__c ASC];
@@ -1117,7 +1118,7 @@ public with sharing class FormBuilderController {
             Form_Page__c form = [SELECT Name FROM Form_Page__c WHERE Id =: id];
             form.Name = rename;
             update form;     
-            List<Form_Fields__c> formFields=[SELECT Id,Name,Form__c,Form_Page__c,Field_Order__c FROM Form_Fields__c ORDER BY Field_Order__c ASC];
+            List<Form_Fields__c> formFields=[SELECT Id,Name,Form__c,Form_Page__c,Field_Order__c, Field_Validations__c FROM Form_Fields__c ORDER BY Field_Order__c ASC];
             pageWrapper pw = new pageWrapper();
             pw.fieldList = formFields;
             pw.pageList = [SELECT Id, Name, Page_Number__c FROM Form_Page__c WHERE Form__c=:FormId ORDER BY Page_Number__c ASC];
@@ -1162,7 +1163,7 @@ public with sharing class FormBuilderController {
                 }
                 update pagesToUpdate;
             }
-            List<Form_Fields__c> formFields=[SELECT Id,Name,Form__c,Form_Page__c,Field_Order__c FROM Form_Fields__c ORDER BY Field_Order__c ASC];
+            List<Form_Fields__c> formFields=[SELECT Id,Name,Form__c,Form_Page__c,Field_Order__c, Field_Validations__c FROM Form_Fields__c ORDER BY Field_Order__c ASC];
             pageWrapper pw = new pageWrapper();
             pw.fieldList = formFields;
             pw.pageList = [SELECT Id, Name, Page_Number__c FROM Form_Page__c WHERE Form__c=:FormId ORDER BY Page_Number__c ASC];
