@@ -577,12 +577,17 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
             // this.spinnerDataTable = true;
             // event.dataTransfer.getData('text/plain', JSON.stringify(event.target.dataset));
             var dropFieldId = event.target.dataset.fieldId;
+            var dropPageId = event.target.dataset.pageRecord;
+
+            // Checking variable is undefined or not if undifined that it will be replaced with empty string.
+            dropFieldId = typeof dropFieldId === 'undefined' ? '' : dropFieldId;
 
             console.log('*** dropFieldId ==>', dropFieldId);
             console.log('*** on drop event.target ==>', event.target);
             console.log('*** dropFieldId JSON==>', JSON.stringify(dropFieldId));
+            console.log('*** dropPageId ==>', dropPageId);
 
-            reOrderField({ dropFieldId: dropFieldId, currentFieldId: this.startFielId })
+            reOrderField({ dropFieldId: dropFieldId, currentFieldId: this.startFielId, dropPageId:dropPageId })
                 .then((result) => {
                     console.log("*** result from apex class ==>", result);
                     this.setPageField(result);
@@ -687,7 +692,12 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
 
             var FieldElement = document.querySelectorAll('.field');
             if (isPageBreak) {
-                await this.makePageBreak(FieldName, PageRecordId, position, oldfieldId);
+                var dropFieldId = event.target.dataset.fieldId;
+                // Checking variable is undefined or not if undifined that it will be replaced with empty string.
+                dropFieldId = typeof dropFieldId === 'undefined' ? '' : dropFieldId;
+                console.log('*** dropField From PageBreak ====>' + dropFieldId);
+
+                await this.makePageBreak(FieldName, PageRecordId, position, dropFieldId);
             } else {
                 await this.SaveFields(FieldName, PageRecordId, position, OldFieldSend, pageIdOfField, fieldLabelOfRemovedFeild);
 
@@ -697,23 +707,30 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
         }
     }
 
-    async makePageBreak(FieldName, pageId, position, oldfieldId) {
-        console.log('inside the page break---');
-        console.log("field id -->" + FieldName);
-        console.log("pageId-->" + pageId);
-        console.log('postion-->' + position);
-        addPageBreak({ FormId: this.ParentMessage, Name: FieldName, Position: position, Form_Page_Id: pageId, TargetedFeild: oldfieldId })
-            .then(result => {
-                this.FieldList = result.fieldList;
-                console.log('inside the result in page break-->');
-                console.log(result);
-                this.PageList = result.pageList;
-                this.setPageField(result.fieldList);
-            })
-            .catch(err => {
-                console.log('inside the error in page break');
-                console.log({ err });
-            })
+    async makePageBreak(FieldName, pageId, position, dropFieldId) {
+        try {
+            console.log('inside the page break---');
+            console.log("field id -->" + FieldName);
+            console.log("pageId-->" + pageId);
+            console.log('postion-->' + position);
+            console.log('dropFieldId-->' + dropFieldId);
+            addPageBreak({ FormId: this.ParentMessage, Name: FieldName, Position: position, Form_Page_Id: pageId, dropFieldId: dropFieldId })
+                .then(result => {
+                    this.FieldList = result.fieldList;
+                    console.log('inside the result in page break-->');
+                    console.log(result);
+                    this.PageList = result.pageList;
+                    this.setPageField(result.fieldList);
+                })
+                .catch(err => {
+                    console.log('inside the error in page break');
+                    console.log({ err });
+                })
+        } catch (error) {
+            console.log("In the catch block ==> Method :** makePageBreak ** || LWC:** formBuilder ** ==>", { error });
+            console.log('above error ==>' + error);
+        }
+
     }
 
 
@@ -1183,9 +1200,9 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
             this.PageList = result.pageList;
             this.setPageField(result.fieldList);
             if (pagelength) {
-                this.showToast('sorry page can not deleted', 'fail')
+                this.showToast('sorry page can not deleted', 'fail');
             } else {
-                this.showToast('page Delete successfully');
+                this.showToast('Page Deleted Successfully', 'success');
             }
         })
     }

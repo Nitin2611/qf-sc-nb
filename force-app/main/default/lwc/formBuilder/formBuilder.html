@@ -210,6 +210,7 @@
                                             data-record-count={fieldcount} onclick={openfieldvalidation} key={field.Id}
                                             data-field-name={field.Name} data-field-id={field.Id} data-id={field.Id} >
                                             <c-quickformfieldcomponent formid={ParentMessage} t-view={field.Name}
+                                                data-page-record={page.pageId}
                                                 compview="Full" disable-field="true" field-attribute=""
                                                 field-attribute-value="" field-id={field.Id}
                                                 page-id={page.ParentMessage} data-field-id={field.Id}
