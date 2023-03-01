@@ -552,7 +552,7 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
             console.log('*** startFielId ==>' + this.startFielId);
             console.log('*** SenddataObj ==>' + JSON.stringify(SenddataObj));
             console.log('event.target.dataset JSON==>', JSON.stringify(event.target.dataset));
-            console.log('event.target.dataset ==>' , event.target.dataset);
+            console.log('event.target.dataset ==>', event.target.dataset);
             console.log('evenet ==>', event.target);
             console.log('On drag start-->');
 
@@ -562,7 +562,7 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
             //     console.log('in else condition');
             //     event.dataTransfer.setData('text/plain', JSON.stringify(SenddataObj));
             // }
-            
+
             event.dataTransfer.setData('text/plain', JSON.stringify(event.target.dataset));
 
         } catch (error) {
@@ -584,9 +584,9 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
 
             reOrderField({ dropFieldId: dropFieldId, currentFieldId: this.startFielId })
                 .then((result) => {
-                    console.log("*** result from apex class ==>" , result);
+                    console.log("*** result from apex class ==>", result);
                     this.setPageField(result);
-                    
+
                 })
                 .catch((error) => {
                     console.log('*** Error From reOrderField ==>');
@@ -594,7 +594,7 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
                     // this.spinnerDataTable = false;
                 });
             // this.spinnerDataTable = false;
-            
+
         } else {
             var dropzone = this.template.querySelectorAll('.example-dropzone');
             for (let i = 0; i < dropzone.length; i++) {
@@ -693,7 +693,7 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
 
                 console.log('both methods are called and finish');
             }
-            
+
         }
     }
 
@@ -781,7 +781,6 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
 
 
     setPageField(fieldList) {
-
         try {
             console.log('in set PageField');
             let outerlist = [];
@@ -873,113 +872,16 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
                 isnotlast = false;
                 outerlist.push(temp);
             }
-            this.MainList = [];
             this.MainList = outerlist;
             // console.log('***Main List ==>', JSON.stringify(outerlist));
             console.log('***Main List ==>', JSON.stringify(this.MainList));
-            // this.renderedCallback();
-
+            console.log('before renderedCallback');
         } catch (error) {
             console.log("In the catch block ==> Method :** setPageField ** || LWC:** formBuilder ** ==>", { error });
             console.log('above error ==>' + error);
         }
+
     }
-
-    // setPageField(fieldList) {
-    //     console.log('in set PageField');
-    //     let outerlist = [];
-    //     let isIndexZero = false;
-    //     let islast = false;
-    //     let isnotlast = false;
-    //     for (let i = 0; i < this.PageList.length; i++) {
-    //         let innerlist = [];
-    //         if (i == 0) {
-    //             isIndexZero = true;
-    //         } else if (i == this.PageList.length - 1) {
-    //             islast = true;
-    //         } else if (i != this.PageList.length - 1) {
-    //             isnotlast = true;
-    //         }
-    //         for (let j = 0; j < fieldList.length; j++) {
-    //             if (this.PageList[i].Id == fieldList[j].Form_Page__c) {
-    //                 console.log('inside inner loop');
-    //                 let fieldofObj = fieldList[j].Name.split(',');
-    //                 let fieldtype = fieldofObj[1];
-    //                 console.log(fieldtype + 'fieldtpys');
-    //                 console.log('in setpage field----->' + fieldofObj);
-    //                 if (fieldofObj.length == 2) {
-    //                     console.log(fieldofObj.length);
-    //                     if (fieldofObj[1] != 'Extra' && fieldofObj[1] != undefined && fieldofObj[1] != 'undefined') {
-    //                         console.log(fieldofObj[0]);
-    //                         this.removeObjFields.push(fieldofObj[0]);
-    //                     }
-    //                 }
-
-    //                 let isdisabledcheck;
-    //                 let isRequiredcheck;
-    //                 let labelcheck;
-    //                 let helptextcheck;
-    //                 let placeholdercheck;
-    //                 let readonlycheck;
-    //                 let prefixcheck;
-    //                 let prefixvalue;
-    //                 let labelvalue;
-    //                 let helptext;
-    //                 let placeholdervalue;
-    //                 let salutationvalue = [];
-
-    //                 if (fieldList[j].Field_Validations__c) {
-    //                     fieldList[j].Field_Validations__c = fieldList[j].Field_Validations__c.split(',');
-    //                     for (let i = 0; i < fieldList[j].Field_Validations__c.length; i++) {
-    //                         fieldList[j].Field_Validations__c[i] = fieldList[j].Field_Validations__c[i].split(':');
-    //                         let labels = fieldList[j].Field_Validations__c[i][0];
-    //                         let value = fieldList[j].Field_Validations__c[i][1];
-
-    //                         if (labels == 'isRequired') {
-    //                             isRequiredcheck = JSON.parse(value);
-    //                         } else if (labels == 'isDisabled') {
-    //                             isdisabledcheck = JSON.parse(value);
-    //                         } else if (labels == 'isLabel') {
-    //                             labelcheck = JSON.parse(value);
-    //                         } else if (labels == 'isHelpText') {
-    //                             helptextcheck = JSON.parse(value);
-    //                         } else if (labels == 'isPlaceholder') {
-    //                             placeholdercheck = JSON.parse(value);
-    //                         } else if (labels == 'isReadonly') {
-    //                             readonlycheck = JSON.parse(value);
-    //                         } else if (labels == 'isPrefix') {
-    //                             prefixcheck = JSON.parse(value);
-    //                         } else if (labels == 'Prefix') {
-    //                             prefixvalue = value.replaceAll('"', '');
-    //                         } else if (labels == 'Label') {
-    //                             labelvalue = value.replaceAll('"', '');
-    //                         } else if (labels == 'HelpText') {
-    //                             helptext = value.replaceAll('"', '');
-    //                         } else if (labels == 'Placeholder') {
-    //                             placeholdervalue = value.replaceAll('"', '');
-    //                         } else if (labels == 'Salutation') {
-    //                             salutationvalue.push(value.replaceAll('"', ''));
-    //                         }
-    //                     }
-    //                     fieldList[j].Field_Validations__c = ({
-    //                         isRequired: isRequiredcheck, isDisabled: isdisabledcheck, isLabel: labelcheck, isHelptext: helptextcheck, isPlaceholder: placeholdercheck,
-    //                         isReadonly: readonlycheck, isPrefix: prefixcheck, Prefix: prefixvalue, Label: labelvalue, HelpText: helptext, Placeholder: placeholdervalue, Salutation: salutationvalue, fieldtype: fieldtype
-    //                     });
-    //                 }
-    //                 innerlist.push(fieldList[j]);
-    //             }
-    //         }
-
-    //         let temp = { pageName: this.PageList[i].Name, pageId: this.PageList[i].Id, isIndexZero: isIndexZero, isIndexLast: islast, isIndexIsNotLast: isnotlast, FieldData: innerlist };
-    //         isIndexZero = false;
-    //         islast = false;
-    //         isnotlast = false;
-    //         outerlist.push(temp);
-    //     }
-    //     this.spinnerDataTable = false;
-    //     this.MainList = outerlist;
-    //     console.log('***Main List ==>', JSON.stringify(outerlist));
-    // }
 
     tempararyfun() {
         for (let i = 0; i < this.removeObjFields.length; i++) {
@@ -1251,7 +1153,7 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
             })
             this.isModalOpen1 = false;
             this.handleModalClose();
-            
+
         } catch (error) {
             console.log("In the catch block ==> Method :** handlecreatePage ** || LWC:** formBuilder ** ==>", { error });
             console.log('above error ==>' + error);
@@ -1506,7 +1408,19 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
         this.activeNotification = false;
         this.activethankyou = false;
         this.template.querySelector('.fieldvalidationdiv').style = "display:none;";
+        this.activesidebar = true;
         // this.connectedCallback();
-
+    }
+    afterfielddelete(event) {
+        console.log('after delete event --> ' + event.detail);
+        var name = event.detail;
+        const temp = this.template.querySelectorAll('.childref');
+        console.log('length temp --> ' + temp.length);
+        console.log('queryselector childcomponent --> ' + this.template.querySelectorAll('.childref'));
+        for (let i = 0; i < temp.length; i++) {
+            const element = temp[i];
+            console.log('element :- ' + element);
+            element.AddField(name);
+        }
     }
 }
