@@ -92,7 +92,7 @@
 
         <template if:true={activesidebar}>
             <div class="child3">
-                <c-fields-section-component formid={ParentMessage} oncallpasstoparent={passToParent}
+                <c-fields-section-component class="childref" formid={ParentMessage} oncallpasstoparent={passToParent}
                     onstopspinner={stopspinner}></c-fields-section-component>
             </div>
         </template>
@@ -210,6 +210,7 @@
                                             data-record-count={fieldcount} onclick={openfieldvalidation} key={field.Id}
                                             data-field-name={field.Name} data-field-id={field.Id} data-id={field.Id} >
                                             <c-quickformfieldcomponent formid={ParentMessage} t-view={field.Name}
+                                                data-page-record={page.pageId}
                                                 compview="Full" disable-field="true" field-attribute=""
                                                 field-attribute-value="" field-id={field.Id}
                                                 page-id={page.ParentMessage} data-field-id={field.Id}
@@ -298,7 +299,7 @@
 
             <!-- <template if:true={fieldvalidationdiv}> -->
             <div class="fieldvalidationdiv">
-                <c-field-validation onclosevalidation={closevalidation}></c-field-validation>
+                <c-field-validation onupdatefields={afterfielddelete} onclosevalidation={closevalidation}></c-field-validation>
             </div>
             <!-- </template> -->
 

@@ -301,3 +301,13 @@ lightning-combobox{
 .loader--ripple div {
   border-color: #00539f;
 }
+@media only screen and (max-width: 1480px) {
+  .backclass {
+      font-size: 11px;
+  }
+}
+@media only screen and (max-width: 1380px) {
+  .backclass {
+      font-size: 10px;
+  }
+}
