@@ -27,7 +27,7 @@
                     <!-- <lightning-combobox name="Form direction" data-id="formdirection" label="Form direction" options={optFormdirection} value={formdir} data-name="width:" onchange={handlFormeCss}  ></lightning-combobox> -->
                     <lightning-input type="color" data-id="formbgcolor" label="Background-color" name="color" value={colorpicker} data-name="background-color:" onchange={handleFormCss} class="slds-color-picker__custom-inputs" ></lightning-input>
                     
-                    <lightning-input label="Background Image" onchange={openformfileUpload} type="file" name="file"  accept=".png , .jpeg , .jpg" ></lightning-input>
+                    <lightning-input label="Background Image" onchange={openformfileUpload} type="file" name="file"  accept=".png , .jpeg , .jpg" class="backclass"></lightning-input>
                     
                     <template if:true={formimage}>
                         <p>{fileData.filename}</p>
@@ -70,7 +70,7 @@
                     <lightning-input type="number" name="Bottom Padding" min="0" max="100" value={bottompadding} data-name="padding-bottom:" label="Bottom Padding (px)" onchange={handlepageCss} ></lightning-input>
                     <lightning-input type="color" label="Background" name="color" value={pagecolorpicker} data-name="background-color:" onchange={handlepageCss} ></lightning-input>
                     
-                    <lightning-input label="Background Image" onchange={openpagefileUpload} type="file" name="file"  accept=".png , .jpeg , .jpg" ></lightning-input>
+                    <lightning-input label="Background Image" onchange={openpagefileUpload} type="file" name="file"  accept=".png , .jpeg , .jpg" class="backclass"></lightning-input>
                     
                     <template if:true={pageimage}>
                         <div class="slds-m-top_small slds-m-bottom_small slds-align_absolute-center">

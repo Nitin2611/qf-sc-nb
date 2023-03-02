@@ -212,6 +212,11 @@ export default class FieldValidation extends LightningElement {
             deletefield({fieldId:this.fieldId})
             .then(result => {
                 event.preventDefault();
+                const deleteEvent = new CustomEvent('updatefields', {
+                    detail: this.fieldName
+                });
+                this.dispatchEvent(deleteEvent);
+
                 const selectEvent = new CustomEvent('closevalidation', {
                     detail: this.tab
                 });
