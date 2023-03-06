@@ -1,3 +1,9 @@
+/***************************************************************
+** Author             : Nitin
+** Created Date       : 04/03/2023
+** Last Modified Date : 06/03/2023
+** Description        : Used for genrating pdf of submission record
+***************************************************************/
 public with sharing class PDFGeneratorController {
     
     public Form_Submission__c fromSubmisionData {get; set;}
@@ -19,10 +25,11 @@ public with sharing class PDFGeneratorController {
         Map<String, String> mapofThirdObjectData = new Map<String, String>();
 
         try {
+            // Getting Form_Submission__c record id using page referenc
             String submissionId = ApexPages.currentPage().getParameters().get('Id');
             System.debug('Id from PageReference ==>' + submissionId);
 
-
+            // Submitted record 
             Form_Submission__c formSubmissionRecord = [SELECT Id, Name, Form__c, Form__r.Name, First_object_data__c, Second_object_data__c, Third_object_data__c, Other_fields_data__c FROM Form_Submission__c WHERE Id =: submissionId];
             fromSubmisionData = formSubmissionRecord;
 
@@ -59,9 +66,11 @@ public with sharing class PDFGeneratorController {
             }
             System.debug('*** mapofThirdObjectData ==>' + mapofThirdObjectData);
 
+            // getting list of pages of the submited form
             List<Form_Page__c> formpageList = new List<Form_Page__c>();
             formpageList = [SELECT Id, Name, Page_Number__c FROM Form_Page__c WHERE Form__c =: formSubmissionRecord.Form__c ORDER BY Page_Number__c ASC];
 
+            // Assigning values to wrraper class
             formData.formName = formSubmissionRecord.Form__r.Name;
             formData.formPages = formpageList;
             formData.firstObjectFieldMap = mapofFirstObjectData;
@@ -78,9 +87,9 @@ public with sharing class PDFGeneratorController {
     public class formDataWrapper {
         public String formName {get; set;} // form name of submmited data
         public List<Form_Page__c> formPages {get; set;}   //List of pages of form
-        public Map<String, String> firstObjectFieldMap {get; set;} //
-        public Map<String, String> secondObjectFieldMap {get; set;} //
-        public Map<String, String> thirdObjectFieldMap {get; set;} //
+        public Map<String, String> firstObjectFieldMap {get; set;} // Map of submitted data of first object
+        public Map<String, String> secondObjectFieldMap {get; set;} // Map of submitted data of second object
+        public Map<String, String> thirdObjectFieldMap {get; set;} // Map of submitted data of third object
     }
 
 }
