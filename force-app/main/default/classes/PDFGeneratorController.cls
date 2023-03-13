@@ -11,6 +11,11 @@ public with sharing class PDFGeneratorController {
     public boolean isFirstObject {get; set;}
     public boolean isSecondObject {get; set;}
     public boolean isThirdObject {get; set;}
+    public boolean isOtherObject {get; set;}
+    // add by smit 
+    // public String documentId { get; set; }
+    // public String verId {get; set;}
+    public List<Id> versionIds {get; set;}
 
     public void getPagesOfForm() {
         fromSubmisionData = new Form_Submission__c();
@@ -23,6 +28,9 @@ public with sharing class PDFGeneratorController {
 
         Map<String, Object> mapofThirdObject = new Map<String, Object>();
         Map<String, String> mapofThirdObjectData = new Map<String, String>();
+
+        Map<String, Object> mapofOtherObject = new Map<String, Object>();
+        Map<String, String> mapofOtherObjectData = new Map<String, String>();
 
         try {
             // Getting Form_Submission__c record id using page referenc
@@ -66,6 +74,17 @@ public with sharing class PDFGeneratorController {
             }
             System.debug('*** mapofThirdObjectData ==>' + mapofThirdObjectData);
 
+            // Storing Other fields submitted data into Map<String, String>
+            mapofOtherObject = (Map<String, Object>)JSON.deserializeUntyped(formSubmissionRecord.Other_fields_data__c);
+            System.debug('other object map : '+mapofOtherObject);
+            for (String key : mapofOtherObject.keySet()) {
+                Object value = mapofOtherObject.get(key);
+                if (value != null) {
+                    mapofOtherObjectData.put(key, String.valueOf(value));
+                }
+                isOtherObject = true;
+            }
+            System.debug('*** mapofOtherObjectData ==>' + mapofOtherObjectData);
 
             // Signature that contains in submission of form
             List<ContentDocument> signList = new List<ContentDocument>();
@@ -78,11 +97,26 @@ public with sharing class PDFGeneratorController {
             }
             signList = [SELECT Id, Title, LatestPublishedVersionId, LatestPublishedVersion.VersionData FROM ContentDocument WHERE Id IN : contentDocIdSet];
             System.debug('*** signList size ==>' + signList.size() + '-- signList ==>' + signList);
+            // add by smit 
+            // documentId = contentDocLinkList[0].ContentDocumentId;
 
             String result = '';
-            ContentVersion cv = [SELECT Id,VersionData FROM ContentVersion WHERE Id =: '0681y0000005NCxAAM'];
+            // ContentVersion cv = [SELECT Id,VersionData FROM ContentVersion WHERE Id =: '0681y0000005NCxAAM'];
+
+            // single versionId 
+            // ContentVersion cv = [SELECT Id, VersionData FROM ContentVersion WHERE ContentDocumentId = : documentId];
+            // verId = cv.Id;
+
+            // list of versionId
+            List<ContentVersion> contentVersions = [SELECT Id FROM ContentVersion WHERE ContentDocumentId IN :contentDocIdSet];
+             versionIds = new List<Id>();
+            
+            for (ContentVersion version : contentVersions) {
+                versionIds.add(version.Id);
+            }
+
             // result += 'url("data:image/png;base64,'+ EncodingUtil.base64Encode(cv.VersionData) + ')';
-            result += '"data:image/png;base64,'+ EncodingUtil.base64Encode(cv.VersionData) + '"';
+            // result += '"data:image/png;base64,'+ EncodingUtil.base64Encode(cv.VersionData) + '"'; //cmt
 
 
             // getting list of pages of the submited form
@@ -95,7 +129,11 @@ public with sharing class PDFGeneratorController {
             formData.firstObjectFieldMap = mapofFirstObjectData;
             formData.secondObjectFieldMap = mapofSecondObjectData;
             formData.thirdObjectFieldMap = mapofThirdObjectData;
+            formData.otherObjectFieldMap = mapofOtherObjectData;
             formData.signatureList = signList;
+            // formData.signId = documentId;
+            // formData.versionId = verId;
+            // formData.verIds = versionIds;
             formData.cvData = result;
             
         } catch (Exception e) {
@@ -113,7 +151,12 @@ public with sharing class PDFGeneratorController {
         public Map<String, String> firstObjectFieldMap {get; set;} // Map of submitted data of first object
         public Map<String, String> secondObjectFieldMap {get; set;} // Map of submitted data of second object
         public Map<String, String> thirdObjectFieldMap {get; set;} // Map of submitted data of third object
+        public Map<String, String> otherObjectFieldMap {get; set;} // Map of submitted data of other object
         public List<ContentDocument> signatureList {get; set;} //List of signature in the submission data
+        // add by smit 
+        // public String signId {get; set;}
+        // public String versionId {get; set;}
+        // public List<Id> verIds {get; set;}
     }
 
 }

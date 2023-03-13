@@ -1,8 +1,9 @@
-<apex:page controller="PDFGeneratorController" renderAs="advanced_pdf" applyHtmlTag="false" showHeader="false" sidebar="false"
-  standardStylesheets="false" action='{!getPagesOfForm}'>
+<apex:page controller="PDFGeneratorController" renderAs="pdf" applyHtmlTag="false" showHeader="false" sidebar="false"
+  standardStylesheets="false" action="{!getPagesOfForm}">
 <!-- <apex:page controller="PDFGeneratorController"  applyHtmlTag="false" showHeader="false" sidebar="false"
   standardStylesheets="false" action='{!getPagesOfForm}'> -->
     <head>
+        <!-- <apex:includeScript value="{!$Resource.PDFGeneratorJs}" /> -->
         <style>
 
             @page {
@@ -57,6 +58,10 @@
                 background: #f2f2f2;
                 text-align: center;
                 font-weight: 600;
+            }
+            .image{
+                height: 200px;
+                width: 200px;
             }
 
         </style>
@@ -118,14 +123,60 @@
                     <div class="page-end"></div>
                 </apex:outputPanel>
 
+                <!-- Other Object Data -->
+                <apex:outputPanel rendered="{!isOtherObject}">
+                    <div class="page-data">
+                        <div class="pg-obj-titile">{!formData.otherObjectFieldMap['sobjectType']}</div>
+                        <apex:repeat value="{!formData.otherObjectFieldMap}" var="field">
+                            <apex:outputPanel rendered="{!field !='sobjectType'}">
+                                <tr>
+                                    <td class="field-txt">{!field}</td>
+                                    <td class="field-txt-data"> : {!formData.otherObjectFieldMap[field]}</td>
+                                    <apex:image url="/sfc/servlet.shepherd/version/download/{!formData.otherObjectFieldMap[field]}"/>
+                                </tr>
+                            </apex:outputPanel>
+                        </apex:repeat>
+                    </div>
+                    <div class="page-end"></div>
+                </apex:outputPanel>
 
 
-                <img src="{!formData.cvData}" />
-                <apex:image value="{!formData.cvData}" />
 
-               <img src="https://efficiency-enterprise-8293-dev-ed.scratch.my.salesforce.com/sfc/p/1y0000002YW8/a/1y000000Cd6y/1TVZX57KlymVMMCKV2FQorAkQDsAHqaUeWnvcdpmBmU" />
-                <apex:image url="https://efficiency-enterprise-8293-dev-ed.scratch.my.salesforce.com/sfc/p/1y0000002YW8/a/1y000000Cd6y/1TVZX57KlymVMMCKV2FQorAkQDsAHqaUeWnvcdpmBmU" />
+                <!-- <img src="{!formData.cvData}" />
+                <apex:image value="{!formData.cvData}" /> -->
 
+                <!-- <apex:image url="/sfc/servlet.shepherd/version/download/05D1y000000Cd6yEAC"/> -->
+                
+                <!-- <apex:image url="/sfc/servlet.shepherd/version/download/{!verId}"/>  -->
+                <!-- <apex:image url="/sfc/servlet.shepherd/version/download/{!fileVersion.Id}"/> -->
+                <!-- {!fileVersion} -->
+                <!-- <apex:repeat value="{!versionIds}" var="fileVersion">
+                    <img src="/sfc/servlet.shepherd/version/download/{!fileVersion}" class="image"/>
+                </apex:repeat>     -->
+                <!-- 0681y0000005NCx -->
+                <!-- 0681y0000005Ou8 -->
+                <!-- <apex:image url="/sfc/servlet.shepherd/version/renditionDownload?rendition=ORIGINAL_Png&versionId=0681y0000005Ou8&operationContext=CHATTER&contentId=05T1y000004Gate"/>  -->
+                <!-- <apex:image url="/sfc/servlet.shepherd/version/renditionDownload?rendition=ORIGINAL_Png&versionId=0681y0000005NCx&operationContext=CHATTER&contentId=05T1y000004GX4i"/>  -->
+                <!-- <apex:image url="/sfc/servlet.shepherd/version/renditionDownload?rendition=ORIGINAL_Png&versionId=0681y0000005OwO&operationContext=CHATTER&contentId=05T1y000004Gawx"/> -->
+                <!-- <apex:image url="/sfc/servlet.shepherd/version/renditionDownload?rendition=ORIGINAL_Png&versionId=0681y0000005Ouc&operationContext=CHATTER&contentId=05T1y000004GauI"/> -->
+                <!-- /sfc/servlet.shepherd/version/download/{!documentId}
+                /sfc/servlet.shepherd/version/download/{!verId}     -->
+
+                <!-- versionId url  -->
+                <!-- <apex:image url="/sfc/servlet.shepherd/version/renditionDownload?rendition=ORIGINAL_Png&versionId=0681y0000005NCx"/> -->
+
+                <!-- contentId and versionId url  -->
+                <!-- <apex:image url="sfc/servlet.shepherd/version/renditionDownload?rendition=ORIGINAL_Png&versionId=0681y0000005NCx&operationContext=CHATTER&contentId=05T1y000004GX4i"/> -->
+
+                <!-- <apex:image url="https://www.google.com/imgres?imgurl=https%3A%2F%2Fcdn.pixabay.com%2Fphoto%2F2014%2F02%2F27%2F16%2F10%2Fflowers-276014__340.jpg&imgrefurl=https%3A%2F%2Fpixabay.com%2Fimages%2Fsearch%2Fnature%2F&tbnid=kFu7-YLw-41T3M&vet=12ahUKEwif5oiD2s79AhV5HrcAHZ_OBrMQMygBegUIARDiAQ..i&docid=Ba_eiczVaD9-zM&w=534&h=340&itg=1&q=nature%20image&ved=2ahUKEwif5oiD2s79AhV5HrcAHZ_OBrMQMygBegUIARDiAQ" /> -->
+
+                <!-- <img src="data:image/png;base64,https://efficiency-enterprise-8293-dev-ed.scratch.my.salesforce.com/sfc/p/1y0000002YW8/a/1y000000Cd6y/1TVZX57KlymVMMCKV2FQorAkQDsAHqaUeWnvcdpmBmU" />
+                <apex:image value="data:image/png;base64,https://efficiency-enterprise-8293-dev-ed.scratch.my.salesforce.com/sfc/p/1y0000002YW8/a/1y000000Cd6y/1TVZX57KlymVMMCKV2FQorAkQDsAHqaUeWnvcdpmBmU" /> -->
+                <!-- <apex:image value="https://marketplace.canva.com/EAE-xnqWvJk/1/0/1600w/canva-retro-smoke-and-round-light-desktop-wallpapers-JLofAI27pCg.jpg" /> -->
+
+                <!-- <apex:image url="{!$Resource.sign}" /> -->
+                
+                
             </div>
         </div>
     </body>
