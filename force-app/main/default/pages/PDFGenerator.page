@@ -47,6 +47,10 @@
                 min-width: 150px;
             }
 
+            .field-txt-data {
+                min-width: 250px;
+            }
+
             .pg-obj-titile {
                 padding: 8px 0px 8px 8px;
                 margin-bottom: 8px;
@@ -74,7 +78,7 @@
                             <apex:outputPanel rendered="{!field !='sobjectType'}">
                                 <tr>
                                     <td class="field-txt">{!field}</td>
-                                    <td> : {!formData.firstObjectFieldMap[field]}</td>
+                                    <td class="field-txt-data"> : {!formData.firstObjectFieldMap[field]}</td>
                                 </tr>
                             </apex:outputPanel>
                         </apex:repeat>
@@ -90,7 +94,7 @@
                             <apex:outputPanel rendered="{!field !='sobjectType'}">
                                 <tr>
                                     <td class="field-txt">{!field}</td>
-                                    <td> : {!formData.secondObjectFieldMap[field]}</td>
+                                    <td class="field-txt-data"> : {!formData.secondObjectFieldMap[field]}</td>
                                 </tr>
                             </apex:outputPanel>
                         </apex:repeat>
@@ -106,13 +110,21 @@
                             <apex:outputPanel rendered="{!field !='sobjectType'}">
                                 <tr>
                                     <td class="field-txt">{!field}</td>
-                                    <td> : {!formData.thirdObjectFieldMap[field]}</td>
+                                    <td class="field-txt-data"> : {!formData.thirdObjectFieldMap[field]}</td>
                                 </tr>
                             </apex:outputPanel>
                         </apex:repeat>
                     </div>
                     <div class="page-end"></div>
                 </apex:outputPanel>
+
+
+
+                <img src="{!formData.cvData}" />
+                <apex:image value="{!formData.cvData}" />
+
+               <img src="https://efficiency-enterprise-8293-dev-ed.scratch.my.salesforce.com/sfc/p/1y0000002YW8/a/1y000000Cd6y/1TVZX57KlymVMMCKV2FQorAkQDsAHqaUeWnvcdpmBmU" />
+                <apex:image url="https://efficiency-enterprise-8293-dev-ed.scratch.my.salesforce.com/sfc/p/1y0000002YW8/a/1y000000Cd6y/1TVZX57KlymVMMCKV2FQorAkQDsAHqaUeWnvcdpmBmU" />
 
             </div>
         </div>
