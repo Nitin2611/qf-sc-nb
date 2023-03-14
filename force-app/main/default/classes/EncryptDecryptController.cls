@@ -1,4 +1,4 @@
-public class EncryptDecryptController {
+public without sharing class EncryptDecryptController {
 
     private Blob cryptoKey = blob.valueOf('QuickForm//Application//MVClouds');
 
@@ -12,10 +12,13 @@ public class EncryptDecryptController {
             encryptedData = EncodingUtil.base64Encode(encryptedBlob);
         }catch(Exception e) {
             System.debug('Error --> '+e);
+            error_handler.insert_errordata(e,'EncryptDecryptController','processEncryption');
+
         }
         return encryptedData;
     }
 
+    @AuraEnabled
     public static String processDecryption(String encryptedData) {
         String decryptedData = '';
         try{
@@ -26,6 +29,8 @@ public class EncryptDecryptController {
             decryptedData = decryptedBlob.toString();
         }catch(Exception e) {
             System.debug('Error --> '+e);
+            error_handler.insert_errordata(e,'EncryptDecryptController','processDecryption');
+
         }
         return decryptedData;
     }

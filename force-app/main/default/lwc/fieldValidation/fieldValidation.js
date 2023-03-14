@@ -7,9 +7,13 @@ import deletefield from '@salesforce/apex/fieldvalidation.deletefield';
 import savevalidation from '@salesforce/apex/fieldvalidation.savevalidation';
 import getfieldvalidation from '@salesforce/apex/fieldvalidation.getfieldvalidation';
 import copyfield from '@salesforce/apex/fieldvalidation.copyfield';
+// import designcss from '@salesforce/resourceUrl/designcss'
+// import {loadStyle,loadScript} from 'lightning/platformResourceLoader';
+import {ShowToastEvent} from 'lightning/platformShowToastEvent';
 
 
 export default class FieldValidation extends LightningElement {
+    
     @api tab;
     @api fieldId;
     @track fieldName = '';
@@ -43,14 +47,18 @@ export default class FieldValidation extends LightningElement {
     fieldsave = fieldsave;
     fielddelete = fielddelete;
 
+
+    //  renderedCallback() {
+    //     loadStyle(this, designcss);
+    // }
     @api
     get field() {
         try {
             if (this.fieldtype == 'Extra') {
                 let mydata1 = { data: [{ Name: this.fieldName }] };
                 mydata1.data.forEach(element => {
-                    if (element.Name == 'QFPHONE') { element.QFPHONE = true }
-                    else if (element.Name == 'QFFULLNAME') { element.QFFULLNAME = true }
+                    // if (element.Name == 'QFPHONE') { element.QFEMAILID = true }
+                    if (element.Name == 'QFFULLNAME') { element.QFFULLNAME = true }
                     else if (element.Name == 'QFADDRESS') { element.QFADDRESS = true }
                     else if (element.Name == 'QFNAME') { element.QFEMAILID = true }
                     else if (element.Name == 'QFEMAILID') { element.QFEMAILID = true }
@@ -76,8 +84,8 @@ export default class FieldValidation extends LightningElement {
             else {
                 let mydata1 = { data: [{ Name: this.fieldtype }] };
                 mydata1.data.forEach(element => {
-                    if (element.Name == 'PHONE') { element.QFPHONE = true }
-                    else if (element.Name == 'STRING' || element.Name == 'TEXTAREA' || element.Name == 'EMAIL' || element.Name == 'ENCRYPTEDSTRING') { element.QFEMAILID = true }
+                    // if (element.Name == 'PHONE') { element.QFEMAILID = true }
+                    if (element.Name == 'STRING' || element.Name == 'TEXTAREA' || element.Name == 'EMAIL' || element.Name == 'ENCRYPTEDSTRING') { element.QFEMAILID = true }
                     else if (element.Name == 'DOUBLE' || element.Name == 'CURRENCY' || element.Name == 'PERCENT') { element.QFNUMBER = true }
                     else if (element.Name == 'DATE') { element.QFDATE = true }
                     else if (element.Name == 'TIME') { element.QFTIME = true }
@@ -245,7 +253,7 @@ export default class FieldValidation extends LightningElement {
                 }
 
                 if (this.maximumvalue > this.minimumvalue) {
-                    savevalidation({ fieldId: this.fieldId, fieldValidation: this.fieldValidation })
+                    savevalidation({ fieldId: this.fieldId, fieldValidation: this.fieldValidation, Label: this.labelvalue })
                         .then(result => {
                             event.preventDefault();
                             const selectEvent = new CustomEvent('closevalidation', {
@@ -317,9 +325,31 @@ export default class FieldValidation extends LightningElement {
             }
             else if (event.currentTarget.dataset.title == 'MinimumDate') {
                 this.minimumdate = event.detail.value;
+                if (this.maximumdate && new Date(this.minimumdate) > new Date(this.maximumdate)) {
+                    this.maximumdate = '';
+                    // alert("Minimum value should be less than the Maximum value");
+                //     this.dispatchEvent(
+                //     new ShowToastEvent({
+                //         title: 'Minimum value should be less than the Maximum value',
+                //         message: error.body.message,
+                //         variant: 'error',
+                //     }),
+                // );
+                }
             }
             else if (event.currentTarget.dataset.title == 'MaximumDate') {
                 this.maximumdate = event.detail.value;
+                if (this.minimumdate && new Date(this.maximumdate) < new Date(this.minimumdate)) {
+                    this.minimumdate = '';
+                    // alert("Maximum value should be greater than the Minimum value");
+                //     this.dispatchEvent(
+                //     new ShowToastEvent({
+                //         title: 'Maximum value should be greater than the Minimum value',
+                //         message: error.body.message,
+                //         variant: 'error',
+                //     }),
+                // );
+                }
             }
         } catch (error) {
             console.log(error + 'Validation Error');
@@ -391,6 +421,7 @@ export default class FieldValidation extends LightningElement {
 
     RichTextData(event) {
         this.Richtextvalue = event.detail.value;
+        console.log('richtextdata----->' + this.Richtextvalue);
     }
 
     closerichtext() {
@@ -417,6 +448,12 @@ export default class FieldValidation extends LightningElement {
             this.maximumvalue = 128;
         }
     }
+    resetdatetime(event){
+            this.minimumdate ='';
+            this.maximumdate ='';
+    }
+
+
     @api
     get salutations() {
         return this.salutation;

@@ -111,12 +111,12 @@
         </template>
 
         <template if:true={activethankyou}>
-            <c-thankyou-component currentformid={ParentMessage} formname={FormName} cmptype="main" form-id={FormId}
-                id='thkmcp'></c-thankyou-component>
+              <c-thankyou-component currentformid={ParentMessage} formname={FormName} cmptype="main" form-id={FormId}
+                id='thkmcp' editing={activethankyou}></c-thankyou-component>
         </template>
 
         <template if:true={activepreview}>
-            <c-preview-form-cmp formid={ParentMessage} activepreview={activepreview}></c-preview-form-cmp>
+            <c-preview-form-cmp formid={ParentMessage}></c-preview-form-cmp>
         </template>
 
         <template if:true={activeqf_publish}>
@@ -124,11 +124,11 @@
         </template>
 
         <template if:true={activeDropZone}>
-            <div class="showtabs2">
+            <!-- <div class="showtabs2">
                 <div class="objects">
                     <c-object-mapping form-id={ParentMessage} id="objcmp"></c-object-mapping>
                 </div>
-            </div>
+            </div> -->
 
             <div class="child2">
 
@@ -155,8 +155,8 @@
                     </div>
                 </div>
 
-                <div class="fieldDiv1 slds-align_absolute-center slds-col slds-small-size_6-of-12  slds-size_1-of-1 slds-medium-size_8-of-12 slds-large-size_9-of-12"
-                    style="padding:2%; width:100%;background-color: white;">
+                <div class="fieldDiv1 slds-align_absolute-center slds-col"
+                    style="padding:2%; width:100%; background-color: white;">
 
                     <div class="myform" id="mainformid">
                         <template for:each={MainList} for:item="page">
@@ -183,13 +183,7 @@
 
                                         </div>
                                     </div>
-                                    <!-- <lightning-button-menu class="pageButtonMenu slds-dropdown_left"
-                                        alternative-text="Show menu" onselect={handleSelectPage} name={page.pageName}>
-                                <lightning-menu-item id={page.pageId} value="edit" label="Edit Page"
-                                            onclick={onEdit} prefix-icon-name="utility:edit"></lightning-menu-item>
-                                <lightning-menu-item id={page.pageId} value="delete" label="Delete Page"
-                                            onclick={ondelete} prefix-icon-name="utility:delete"></lightning-menu-item>
-                                    </lightning-button-menu> -->
+                                    
                                     <div class="PageButtonMenu">
                                         <button class="pageIconButton" data-record={page.pageName} data-id={page.pageId}
                                             onclick={openmodal2}><img class="pageIcons" src={editpageIcon}
@@ -224,40 +218,22 @@
                                                 placeholder={field.Field_Validations__c.Placeholder}
                                                 fieldtype={field.Field_Validations__c.fieldtype}
                                                 terms-and-condition-value={field.Field_Validations__c.Richtext}
-                                                hovercssproperty={hovercss}
-                                                focuscssproperty={focuscss}></c-quickformfieldcomponent>
+                                                hovercssproperty={hovercss} focuscssproperty={focuscss}
+                                                fieldcss={fcss}
+                                                labelcss={lcss}
+                                                is-field-view={isFieldView}
+                                                onpassfieldvalue={storefielddata} 
+                                                onnextbtval={next_val_by}
+                                                onnextbtvaltrue={next_val_true}></c-quickformfieldcomponent>
 
                                         </div>
-                                        <!-- <div id={field.ParentMessage} class="field" draggable="true"
-                                            data-order-id={field.Field_Order__c} data-page-record={field.Form_Page__c}
-                                            data-record={field.ParentMessage} data-ref="inner" ondragstart={onDragStart}
-                                            data-record-count={fieldcount} onclick={openfieldvalidation}
-                                            key={field.ParentMessage} data-field-name={field.Name} data-id={field.Id} data-field-id={field.Id}>
-                                            <c-quickformfieldcomponent formid={ParentMessage} t-view={field.Name}
-                                                compview="Full" disable-field="true" field-attribute=""
-                                                field-attribute-value="" field-id={field.ParentMessage}
-                                                page-id={page.ParentMessage} 
-                                                data-field-id={field.Id}
-                                                is-reqired={field.Field_Validations__c.isRequired}
-                                                helptextcheck={field.Field_Validations__c.isHelptext}
-                                                labelcheck={field.Field_Validations__c.isLabel}
-                                                labelvalue={field.Field_Validations__c.Label}
-                                                helptextvalue={field.Field_Validations__c.HelpText}
-                                                salutationvalue={field.Field_Validations__c.Salutation}
-                                                isdisabled={field.Field_Validations__c.isDisabled}
-                                                placeholder={field.Field_Validations__c.Placeholder}
-                                                fieldtype={field.Field_Validations__c.Fieldtype}
-                                                onstartsppiner={stopspinner}></c-quickformfieldcomponent>
-
-                                        </div> -->
+                                        
                                     </template>
                                 </div>
-                                <div class="footer" style="gap:20px;">
+                                <div class="footer">
 
                                     <template if:true={page.isIndexZero}>
 
-                                        <!-- <button class="nextbutton " variant="brand" value="Next" title="Next"
-                                            onclick={onaddpage1}>Submit</button> -->
                                         <template if:false={isIndexLast}>
                                             <button data-name="next" variant="brand" title="Next" onclick={onaddpage1}
                                                 class="btn1">Next</button>
@@ -268,7 +244,7 @@
                                         </template>
                                     </template>
 
-                                    <template if:true={page.isIndexIsNotLast}>
+                                    <template if:true={page.isIndexIsNotLast} style="gap:20px;">
 
                                         <button id={previousButton} variant="brand" value="Previous" title="Previous"
                                             onclick={onaddpage1} class="btn1">Previous</button>
@@ -276,8 +252,8 @@
                                             onclick={onaddpage1} class="btn1">Next</button>
 
                                     </template>
-                                    <!-- <template if:false={isIndexIsNotLast}> -->
-                                    <template if:true={page.isIndexLast}>
+                                    
+                                    <template if:true={page.isIndexLast} style="gap:20px;">
 
                                         <button variant="brand" value="Previous" title="Previous" onclick={onaddpage1}
                                             class="btn1">Previous</button>
@@ -396,8 +372,8 @@
                                     :
                                 </div>
                                 <div class="slds-col slds-size_6-of-12">
-                                    <textarea variant="label-hidden" name="description" onchange={changeDescription}
-                                        class="desc"></textarea>
+                                    <lightning-textarea variant="label-hidden" name="description" onchange={changeDescription}
+                                        class="desc"></lightning-textarea>
                                 </div>
                             </div>
                         </div>

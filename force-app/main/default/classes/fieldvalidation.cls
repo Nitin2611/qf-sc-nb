@@ -1,4 +1,4 @@
-public with sharing class fieldvalidation {
+public without sharing class fieldvalidation {
     public fieldvalidation() {
 
     }
@@ -10,7 +10,9 @@ public with sharing class fieldvalidation {
             return fieldvalidation.Field_Validations__c;
 
         } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
+         // error_handler.insert_errordata(e,'fieldvalidation','getfieldvalidation');
+            // throw new AuraHandledException(e.getMessage());
+            return null;
         }
     }
 
@@ -21,19 +23,22 @@ public with sharing class fieldvalidation {
             delete [SELECT Id FROM Form_Fields__c WHERE Id =: fieldId];
             
         } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
+         error_handler.insert_errordata(e,'fieldvalidation','deletefield');
+            // throw new AuraHandledException(e.getMessage());
         }
     }
     @AuraEnabled
-    public static void savevalidation(Id fieldId, String fieldValidation){
+    public static void savevalidation(Id fieldId, String fieldValidation, String Label){
         try {
             System.debug(fieldValidation);
-            fieldValidation = fieldValidation.replaceAll('"', '');
+            fieldValidation = fieldValidation;
             Form_Fields__c field = [SELECT Id,Field_Validations__c	FROM Form_Fields__c WHERE Id =: fieldId];
             field.Field_Validations__c = fieldValidation;
+            field.Field_Label__c = Label;
             update field;
         } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
+            error_handler.insert_errordata(e,'fieldvalidation','savevalidation');
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -44,7 +49,8 @@ public with sharing class fieldvalidation {
             insert(new Form_Fields__c(Field_Validations__c = field.Field_Validations__c ,Field_Mapping__c = field.Field_Mapping__c ,Field_Order__c =field.Field_Order__c,
             Field_Properties__c =field.Field_Properties__c ,Field_Styling__c = field.Field_Styling__c , Form__c = field.Form__c ,Form_Page__c = field.Form_Page__c,Name = field.Name,Mapped_Obj__c =field.Mapped_Obj__c));
         } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
+            error_handler.insert_errordata(e,'fieldvalidation','copyfield');
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 }
