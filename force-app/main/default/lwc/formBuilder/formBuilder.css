@@ -317,9 +317,9 @@ div.child2 {
     font-size: 1.5rem;
 }
 
-.slds-modal__footer {
+/* .slds-modal__footer {
     padding-bottom: 3% !important;
-}
+} */
 
 .slds-modal__header {
     background-color: rgb(243, 242, 242);
@@ -1489,7 +1489,7 @@ lightning-textarea {
     flex-direction: column;
     /* justify-content: center; */
     height: 100%;
-    padding: 20px 20px 5px 20px;
+    padding: 5px 20px 5px 20px;
 }
 
 .captcha_progressbar_preview_main {
@@ -1542,7 +1542,7 @@ lightning-textarea {
 
 .captcha_preview {
     width: 100%;
-    height: 65%;
+    height: 60%;
     background-color: #ffffff;
     margin-top: 5%;
     border: 1px solid #000000;
@@ -2298,4 +2298,11 @@ img {
 
 .btn1{
     padding-left: 0%;
+}
+
+.btn2{
+    padding-left: 0%;
+    color: rgba(0, 0, 0, 0) !important;
+    background-color: rgba(0, 0, 0, 0)!important;
+    border-color:  rgba(0, 0, 0, 0) !important;
 }

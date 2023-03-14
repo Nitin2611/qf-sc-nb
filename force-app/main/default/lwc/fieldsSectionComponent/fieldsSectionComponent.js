@@ -1,4 +1,8 @@
-import { LightningElement, track, api } from 'lwc';
+import {
+    LightningElement,
+    track,
+    api
+} from 'lwc';
 import GetFieldsMetaData from '@salesforce/apex/FormBuilderController.GetFieldsMetaData';
 import getFields from '@salesforce/apex/FormBuilderController.getFields';
 import ObjName from '@salesforce/apex/FormBuilderController.ObjName';
@@ -38,7 +42,9 @@ export default class FieldsSectionComponent extends LightningElement {
     connectedCallback() {
         console.log('>>>>> ' + this.formid);
 
-        ObjName({ id: this.formid }).then(result => {
+        ObjName({
+            id: this.formid
+        }).then(result => {
             this.ObjectName = result.split(',');
             console.log('result name --> ' + result);
             console.log('1', this.ObjectName.length);
@@ -69,7 +75,9 @@ export default class FieldsSectionComponent extends LightningElement {
             console.log(error);
         })
 
-        getFields({ id: this.formid }).then(result => {
+        getFields({
+            id: this.formid
+        }).then(result => {
             let LabelList = [];
             let OnlyLabelList = [];
             for (let i = 0; i < result.length; i++) {
@@ -100,6 +108,7 @@ export default class FieldsSectionComponent extends LightningElement {
 
             console.log(LabelList);
             console.log('FirstList' + LabelList[0]);
+            console.log('FirstList' + JSON.stringify(LabelList[0]));
             //console.log('RecordId is'+recordId);
             // this.pathrecord = result;
             console.log(typeof (result));
@@ -119,7 +128,9 @@ export default class FieldsSectionComponent extends LightningElement {
         }).catch(error => {
             this.isLoaded = false;
             console.log('OUTPUT fetch path>>: ');
-            console.log({ error });
+            console.log({
+                error
+            });
         });
 
         GetFieldsMetaData()
@@ -164,6 +175,15 @@ export default class FieldsSectionComponent extends LightningElement {
 
             });
     }
+
+    renderedCallback(){
+        var element = this.template.querySelector('.slds-icon-standard-account');
+        if (element != null){
+            console.log('queryselector slds-icon-standard-asset' , element.style);
+        }
+
+    }
+
     get hasMainObj() {
         return this.accfields.length != 0;
     }
@@ -193,12 +213,14 @@ export default class FieldsSectionComponent extends LightningElement {
                 this.activeDropZone = true;
                 const custEvent = new CustomEvent(
                     'callpasstoparent', {
-                    detail: this.activeDropZone
-                });
+                        detail: this.activeDropZone
+                    });
                 this.dispatchEvent(custEvent);
             }
         } catch (error) {
-            console.log("In the catch block ==> Method:** onDragStart ** || LWC:** fieldsSectionComponent ** ==>", { error });
+            console.log("In the catch block ==> Method:** onDragStart ** || LWC:** fieldsSectionComponent ** ==>", {
+                error
+            });
             console.log('above error ==>' + error);
         }
     }
@@ -208,8 +230,8 @@ export default class FieldsSectionComponent extends LightningElement {
         this.activeDropZone = false;
         const custEvent = new CustomEvent(
             'callpasstoparent', {
-            detail: this.activeDropZone
-        });
+                detail: this.activeDropZone
+            });
         this.dispatchEvent(custEvent);
 
 
@@ -222,7 +244,6 @@ export default class FieldsSectionComponent extends LightningElement {
         for (let i = 0; i < this.accfields.length; i++) {
 
             if (this.accfields[i].Label != name) {
-                //  console.log(this.accfields[i].Label);
                 tempararyArray.push(this.accfields[i]);
             }
         }
@@ -231,7 +252,6 @@ export default class FieldsSectionComponent extends LightningElement {
         for (let i = 0; i < this.confields.length; i++) {
 
             if (this.confields[i].Label != name) {
-                // console.log(this.accfields[i].Label);
                 tempararyArray.push(this.confields[i]);
             }
         }
@@ -240,7 +260,6 @@ export default class FieldsSectionComponent extends LightningElement {
         for (let i = 0; i < this.oppfields.length; i++) {
 
             if (this.oppfields[i].Label != name) {
-                //  console.log(this.accfields[i].Label);
                 tempararyArray.push(this.oppfields[i]);
             }
         }
@@ -249,12 +268,17 @@ export default class FieldsSectionComponent extends LightningElement {
     }
 
     @api AddField(name) {
-        console.log('Deleted field name --> '+name);
+        console.log('Deleted field name --> ' + name);
+        console.log('storeRemovedFields: ' + this.storeRemovedFields);
         const index = this.storeRemovedField.indexOf(name);
-        if (index !== -1) {
+        console.log('index of name:-'+index);
+        if (index != -1) {
             this.storeRemovedField.splice(index, 1);
+            console.log('storeRemovedField' + this.storeRemovedField);
         }
-        getFields({ id: this.formid }).then(result => {
+        getFields({
+            id: this.formid
+        }).then(result => {
             let LabelList = [];
             let OnlyLabelList = [];
             for (let i = 0; i < result.length; i++) {
@@ -283,10 +307,8 @@ export default class FieldsSectionComponent extends LightningElement {
             }
 
 
-            console.log(LabelList);
-            console.log('FirstList' + LabelList[0]);
-            //console.log('RecordId is'+recordId);
-            // this.pathrecord = result;
+            console.log({LabelList});
+            console.log('FirstList' + JSON.stringify(LabelList[0]));
             console.log(typeof (result));
             this.accfields = LabelList[0];
             if (LabelList.length != 1) {
@@ -299,12 +321,14 @@ export default class FieldsSectionComponent extends LightningElement {
 
             }
 
-            console.log('FolderURL after' + this.accfields.Label);
-            console.log('type' + this.accfields.Type);
+            console.log('FolderURL after' + this.accfields[0].Label);
+            console.log('type' + this.accfields[0].Type);
         }).catch(error => {
             this.isLoaded = false;
             console.log('OUTPUT fetch path>>: ');
-            console.log({ error });
+            console.log({
+                error
+            });
         });
     }
 }

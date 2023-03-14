@@ -208,6 +208,18 @@ label.slds-checkbox_toggle.slds-grid .slds-checkbox_faux_container {
     align-items: center;
     cursor: pointer;
 }
+.resetbtns {
+    width: 25%;
+    height: 3vh;
+    border: 1px solid black;
+    background: white;
+    margin: auto;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
 
 .resettext {
     padding: auto;
@@ -361,4 +373,82 @@ label.slds-checkbox_toggle.slds-grid .slds-checkbox_faux_container {
     .togglebox {
         padding-bottom: 7px;
     }
+}
+.saveModelButton {
+  background: #6699CC;
+  color: #fff;
+  width: 100px;
+  box-shadow: 0px 4px 4px rgb(0 0 0 / 25%);
+  border-radius: 28px;
+  font-size: medium;
+  font-weight: 400;
+  border: 0;
+  height: 35px;
+  width: 130px;
+  font-family: 'Roboto', sans-serif;
+}
+.cancelModelButton {
+  background: #DEDEDE;
+  color: #000;
+  width: 100px;
+  box-shadow: 0px 4px 4px rgb(0 0 0 / 25%);
+  border-radius: 28px;
+  font-size: medium;
+  font-weight: 400;
+  border: 0;
+  height: 35px;
+  width: 130px;
+  font-family: 'Roboto', sans-serif;
+}
+.richtextheader{
+    height: 60px;
+  background: #6699cc;
+  padding: 7px;
+  font-size: 30px !important;
+  font-weight: 500;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  color: #fff;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  justify-content: center;
+    display: flex;
+    align-items: center;
+}
+.richtextfooter{
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    border-bottom-left-radius: 28px;
+    border-bottom-right-radius: 28px;
+}
+
+.slds-tabs_scoped__nav, .slds-tabs--scoped__nav {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+}
+.slds-tabs_scoped__content, .slds-tabs--scoped__content {
+    border-bottom-left-radius: 0 !important; 
+    border-bottom-right-radius: 0 !important;
+    --sds-c-textarea-sizing-min-height: initial;
+}
+.slds-text-heading_medium, .slds-text-heading--medium {
+    font-size: 30px !important;
+}
+.richtextContent {
+  min-height: 260px;
+  background-color: white;
+}
+.htmlTab {
+  border: none;
+  --sds-c-textarea-sizing-min-height: initial;
+}
+.slds-tabs_scoped__nav {
+  border-right: none;
+  border-left: none;
+}
+.richtextModel .richtextTab,
+.richtextModel .htmlTab {
+  border: none;
+  --sds-c-textarea-sizing-min-height: initial;
 }

@@ -5,7 +5,7 @@ import QuickBotBody from '@salesforce/resourceUrl/QuickBotBody';
 import QuickBot_Cross from '@salesforce/resourceUrl/QuickBot_Cross';
 import QuickBotCSS from '@salesforce/resourceUrl/QuickBotCSS';
 import quickbotheader from '@salesforce/label/c.QuickBot_Header';
-import sendemail from '@salesforce/apex/qfhome.sendemail';
+import sendemail from '@salesforce/apex/QuickFormHome.sendemail';
 export default class QuickBot extends LightningElement {
     // @track spinnerdatatable = true;
     Logo = QuickBotLogo;

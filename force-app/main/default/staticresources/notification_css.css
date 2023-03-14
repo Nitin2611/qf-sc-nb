@@ -11,3 +11,12 @@
     color: #FFFFFF;
     height: var(--lwc-squareIconXxSmallContent,.875rem);
 }
+.checkboxdivnoti .slds-checkbox .slds-checkbox_faux{
+    border: 1px solid grey !important;
+}
+.notidivcont .slds-nowrap {
+    border: 1px solid grey !important;
+}
+.notiinputcls .slds-input{
+    border: 1px solid grey !important;
+}

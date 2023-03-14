@@ -1,11 +1,13 @@
-public with sharing class FormBuilderController{
+public without sharing class FormBuilderController{
     @AuraEnabled
     public static List<BaseField_mdt__mdt> GetFieldsMetaData(){
         try{
             List<BaseField_mdt__mdt> basefield = BaseField_mdt__mdt.getAll().values();
             return basefield;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','GetFieldsMetaData');
+            // throw new AuraHandledException(e.getMessage());
+            return null;
         }
     }
 
@@ -14,6 +16,7 @@ public with sharing class FormBuilderController{
         try{
             StylesWrapper sw = new StylesWrapper();
             sw.AlignmentProp = Alignment__mdt.getAll().values();
+            sw.Btn_AlignmentProp = Btn_Alignment__mdt.getAll().values();
             sw.BgPositionProp = Background_position__mdt.getAll().values();
             sw.BgRepeatProp = Background_repeat__mdt.getAll().values();
             sw.BgsizeProp = Background_size__mdt.getAll().values();
@@ -26,58 +29,68 @@ public with sharing class FormBuilderController{
             sw.FormDirectionProp = Form_Direction__mdt.getAll().values();
             return sw;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','GetStyles');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
     //Method to get Field's Data
     @Auraenabled
     public static List<List<String>> getFields(String id){
-        List<String> types = new List<String>();
-        Form__c FormDetail = [SELECT Id, Mapped_Objects__c
-                              FROM Form__c
-                              WHERE Id = :id
-                              LIMIT 1];
-        //List<Form_Page__c> pageList = [SELECT Id, Name, Page_Number__c FROM Form_Page__c WHERE Form__c=:Form_Id ORDER BY Page_Number__c ASC];
-        types = (FormDetail.Mapped_Objects__c).split(',');
-        System.debug(types);
-        List<List<String>> allFields = new List<List<String>>();
-        List<List<String>> allReqiredFields = new List<List<String>>();
-        List<Form_Fields__c> FieldList = new List<Form_Fields__c>();
+        try{
+            List<String> types = new List<String>();
+            Form__c FormDetail = [SELECT Id, Mapped_Objects__c
+                                  FROM Form__c
+                                  WHERE Id = :id
+                                  LIMIT 1];
+            //List<Form_Page__c> pageList = [SELECT Id, Name, Page_Number__c FROM Form_Page__c WHERE Form__c=:Form_Id ORDER BY Page_Number__c ASC];
+            types = (FormDetail.Mapped_Objects__c).split(',');
+            System.debug(types);
+            List<List<String>> allFields = new List<List<String>>();
+            List<List<String>> allReqiredFields = new List<List<String>>();
+            List<Form_Fields__c> FieldList = new List<Form_Fields__c>();
 
-        for (String type : types){
-            Map<String, Schema.SObjectType> schemaMap = Schema.getGlobalDescribe();
-            Schema.SObjectType leadSchema = schemaMap.get(type) ;
-            Map<String, Schema.SObjectField> fieldMap = leadSchema.getDescribe().fields.getMap();
-            List<String> Fields = new List<String>();
-            Set<String> compoundFields = new Set<String>();
-            Integer Position = 0;
-            for (String fieldName : fieldMap.keySet()){
-                if (fieldMap.get(fieldName).getDescribe().isUpdateable() && fieldMap.get(fieldName).getDescribe().isNillable() == true){
-                    // list of all field API name
-                    System.debug(fieldMap.get(fieldName).getDescribe().getCompoundFieldName() + '===> getfields');
-                    if (fieldMap.get(fieldName).getDescribe().getCompoundFieldName() == null){
-                        Fields.add(fieldMap.get(fieldName).getDescribe().getLabel() + './.' + fieldMap.get(fieldName).getDescribe().getType());
-                    } else{
-                        String temp = fieldMap.get(fieldName).getDescribe().getCompoundFieldName();
-                        String type1 = '';
-                        boolean hasAddress = temp.Contains('Address');
-                        if (hasAddress){
-                            type1 = 'QFADDRESS';
+            for (String type : types){
+                Map<String, Schema.SObjectType> schemaMap = Schema.getGlobalDescribe();
+                Schema.SObjectType leadSchema = schemaMap.get(type) ;
+                Map<String, Schema.SObjectField> fieldMap = leadSchema.getDescribe().fields.getMap();
+                List<String> Fields = new List<String>();
+                Set<String> compoundFields = new Set<String>();
+                Integer Position = 0;
+                for (String fieldName : fieldMap.keySet()){
+                    System.debug(fieldName);
+                    if ((fieldMap.get(fieldName).getDescribe().getRelationshipName() != null && fieldMap.get(fieldName).getDescribe().isUpdateable()) || ((fieldMap.get(fieldName).getDescribe().isUpdateable() && fieldMap.get(fieldName).getDescribe().isNillable() == true) && fieldMap.get(fieldName).getDescribe().getCalculatedFormula() == null)){
+                        // if (((fieldMap.get(fieldName).getDescribe().isUpdateable() && fieldMap.get(fieldName).getDescribe().isNillable() == true) && fieldMap.get(fieldName).getDescribe().getCalculatedFormula() == null)){
+                        // list of all field API name
+                        System.debug(fieldMap.get(fieldName).getDescribe().getCompoundFieldName() + '===> getfields');
+                        if (fieldMap.get(fieldName).getDescribe().getCompoundFieldName() == null){
+                            Fields.add(fieldMap.get(fieldName).getDescribe().getLabel() + './.' + fieldMap.get(fieldName).getDescribe().getType());
+                        } else{
+                            String temp = fieldMap.get(fieldName).getDescribe().getCompoundFieldName();
+                            String type1 = '';
+                            boolean hasAddress = temp.Contains('Address');
+                            if (hasAddress){
+                                type1 = 'QFADDRESS';
+                            }
+                            compoundFields.add(temp + './.' + type1);
                         }
-                        compoundFields.add(temp + './.' + type1);
                     }
                 }
+                Fields.addAll(compoundFields);
+                allFields.add(Fields);
             }
-            Fields.addAll(compoundFields);
-            allFields.add(Fields);
-        }
-        // if(!FieldList.isEmpty()){
-        //     insert FieldList;
-        // }
-        System.debug(allFields);
+            // if(!FieldList.isEmpty()){
+            //     insert FieldList;
+            // }
+            System.debug(allFields);
 
-        return allFields;
+            return allFields;
+
+        } catch (Exception e){
+            // error_handler.insert_errordata(e,'FormBuilderController','getfields');
+            return null;
+        }
     }
 
     @AuraEnabled
@@ -135,7 +148,9 @@ public with sharing class FormBuilderController{
             update nform;
             return nform.Form_Styling__c + ',' + URL;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','UploadFormImage');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -193,7 +208,9 @@ public with sharing class FormBuilderController{
             update nform;
             return nform.Page_CSS__c + ',' + URL;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','UploadPageImage');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -223,7 +240,9 @@ public with sharing class FormBuilderController{
             update nform;
             return nform.Form_Styling__c;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','RemoveFormImage');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -253,7 +272,9 @@ public with sharing class FormBuilderController{
             update nform;
             return nform.Page_CSS__c;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','RemovePageImage');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -296,6 +317,7 @@ public with sharing class FormBuilderController{
             update nform;
             result = nform.Button_CSS__c;
         } catch (Exception e){
+            error_handler.insert_errordata(e, 'FormBuilderController', 'StoreBtnStyles');
             result = e.getMessage();
         }
         return result;
@@ -311,7 +333,9 @@ public with sharing class FormBuilderController{
             update nform;
             return nform.Button_Position__c;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            error_handler.insert_errordata(e, 'FormBuilderController', 'StoreBtnposition');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -356,6 +380,7 @@ public with sharing class FormBuilderController{
             // nform.All_Field_Styling__c = Value;
             result = nform.Label_CSS__c;
         } catch (Exception e){
+            // error_handler.insert_errordata(e,'FormBuilderController','StoreLabelStyles');
             result = e.getMessage();
         }
         return result;
@@ -400,6 +425,7 @@ public with sharing class FormBuilderController{
             update nform;
             result = nform.Form_Styling__c;
         } catch (Exception e){
+            error_handler.insert_errordata(e, 'FormBuilderController', 'StoreFormStyles');
             result = e.getMessage();
         }
         return result;
@@ -445,6 +471,7 @@ public with sharing class FormBuilderController{
             // nform.Page_CSS__c = Value;
             result = nform.Page_CSS__c;
         } catch (Exception e){
+            error_handler.insert_errordata(e, 'FormBuilderController', 'StorePageStyles');
             result = e.getMessage();
         }
         return result;
@@ -489,6 +516,7 @@ public with sharing class FormBuilderController{
             update nform;
             result = nform.All_Field_Styling__c;
         } catch (Exception e){
+            error_handler.insert_errordata(e, 'FormBuilderController', 'StoreStyles');
             result = e.getMessage();
         }
         return result;
@@ -503,7 +531,9 @@ public with sharing class FormBuilderController{
             String str = '/sfc/servlet.shepherd/version/download/' + nform.FormBgID__c + ',' + '/sfc/servlet.shepherd/version/download/' + nform.PageBgID__c;
             return str;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','getBGImages');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -548,6 +578,7 @@ public with sharing class FormBuilderController{
             // nform.All_Field_Styling__c = Value;
             result = nform.All_Field_Hover__c;
         } catch (Exception e){
+            error_handler.insert_errordata(e, 'FormBuilderController', 'StoreHoverStyles');
             result = e.getMessage();
         }
         return result;
@@ -594,115 +625,24 @@ public with sharing class FormBuilderController{
             // nform.All_Field_Styling__c = Value;
             result = nform.All_Field_Focus__c;
         } catch (Exception e){
+            error_handler.insert_errordata(e, 'FormBuilderController', 'StoreFocusStyles');
             result = e.getMessage();
         }
         return result;
     }
 
     @AuraEnabled
-    public static string getFormCSS(String id){
+    public static Form__c formdetails(Id id){
         try{
-            Form__c nform = [SELECT Id, Form_Styling__c
+            Form__c nform = [SELECT Id, Name, Progress_Indicator__c, Captcha_Type__c, Button_CSS__c, Button_Position__c, Page_CSS__c, Form_Styling__c, All_Field_Hover__c, All_Field_Focus__c, All_Field_Styling__c, Label_CSS__c, FormBgID__c, PageBgID__c
                              FROM Form__c
                              WHERE Id = :id];
-            System.debug(nform);
-            System.debug('CSS->>>' + nform.Form_Styling__c);
-            return nform.Form_Styling__c;
+            System.debug('all styles :---> ' + nform);
+            return nform;
         } catch (Exception e){
-            String errorM = '';
-            errorM = 'Method getFormCSS ==> ' + 'Apex Form Id ==>' + id + '--Error Line Number ==>' + e.getLineNumber() + ' Error Message ==>' + e.getMessage();
-            return errorM;
-        }
-    }
-
-    @AuraEnabled
-    public static string getPageCSS(String id){
-        try{
-            Form__c nform = [SELECT Id, Page_CSS__c
-                             FROM Form__c
-                             WHERE Id = :id];
-            System.debug(nform);
-            System.debug('CSS->>>' + nform.Page_CSS__c);
-            return nform.Page_CSS__c;
-        } catch (Exception e){
-            String errorM = '';
-            errorM = 'Method getPageCSS ==> ' + 'Apex Form Id ==>' + id + '--Error Line Number ==>' + e.getLineNumber() + ' Error Message ==>' + e.getMessage();
-            return errorM;
-        }
-    }
-
-    @AuraEnabled
-    public static string getFieldCSS(String id){
-        try{
-            Form__c nform = [SELECT Id, All_Field_Styling__c
-                             FROM Form__c
-                             WHERE Id = :id];
-            System.debug(nform);
-            System.debug('CSS->>>' + nform.All_Field_Styling__c);
-            return nform.All_Field_Styling__c;
-        } catch (Exception e){
-            //throw new AuraHandledException(e.getMessage());
-            String errorM = '';
-            errorM = 'Apex Form Id ==>' + id + '--Error Line Number ==>' + e.getLineNumber() + ' Error Message ==>' + e.getMessage();
-            return errorM;
-        }
-    }
-
-    @AuraEnabled
-    public static string getHoverCSS(String id){
-        Form__c nform = [SELECT Id, All_Field_Hover__c
-                         FROM Form__c
-                         WHERE Id = :id];
-        System.debug(nform);
-        System.debug('CSS->>>' + nform.All_Field_Hover__c);
-        return nform.All_Field_Hover__c;
-    }
-
-    @AuraEnabled
-    public static string getFocusCSS(String id){
-        Form__c nform = [SELECT Id, All_Field_Focus__c
-                         FROM Form__c
-                         WHERE Id = :id];
-        System.debug(nform);
-        System.debug('CSS->>>' + nform.All_Field_Focus__c);
-        return nform.All_Field_Focus__c;
-    }
-
-    @AuraEnabled
-    public static string getLabelCSS(String id){
-        Form__c nform = [SELECT Id, Label_CSS__c
-                         FROM Form__c
-                         WHERE Id = :id];
-        System.debug(nform);
-        System.debug('CSS->>>' + nform.Label_CSS__c);
-        return nform.Label_CSS__c;
-    }
-
-    @AuraEnabled
-    public static string getButtonCSS(String id){
-        try{
-            Form__c nform = [SELECT Id, Button_CSS__c, Button_Position__c
-                             FROM Form__c
-                             WHERE Id = :id];
-            System.debug(nform);
-            System.debug('CSS->>>' + nform.Button_CSS__c + nform.Button_Position__c);
-            return nform.Button_CSS__c + nform.Button_Position__c;
-        } catch (Exception e){
-            String errorM = '';
-            errorM = 'Method getButtonCSS ==> ' + 'Apex Form Id ==>' + id + '--Error Line Number ==>' + e.getLineNumber() + ' Error Message ==>' + e.getMessage();
-            return errorM;
-        }
-    }
-
-    @AuraEnabled
-    public static string getprogressbar(String id){
-        try{
-            Form__c nform = [SELECT Id, Progress_Indicator__c
-                             FROM Form__c
-                             WHERE Id = :id];
-            return nform.Progress_Indicator__c;
-        } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','formdetails');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -714,7 +654,9 @@ public with sharing class FormBuilderController{
                              WHERE Id = :id];
             return nform.Captcha_Type__c;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','getcaptcha');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -727,13 +669,18 @@ public with sharing class FormBuilderController{
                                            ORDER BY Page_Number__c ASC];
             return pageList;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','GetFormPage');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
     public class StylesWrapper{
         @AuraEnabled
         public list<Alignment__mdt> AlignmentProp{ get; set; }
+
+        @AuraEnabled
+        public list<Btn_Alignment__mdt> Btn_AlignmentProp{ get; set; }
 
         @AuraEnabled
         public list<Background_position__mdt> BgPositionProp{ get; set; }
@@ -772,6 +719,7 @@ public with sharing class FormBuilderController{
         try{
             return Scale_Rating__mdt.getAll().values();
         } catch (Exception e){
+            // error_handler.insert_errordata(e,'FormBuilderController','getScaleRating');
             throw new AuraHandledException(e.getMessage());
         }
     }
@@ -789,12 +737,12 @@ public with sharing class FormBuilderController{
             Form_Fields__c field = new Form_Fields__c();
             List<Form_Fields__c> updateList = new List<Form_Fields__c>();
 
-            List<Form_Fields__c> fieldList = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c
+            List<Form_Fields__c> fieldList = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Mapping__c
                                               FROM Form_Fields__c
                                               WHERE Form_Page__c = :Form_Page_Id
                                               ORDER BY Field_Order__c ASC];
             if (Field_Page_Id != ''){
-                Form_Fields__c field_which_page_changed = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c
+                Form_Fields__c field_which_page_changed = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Mapping__c
                                                            FROM Form_Fields__c
                                                            WHERE Id = :Name
                                                            ORDER BY Field_Order__c ASC];
@@ -827,6 +775,7 @@ public with sharing class FormBuilderController{
                 List<String> Objects = form.split(',');
                 List<String> label = Name.split(',');
                 String firstLabel = label[0];
+                String secondlabel = label[1];
                 System.debug(firstLabel);
                 for (String type : Objects){
                     Map<String, Schema.SObjectType> schemaMap = Schema.getGlobalDescribe();
@@ -839,13 +788,13 @@ public with sharing class FormBuilderController{
                                 System.debug('##Field API Name=' + fieldName);// list of all field API na
                                 System.debug('type:=>' + type);
                                 field.Mapped_Obj__c = type;
-                                field.Field_Mapping__c = fieldName;
+                                field.Field_Mapping__c = fieldMap.get(fieldName) + '<!@!>' + type;
                             }
                         }
                     }
                 }
                 if (Position == 0){
-                    Form_Fields__c maxPostion = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c
+                    Form_Fields__c maxPostion = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Mapping__c
                                                  FROM Form_Fields__c
                                                  ORDER BY Field_Order__c DESC
                                                  LIMIT 1];
@@ -857,12 +806,13 @@ public with sharing class FormBuilderController{
                 field.Form__c = Form_Id;
                 field.Form_Page__c = Form_Page_Id;
                 field.Field_Order__c = Position + 1;
+                field.Field_Label__c = Name.split(',')[0].replace('QF', '').toUpperCase();
                 if (Name.split(',')[0].replace('QF', '') == 'RADIOBUTTON' || Name.split(',')[0].replace('QF', '') == 'CHECKBOX'){
                     field.Field_Validations__c = 'isRequired<!@!>false' + 
                              '?$`~isDisabled<!@!>false' + 
                              '?$`~isLabel<!@!>true' + 
                              '?$`~isHelpText<!@!>false' + 
-                             '?$`~Label<!@!>' + Name.split(',')[0].replace('QF', '') + 
+                             '?$`~Label<!@!>' + Name.split(',')[0].replace('QF', '').toUpperCase() + 
                              '?$`~HelpText<!@!>' + 
                              '?$`~isPlaceholder<!@!>false' + 
                              '?$`~Placeholder<!@!>' + 
@@ -884,7 +834,7 @@ public with sharing class FormBuilderController{
                              '?$`~isDisabled<!@!>false' + 
                              '?$`~isLabel<!@!>true' + 
                              '?$`~isHelpText<!@!>false' + 
-                             '?$`~Label<!@!>' + Name.split(',')[0].replace('QF', '') + 
+                             '?$`~Label<!@!>' + Name.split(',')[0].replace('QF', '').toUpperCase() + 
                              '?$`~HelpText<!@!>' + 
                              '?$`~isPlaceholder<!@!>false' + 
                              '?$`~Placeholder<!@!>' + 
@@ -906,7 +856,7 @@ public with sharing class FormBuilderController{
                              '?$`~isDisabled<!@!>false' + 
                              '?$`~isLabel<!@!>true' + 
                              '?$`~isHelpText<!@!>false' + 
-                             '?$`~Label<!@!>' + Name.split(',')[0].replace('QF', '') + 
+                             '?$`~Label<!@!>' + Name.split(',')[0].replace('QF', '').toUpperCase() + 
                              '?$`~HelpText<!@!>' + 
                              '?$`~isPlaceholder<!@!>false' + 
                              '?$`~Placeholder<!@!>' + 
@@ -930,17 +880,30 @@ public with sharing class FormBuilderController{
                 if (Name.split(',')[1] == 'Extra'){
                     field.Mapped_Obj__c = 'Extra';
                     field.Field_Mapping__c = field.Id + '<!@!>' + 'Extra';
+                } else if (Name.split(',')[1] == 'QFADDRESS'){
+                    for (String type : Objects){
+                        Map<String, Schema.SObjectType> schemaMap = Schema.getGlobalDescribe();
+                        Schema.SObjectType leadSchema = schemaMap.get(type) ;
+                        Map<String, Schema.SObjectField> fieldMap = leadSchema.getDescribe().fields.getMap();
+                        if (Name.split(',')[1] == 'QFADDRESS'){
+                            field.Mapped_Obj__c = type;
+                            field.Field_Mapping__c = fieldMap.get(Name.split(',')[0]) + '<!@!>' + type;
+                        }
+                    }
+
                 }
                 update field;
             }
-            fieldList = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Validations__c
+            fieldList = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Validations__c, Field_Mapping__c
                          FROM Form_Fields__c
                          WHERE Form__c = :Form_Id
                          ORDER BY Field_Order__c ASC];
             return fieldList;
 
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            error_handler.insert_errordata(e, 'FormBuilderController', 'CreateFieldRecord');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -952,7 +915,7 @@ public with sharing class FormBuilderController{
             List<Form_Fields__c> cuurentPageFields = new List<Form_Fields__c>();
 
             Form_Page__c currentFormPage = new Form_Page__c();
-            cuurentPageFields = [SELECT Id, Name, Field_Order__c, Form_Page__c
+            cuurentPageFields = [SELECT Id, Name, Field_Order__c, Form_Page__c, Field_Mapping__c
                                  FROM Form_Fields__c
                                  WHERE Form_Page__c = :Form_Page_Id
                                  ORDER BY Field_Order__c ASC];
@@ -1005,24 +968,26 @@ public with sharing class FormBuilderController{
 
                 for (Form_Fields__c ff : newPageFields){
                     ff.Form_Page__c = newFormPage.Id;
-                    }
-                update newPageFields;
                 }
+                update newPageFields;
+            }
 
             pageWrapper pw = new pageWrapper();
-            pw.fieldList = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Validations__c
-                              FROM Form_Fields__c
+            pw.fieldList = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Validations__c, Field_Mapping__c
+                            FROM Form_Fields__c
                             WHERE Form__c = :FormId
-                              ORDER BY Field_Order__c ASC];
-                pw.pageList = [SELECT Id, Name, Page_Number__c
-                               FROM Form_Page__c
-                               WHERE Form__c = :FormId
-                               ORDER BY Page_Number__c ASC];
-                return pw;
+                            ORDER BY Field_Order__c ASC];
+            pw.pageList = [SELECT Id, Name, Page_Number__c
+                           FROM Form_Page__c
+                           WHERE Form__c = :FormId
+                           ORDER BY Page_Number__c ASC];
+            return pw;
 
         } catch (Exception e){
             System.debug('Exception-->>' + e.getMessage() + '-->Line--' + e.getLineNumber() + '-->Stack-->' + e.getStackTraceString());
-            throw new AuraHandledException(e.getMessage());
+            error_handler.insert_errordata(e, 'FormBuilderController', 'addPageBreak');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -1041,14 +1006,16 @@ public with sharing class FormBuilderController{
             Form__c nform = [SELECT Id, Mapped_Objects__c
                              FROM Form__c
                              WHERE Id = :id];
-            Set<String> objectset = new Set<String>{ 'Account', 'Address', 'AlternativePaymentMethod', 'Announcement', 'AppAnalyticsQueryRequest', 'AppointmentTopicTimeSlot', 'ApptBundleAggrDurDnscale', 'ApptBundleAggrPolicy', 'ApptBundleConfig', 'ApptBundlePolicy', 'ApptBundlePolicySvcTerr', 'ApptBundlePropagatePolicy', 'ApptBundleRestrictPolicy', 'ApptBundleSortPolicy', 'Asset', 'AssetDowntimePeriod', 'AssetRelationship', 'AssetWarranty', 'AssociatedLocation', 'AttributeDefinition', 'AuthorizationForm', 'AuthorizationFormConsent', 'AuthorizationFormDataUse', 'AuthorizationFormText', 'BusinessBrand', 'CalendarView', 'Campaign', 'CampaignMember', 'CardPaymentMethod', 'Case', 'CollaborationGroup', 'CollaborationGroupRecord', 'CommSubscription', 'CommSubscriptionChannelType', 'CommSubscriptionConsent', 'CommSubscriptionTiming', 'ConsumptionRate', 'ConsumptionSchedule', 'Contact', 'ContactPointAddress', 'ContactPointConsent', 'ContactPointEmail', 'ContactPointPhone', 'ContactPointTypeConsent', 'ContactRequest', 'ContentVersion', 'Contract', 'ContractGroupPlan', 'ContractGroupPlanGroupClass', 'ContractLineItem', 'Customer', 'DataUseLegalBasis', 'DataUsePurpose', 'DigitalWallet', 'DuplicateRecordItem', 'DuplicateRecordSet', 'EngagementChannelType', 'Entitlement', 'EntitlementContact', 'Error_Handler__c', 'Event', 'Expense', 'ExpenseReport', 'ExpenseReportEntry', 'ExpressionFilter', 'ExpressionFilterCriteria', 'FinanceTransaction', 'FlowRecordRelation', 'GroupCensus', 'GroupCensusMember', 'GroupCensusMemberPlan', 'GroupClass', 'GroupClassContribution', 'Idea', 'Image', 'Individual', 'InsuranceContract', 'JobProfile', 'Lead', 'LegalEntity', 'ListEmail', 'ListEmailIndividualRecipient', 'ListEmailRecipientSource', 'Location', 'LocationGroup', 'LocationGroupAssignment', 'Macro', 'MacroInstruction', 'MaintenanceAsset', 'MaintenancePlan', 'MaintenanceWorkRule', 'Opportunity', 'Order', 'OrgMetric', 'OrgMetricScanResult', 'OrgMetricScanSummary', 'PartyConsent', 'Payment', 'PaymentAuthAdjustment', 'PaymentAuthorization', 'PaymentGateway', 'PaymentGatewayLog', 'PaymentGroup', 'PaymentLineInvoice', 'Pricebook2', 'ProcessException', 'Product2', 'ProductConsumed', 'ProductConsumptionSchedule', 'ProductItem', 'ProductRequest', 'ProductRequestLineItem', 'ProductRequired', 'ProductServiceCampaign', 'ProductServiceCampaignItem', 'ProductTransfer', 'ProductWarrantyTerm', 'ProfileSkill', 'ProfileSkillEndorsement', 'ProfileSkillUser', 'PromptAction', 'PromptError', 'QuickText', 'Recommendation', 'RecommendationResponse', 'RecordAction', 'Refund', 'RefundLinePayment', 'ResourceAbsence', 'ReturnOrder', 'ReturnOrderLineItem', 'SchedulingConstraint', 'Scorecard', 'ScorecardAssociation', 'ScorecardMetric', 'SearchPromotionRule', 'Seller', 'SerializedProduct', 'ServiceAppointment', 'ServiceContract', 'ServiceCrew', 'ServiceCrewMember', 'ServiceResource', 'ServiceResourcePreference', 'ServiceTerritory', 'ServiceTerritoryLocation', 'SetupAssistantStep', 'Shift', 'ShiftTemplate', 'Shipment', 'ShipmentItem', 'Solution', 'Task', 'TimeSheet', 'TimeSheetEntry', 'TravelMode', 'UnitOfMeasure', 'UserEmailPreferredPerson', 'WarrantyTerm', 'WorkAccess', 'WorkBadge', 'WorkBadgeDefinition', 'WorkOrder', 'WorkOrderLineItem', 'WorkPlan', 'WorkPlanSelectionRule', 'WorkPlanTemplate', 'WorkPlanTemplateEntry', 'WorkStep', 'WorkStepTemplate', 'WorkThanks', 'WorkType', 'WorkTypeGroup', 'WorkTypeGroupMember' };
+            // Set<String> objectset = new Set<String>{ 'Account', 'Address', 'AlternativePaymentMethod', 'Announcement', 'AppAnalyticsQueryRequest', 'AppointmentTopicTimeSlot', 'ApptBundleAggrDurDnscale', 'ApptBundleAggrPolicy', 'ApptBundleConfig', 'ApptBundlePolicy', 'ApptBundlePolicySvcTerr', 'ApptBundlePropagatePolicy', 'ApptBundleRestrictPolicy', 'ApptBundleSortPolicy', 'Asset', 'AssetDowntimePeriod', 'AssetRelationship', 'AssetWarranty', 'AssociatedLocation', 'AttributeDefinition', 'AuthorizationForm', 'AuthorizationFormConsent', 'AuthorizationFormDataUse', 'AuthorizationFormText', 'BusinessBrand', 'CalendarView', 'Campaign', 'CampaignMember', 'CardPaymentMethod', 'Case', 'CollaborationGroup', 'CollaborationGroupRecord', 'CommSubscription', 'CommSubscriptionChannelType', 'CommSubscriptionConsent', 'CommSubscriptionTiming', 'ConsumptionRate', 'ConsumptionSchedule', 'Contact', 'ContactPointAddress', 'ContactPointConsent', 'ContactPointEmail', 'ContactPointPhone', 'ContactPointTypeConsent', 'ContactRequest', 'ContentVersion', 'Contract', 'ContractGroupPlan', 'ContractGroupPlanGroupClass', 'ContractLineItem', 'Customer', 'DataUseLegalBasis', 'DataUsePurpose', 'DigitalWallet', 'DuplicateRecordItem', 'DuplicateRecordSet', 'EngagementChannelType', 'Entitlement', 'EntitlementContact', 'Error_Handler__c', 'Event', 'Expense', 'ExpenseReport', 'ExpenseReportEntry', 'ExpressionFilter', 'ExpressionFilterCriteria', 'FinanceTransaction', 'FlowRecordRelation', 'GroupCensus', 'GroupCensusMember', 'GroupCensusMemberPlan', 'GroupClass', 'GroupClassContribution', 'Idea', 'Image', 'Individual', 'InsuranceContract', 'JobProfile', 'Lead', 'LegalEntity', 'ListEmail', 'ListEmailIndividualRecipient', 'ListEmailRecipientSource', 'Location', 'LocationGroup', 'LocationGroupAssignment', 'Macro', 'MacroInstruction', 'MaintenanceAsset', 'MaintenancePlan', 'MaintenanceWorkRule', 'Opportunity', 'Order', 'OrgMetric', 'OrgMetricScanResult', 'OrgMetricScanSummary', 'PartyConsent', 'Payment', 'PaymentAuthAdjustment', 'PaymentAuthorization', 'PaymentGateway', 'PaymentGatewayLog', 'PaymentGroup', 'PaymentLineInvoice', 'Pricebook2', 'ProcessException', 'Product2', 'ProductConsumed', 'ProductConsumptionSchedule', 'ProductItem', 'ProductRequest', 'ProductRequestLineItem', 'ProductRequired', 'ProductServiceCampaign', 'ProductServiceCampaignItem', 'ProductTransfer', 'ProductWarrantyTerm', 'ProfileSkill', 'ProfileSkillEndorsement', 'ProfileSkillUser', 'PromptAction', 'PromptError', 'QuickText', 'Recommendation', 'RecommendationResponse', 'RecordAction', 'Refund', 'RefundLinePayment', 'ResourceAbsence', 'ReturnOrder', 'ReturnOrderLineItem', 'SchedulingConstraint', 'Scorecard', 'ScorecardAssociation', 'ScorecardMetric', 'SearchPromotionRule', 'Seller', 'SerializedProduct', 'ServiceAppointment', 'ServiceContract', 'ServiceCrew', 'ServiceCrewMember', 'ServiceResource', 'ServiceResourcePreference', 'ServiceTerritory', 'ServiceTerritoryLocation', 'SetupAssistantStep', 'Shift', 'ShiftTemplate', 'Shipment', 'ShipmentItem', 'Solution', 'Task', 'TimeSheet', 'TimeSheetEntry', 'TravelMode', 'UnitOfMeasure', 'UserEmailPreferredPerson', 'WarrantyTerm', 'WorkAccess', 'WorkBadge', 'WorkBadgeDefinition', 'WorkOrder', 'WorkOrderLineItem', 'WorkPlan', 'WorkPlanSelectionRule', 'WorkPlanTemplate', 'WorkPlanTemplateEntry', 'WorkStep', 'WorkStepTemplate', 'WorkThanks', 'WorkType', 'WorkTypeGroup', 'WorkTypeGroupMember' };
+
             List<String> obj1 = nform.Mapped_Objects__c.split(',');
             String result = nform.Mapped_Objects__c;
+            Map<String, String> objectIconMap = new Map<String, String>{ 'Account' => 'standard:account', 'Address' => 'standard:address', 'AlternativePaymentMethod' => 'standard:payment_gateway', 'Announcement' => 'standard:announcement', 'AppAnalyticsQueryRequest' => 'standard:care_request_reviewer', 'AppointmentTopicTimeSlot' => 'standard:timeslot', 'ApptBundleAggrDurDnscale' => 'standard:event', 'ApptBundleAggrPolicy' => 'standard:aggregation_policy', 'ApptBundleConfig' => 'standard:bundle_config', 'ApptBundlePolicy' => 'standard:bundle_policy', 'ApptBundlePolicySvcTerr' => 'standard:service_territory_policy', 'ApptBundlePropagatePolicy' => 'standard:propagation_policy', 'ApptBundleRestrictPolicy' => 'standard:restriction_policy', 'ApptBundleSortPolicy' => 'standard:sort_policy', 'Asset' => 'standard:asset_object', 'AssetDowntimePeriod' => 'standard:asset_downtime_period', 'AssetRelationship' => 'standard:asset_relationship', 'AssetWarranty' => 'standard:asset_warranty', 'AssociatedLocation' => 'standard:location', 'AttributeDefinition' => 'standard:variation_attribute_setup', 'AuthorizationForm' => 'standard:form', 'AuthorizationFormConsent' => 'standard:form', 'AuthorizationFormDataUse' => 'standard:form', 'AuthorizationFormText' => 'standard:form', 'BusinessBrand' => 'standard:store', 'CalendarView' => 'standard:date_input', 'Campaign' => 'standard:campaign', 'CampaignMember' => 'standard:campaign_members', 'CardPaymentMethod' => 'standard:contract_payment', 'Case' => 'standard:case', 'CollaborationGroup' => 'standard:live_chat', 'CollaborationGroupRecord' => 'standard:live_chat', 'CommSubscription' => 'standard:product_consumed', 'CommSubscriptionChannelType' => 'standard:channel_program_levels', 'CommSubscriptionConsent' => 'standard:product_consumed', 'CommSubscriptionTiming' => 'standard:channel_program_history', 'ConsumptionRate' => 'standard:product_consumed_state', 'ConsumptionSchedule' => 'standard:product_consumed_state', 'Contact' => 'standard:contact', 'ContactPointAddress' => 'standard:address', 'ContactPointConsent' => 'standard:address', 'ContactPointEmail' => 'standard:email', 'ContactPointPhone' => 'standard:call', 'ContactPointTypeConsent' => 'standard:contact', 'ContactRequest' => 'standard:contact_request', 'ContentVersion' => 'standard:file', 'Contract' => 'standard:contract', 'ContractGroupPlan' => 'standard:contract', 'ContractGroupPlanGroupClass' => 'standard:contract', 'ContractLineItem' => 'standard:contract_line_item', 'Customer' => 'standard:customer', 'DataUseLegalBasis' => 'standard:product_consumed', 'DataUsePurpose' => 'standard:product_consumed', 'DigitalWallet' => 'standard:connect_wallet', 'DuplicateRecordItem' => 'custom:custom49', 'DuplicateRecordSet' => 'standard:record', 'EngagementChannelType' => 'standard:channel_programs', 'Entitlement' => 'standard:entitlement', 'EntitlementContact' => 'standard:people', 'Event' => 'standard:event', 'Expense' => 'standard:expense', 'ExpenseReport' => 'standard:expense_report', 'ExpenseReportEntry' => 'standard:expense_report_entry', 'ExpressionFilter' => 'standard:filter', 'ExpressionFilterCriteria' => 'standard:filter_criteria', 'FinanceTransaction' => 'standard:crypto_transaction', 'FlowRecordRelation' => 'standard:flow', 'GroupCensus' => 'standard:groups', 'GroupCensusMember' => 'standard:groups', 'GroupCensusMemberPlan' => 'standard:groups', 'GroupClass' => 'standard:groups', 'GroupClassContribution' => 'standard:groups', 'Idea' => 'standard:solution', 'Image' => 'custom:custom38', 'Individual' => 'standard:individual', 'InsuranceContract' => 'standard:entitlement_policy', 'JobProfile' => 'standard:job_profile', 'Lead' => 'standard:lead', 'LegalEntity' => 'standard:entity', 'ListEmail' => 'standard:list_email', 'ListEmailIndividualRecipient' => 'standard:email', 'ListEmailRecipientSource' => 'standard:email', 'Location' => 'standard:location', 'LocationGroup' => 'standard:location', 'LocationGroupAssignment' => 'standard:location', 'Macro' => 'standard:macros', 'MacroInstruction' => 'standard:macros', 'MaintenanceAsset' => 'standard:maintenance_asset', 'MaintenancePlan' => 'standard:maintenance_plan', 'MaintenanceWorkRule' => 'standard:maintenance_work_rule', 'Opportunity' => 'standard:opportunity', 'Order' => 'standard:orders', 'OrgMetric' => 'standard:dashboard', 'OrgMetricScanResult' => 'standard:dashboard_ea', 'OrgMetricScanSummary' => 'standard:dashboard_component', 'PartyConsent' => 'custom:custom69', 'Payment' => 'standard:contract_payment', 'PaymentAuthAdjustment' => 'standard:contract_payment', 'PaymentAuthorization' => 'standard:contract_payment', 'PaymentGateway' => 'standard:payment_gateway', 'PaymentGatewayLog' => 'standard:payment_gateway', 'PaymentGroup' => 'standard:partner_fund_request', 'PaymentLineInvoice' => 'standard:payment_gateway', 'Pricebook2' => 'standard:pricebook', 'ProcessException' => 'standard:process_exception', 'Product2' => 'standard:product', 'ProductConsumed' => 'standard:product_consumed', 'ProductConsumptionSchedule' => 'standard:product_consumed', 'ProductItem' => 'standard:product_item', 'ProductRequest' => 'standard:product_request', 'ProductRequestLineItem' => 'standard:product_request_line_item', 'ProductRequired' => 'standard:product_required', 'ProductServiceCampaign' => 'standard:product_service_campaign', 'ProductServiceCampaignItem' => 'standard:product_service_campaign_item', 'ProductTransfer' => 'standard:product_transfer', 'ProductWarrantyTerm' => 'standard:product_warranty_term', 'ProfileSkill' => 'standard:skill', 'ProfileSkillEndorsement' => 'standard:skill_entity', 'ProfileSkillUser' => 'standard:skill_entity', 'PromptAction' => 'standard:prompt', 'PromptError' => 'standard:prompt', 'QuickText' => 'standard:quick_text', 'Recommendation' => 'standard:feedback', 'RecommendationResponse' => 'standard:feedback', 'RecordAction' => 'standard:record', 'Refund' => 'standard:contract_payment', 'RefundLinePayment' => 'standard:contract_payment', 'ResourceAbsence' => 'standard:resource_absence', 'ReturnOrder' => 'standard:return_order', 'ReturnOrderLineItem' => 'standard:return_order_line_item', 'SchedulingConstraint' => 'standard:scheduling_constraint', 'Scorecard' => 'standard:scan_card', 'ScorecardAssociation' => 'standard:scan_card', 'ScorecardMetric' => 'standard:scan_card', 'SearchPromotionRule' => 'standard:search', 'Seller' => 'standard:partner_fund_allocation', 'SerializedProduct' => 'standard:serialized_product', 'ServiceAppointment' => 'standard:service_appointment', 'ServiceContract' => 'standard:service_contract', 'ServiceCrew' => 'standard:service_crew', 'ServiceCrewMember' => 'standard:service_crew_member', 'ServiceResource' => 'standard:service_resource', 'ServiceResourcePreference' => 'standard:service_territory', 'ServiceTerritory' => 'standard:service_territory', 'ServiceTerritoryLocation' => 'standard:location', 'SetupAssistantStep' => 'standard:setup_modal', 'Shift' => 'standard:shift', 'ShiftTemplate' => 'standard:shift_template', 'Shipment' => 'standard:shipment', 'ShipmentItem' => 'standard:shipment', 'Solution' => 'standard:solution', 'Task' => 'standard:task', 'TimeSheet' => 'standard:timesheet', 'TimeSheetEntry' => 'standard:timesheet_entry', 'TravelMode' => 'standard:location', 'UnitOfMeasure' => 'custom:custom79', 'UserEmailPreferredPerson' => 'standard:people', 'WarrantyTerm' => 'standard:warranty_term', 'WorkAccess' => 'standard:work_queue', 'WorkBadge' => 'standard:skill_requirement', 'WorkBadgeDefinition' => 'standard:skill_requirement', 'WorkOrder' => 'standard:work_order', 'WorkOrderLineItem' => 'standard:work_order_item', 'WorkPlan' => 'standard:work_plan', 'WorkPlanSelectionRule' => 'standard:work_plan_rule', 'WorkPlanTemplate' => 'standard:work_plan_template', 'WorkPlanTemplateEntry' => 'standard:work_plan_template_entry', 'WorkStep' => 'standard:work_step', 'WorkStepTemplate' => 'standard:work_step_template', 'WorkThanks' => 'standard:thanks', 'WorkType' => 'standard:work_type', 'WorkTypeGroup' => 'standard:work_type_group', 'WorkTypeGroupMember' => 'standard:team_member' };
             Integer n = 0;
             for (String a : obj1){
                 String str = '';
-                if (objectset.contains(a)){
-                    str = 'standard:' + a.toLowerCase();
+                if (objectIconMap.containsKey(a)){
+                    str = objectIconMap.get(a);
                 } else{
                     if (n == 0){
                         str = 'custom:custom3';
@@ -1065,7 +1032,9 @@ public with sharing class FormBuilderController{
             }
             return result;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','ObjName');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -1114,42 +1083,43 @@ public with sharing class FormBuilderController{
                         Schema.SObjectType leadSchema = schemaMap.get(type) ;
                         Map<String, Schema.SObjectField> fieldMap = leadSchema.getDescribe().fields.getMap();
                         for (String fieldName : fieldMap.keySet()){
-                            if (fieldMap.get(fieldName).getDescribe().isUpdateable()){
-                                if (fieldMap.get(fieldName).getDescribe().isNillable() == false){
-                                    Position = Position + 1;
-                                    System.debug('##Field API Name=' + fieldName);
-                                    Form_Fields__c field = new Form_Fields__c();
-                                    //requiredFieldList.add(fieldMap.get(fieldName).getDescribe().getLabel()+'./.'+ fieldMap.get(fieldName).getDescribe().getType());
-                                    field.Mapped_Obj__c = type;
-                                    field.Field_Mapping__c = fieldName;
-                                    field.Name = fieldMap.get(fieldName).getDescribe().getLabel() + ',' + fieldMap.get(fieldName).getDescribe().getType() + ',isrequired';
-                                    field.Form__c = FormDetail.Id;
-                                    field.Form_Page__c = page_Id.Id;
-                                    field.Field_Order__c = Position + 1;
-                                    field.Field_Validations__c = 'isRequired<!@!>true' + 
-                                                             '?$`~isDisabled<!@!>false' + 
-                                                             '?$`~isLabel<!@!>true' + 
-                                                             '?$`~isHelpText<!@!>false' + 
-                                                             '?$`~Label<!@!>' + fieldName.split(',')[0] + 
-                                                             '?$`~HelpText<!@!>' + 
-                                                             '?$`~isPlaceholder<!@!>false' + 
-                                                             '?$`~Placeholder<!@!>' + 
-                                                             '?$`~Minimum<!@!>0' + 
-                                                             '?$`~Maximum<!@!>128' + 
-                                                             '?$`~isPrefix<!@!>false' + 
-                                                             '?$`~Prefix<!@!>' + 
-                                                             '?$`~Decimal<!@!>' + 
-                                                             '?$`~Richtext<!@!>' + 
-                                                             '?$`~MinimumTime<!@!>' + 
-                                                             '?$`~MaximumTime<!@!>' + 
-                                                             '?$`~MinimumDateTime<!@!>' + 
-                                                             '?$`~MaximumDateTime<!@!>' + 
-                                                             '?$`~MinimumDate<!@!>' + 
-                                                             '?$`~MaximumDate<!@!>' + 
-                                                             '?$`~Salutation<!@!>';
-                                    Fields.add(field);
-                                }
+
+                            if (fieldName == 'Name' || (!fieldMap.get(fieldName).getDescribe().isNillable() && !fieldMap.get(fieldName).getDescribe().isDefaultedOnCreate() && fieldMap.get(fieldName).getDescribe().isCreateable())){
+                                Position = Position + 1;
+                                System.debug('##Field API Name=' + fieldName);
+                                Form_Fields__c field = new Form_Fields__c();
+                                //requiredFieldList.add(fieldMap.get(fieldName).getDescribe().getLabel()+'./.'+ fieldMap.get(fieldName).getDescribe().getType());
+                                field.Mapped_Obj__c = type;
+                                field.Field_Mapping__c = fieldMap.get(fieldName) + '<!@!>' + type;
+                                field.Name = fieldMap.get(fieldName).getDescribe().getLabel() + ',' + fieldMap.get(fieldName).getDescribe().getType() + ',isrequired';
+                                field.Form__c = FormDetail.Id;
+                                field.Form_Page__c = page_Id.Id;
+                                field.Field_Order__c = Position + 1;
+                                field.Field_Label__c = fieldMap.get(fieldName).getDescribe().getLabel().toUpperCase();
+                                field.Field_Validations__c = 'isRequired<!@!>true' + 
+                                                         '?$`~isDisabled<!@!>false' + 
+                                                         '?$`~isLabel<!@!>true' + 
+                                                         '?$`~isHelpText<!@!>false' + 
+                                                         '?$`~Label<!@!>' + fieldMap.get(fieldName).getDescribe().getLabel().toUpperCase() + 
+                                                         '?$`~HelpText<!@!>' + 
+                                                         '?$`~isPlaceholder<!@!>false' + 
+                                                         '?$`~Placeholder<!@!>' + 
+                                                         '?$`~Minimum<!@!>0' + 
+                                                         '?$`~Maximum<!@!>128' + 
+                                                         '?$`~isPrefix<!@!>false' + 
+                                                         '?$`~Prefix<!@!>' + 
+                                                         '?$`~Decimal<!@!>' + 
+                                                         '?$`~Richtext<!@!>' + 
+                                                         '?$`~MinimumTime<!@!>' + 
+                                                         '?$`~MaximumTime<!@!>' + 
+                                                         '?$`~MinimumDateTime<!@!>' + 
+                                                         '?$`~MaximumDateTime<!@!>' + 
+                                                         '?$`~MinimumDate<!@!>' + 
+                                                         '?$`~MaximumDate<!@!>' + 
+                                                         '?$`~Salutation<!@!>';
+                                Fields.add(field);
                             }
+
                         }
                         iteration = iteration + 1;
                     }
@@ -1158,7 +1128,7 @@ public with sharing class FormBuilderController{
             }
             // List<Form_Fields__c> fieldList=[SELECT Id,Name,Form__c,Form_Page__c,Field_Order__c, Field_Validations__c FROM Form_Fields__c];
             // return fieldList;
-            List<Form_Fields__c> fieldList = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Validations__c
+            List<Form_Fields__c> fieldList = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Validations__c, Field_Mapping__c
                                               FROM Form_Fields__c
                                               WHERE Form__c = :id
                                               ORDER BY Field_Order__c ASC];
@@ -1167,6 +1137,7 @@ public with sharing class FormBuilderController{
         } catch (Exception e){
             System.debug('Error Line Number ==>' + e.getLineNumber() + ' Error Message ==>' + e.getMessage());
             System.debug('Error ==>' + e);
+            // error_handler.insert_errordata(e,'FormBuilderController','getFieldsRecords');
             return null;
         }
     }
@@ -1186,13 +1157,13 @@ public with sharing class FormBuilderController{
         Form_Fields__c dropField = new Form_Fields__c();
         try{
             if (String.isNotBlank(dropFieldId) && String.isNotBlank(currentFieldId)){
-                cuurentField = [SELECT Id, Name, Form_Page__c, Field_Order__c, Form__c
+                cuurentField = [SELECT Id, Name, Form_Page__c, Field_Order__c, Form__c, Field_Mapping__c
                                 FROM Form_Fields__c
                                 WHERE Id = :currentFieldId];
-                dropField = [SELECT Id, Name, Form_Page__c, Field_Order__c, Form__c
+                dropField = [SELECT Id, Name, Form_Page__c, Field_Order__c, Form__c, Field_Mapping__c
                              FROM Form_Fields__c
                              WHERE Id = :dropFieldId];
-                fieldList = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c
+                fieldList = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Mapping__c
                              FROM Form_Fields__c
                              WHERE Form__c = :cuurentField.Form__c
                              ORDER BY Field_Order__c ASC];
@@ -1235,7 +1206,7 @@ public with sharing class FormBuilderController{
                 update cuurentField;
             }
             List<Form_Fields__c> latestFieldList = new List<Form_Fields__c>();
-            latestFieldList = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Validations__c
+            latestFieldList = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Validations__c, Field_Mapping__c
                                FROM Form_Fields__c
                                WHERE Form__c = :cuurentField.Form__c
                                ORDER BY Field_Order__c ASC];
@@ -1243,6 +1214,7 @@ public with sharing class FormBuilderController{
         } catch (Exception e){
             System.debug('Error Line Number ==>' + e.getLineNumber() + ' Error Message ==>' + e.getMessage());
             System.debug('Error ==>' + e);
+            // error_handler.insert_errordata(e,'FormBuilderController','reOrderField');
             return null;
         }
     }
@@ -1268,7 +1240,7 @@ public with sharing class FormBuilderController{
                 newFormPage.Page_Number__c = totalPages + 1;
             }
             insert newFormPage;
-            List<Form_Fields__c> formFields = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Validations__c
+            List<Form_Fields__c> formFields = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Validations__c, Field_Mapping__c
                                                FROM Form_Fields__c
                                                ORDER BY Field_Order__c ASC];
             pageWrapper pw = new pageWrapper();
@@ -1279,7 +1251,9 @@ public with sharing class FormBuilderController{
                            ORDER BY Page_Number__c ASC];
             return pw;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','createPage');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -1329,7 +1303,7 @@ public with sharing class FormBuilderController{
             pagesToUpdate.add(updatedPage);
             pagesToUpdate.addAll(pagesAfter);
             update pagesToUpdate;
-            List<Form_Fields__c> formFields = [SELECT Id, Name, Form__c, Form_Page__c, Field_Validations__c, Field_Order__c
+            List<Form_Fields__c> formFields = [SELECT Id, Name, Form__c, Form_Page__c, Field_Validations__c, Field_Order__c, Field_Mapping__c
                                                FROM Form_Fields__c
                                                ORDER BY Field_Order__c ASC];
             pageWrapper pw = new pageWrapper();
@@ -1340,7 +1314,9 @@ public with sharing class FormBuilderController{
                            ORDER BY Page_Number__c ASC];
             return pw;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','updatePage');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -1352,7 +1328,7 @@ public with sharing class FormBuilderController{
                                  WHERE Id = :id];
             form.Name = rename;
             update form;
-            List<Form_Fields__c> formFields = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Validations__c
+            List<Form_Fields__c> formFields = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Validations__c, Field_Mapping__c
                                                FROM Form_Fields__c
                                                ORDER BY Field_Order__c ASC];
             pageWrapper pw = new pageWrapper();
@@ -1363,7 +1339,9 @@ public with sharing class FormBuilderController{
                            ORDER BY Page_Number__c ASC];
             return pw;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','renameform');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -1377,7 +1355,9 @@ public with sharing class FormBuilderController{
             update renameform;
             return rename;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','renameMainform');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -1410,7 +1390,7 @@ public with sharing class FormBuilderController{
                 }
                 update pagesToUpdate;
             }
-            List<Form_Fields__c> formFields = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Validations__c
+            List<Form_Fields__c> formFields = [SELECT Id, Name, Form__c, Form_Page__c, Field_Order__c, Field_Validations__c, Field_Mapping__c
                                                FROM Form_Fields__c
                                                ORDER BY Field_Order__c ASC];
             pageWrapper pw = new pageWrapper();
@@ -1421,21 +1401,22 @@ public with sharing class FormBuilderController{
                            ORDER BY Page_Number__c ASC];
             return pw;
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','deletePage');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
-    @AuraEnabled
-    public static Form__c formDetails(Id id){
-        try{
-            return [SELECT Id, Captcha_Type__c, Progress_Indicator__c, Name
-                    FROM Form__c
-                    where Id = :id];
-        } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
-        }
-    }
-
+    // @AuraEnabled
+    // public static Form__c formDetails(Id id){
+    //     try{
+    //         return [SELECT Id, Captcha_Type__c, Progress_Indicator__c, Name
+    //                 FROM Form__c
+    //                 where Id = :id];
+    //     } catch (Exception e){
+    //         throw new AuraHandledException(e.getMessage());
+    //     }
+    // }
     @AuraEnabled
     public static Form_Page__c pageDetails(Id FormId, Id PageId){
         try{
@@ -1443,10 +1424,12 @@ public with sharing class FormBuilderController{
                     from Form_Page__c
                     where Id = :PageId];
         } catch (Exception e){
-            throw new AuraHandledException(e.getMessage());
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 
+    // add by yash
     @AuraEnabled
     public static string editFormSubmit(String id, String name, String progressIn, String captcha){
         try{
@@ -1468,8 +1451,341 @@ public with sharing class FormBuilderController{
             update editForm;
             return 'saved successfully';
         } catch (Exception e){
+            error_handler.insert_errordata(e, 'FormBuilderController', 'editFormSubmit');
+            // throw new AuraHandledException(e.getMessage());
+            return null;
+        }
+    }
+
+    @AuraEnabled
+    public static referencewrapper getreferencevalue(Id id, String searchkey){
+        try{
+            String searchkeyword = '%' + searchkey + '%';
+            String Query;
+            Form_Fields__c MappedObject = [SELECT Id, Mapped_Obj__c, Field_Mapping__c
+                                           FROM Form_Fields__c
+                                           WHERE Id = :id];
+            String mappedfield = MappedObject.Field_Mapping__c.split('<!@!>')[0];
+            Schema.DescribeFieldResult f = Schema.getGlobalDescribe().get(MappedObject.Mapped_Obj__c).getDescribe().fields.getMap().get(mappedfield).getDescribe();
+            String Objects;
+            for (Schema.SObjectType reference : f.getReferenceTo()){
+                Objects = reference.getDescribe().getName();
+            }
+            if (searchkey == null || searchkey == 'undefined' || searchkey == ''){
+                Query = 'SELECT Id, Name FROM ' + Objects + ' Limit 1000';
+            } else{
+                Query = 'SELECT Id, Name FROM ' + Objects + ' WHERE Name LIKE :searchkeyword';
+            }
+            List<sObject> ObjectRecords = Database.query(Query);
+
+            referencewrapper rw = new referencewrapper();
+            rw.referenceval = ObjectRecords;
+
+            // Set<String> objectset = new Set<String>{ 'Account', 'Address', 'AlternativePaymentMethod', 'Announcement', 'AppAnalyticsQueryRequest', 'AppointmentTopicTimeSlot', 'ApptBundleAggrDurDnscale', 'ApptBundleAggrPolicy', 'ApptBundleConfig', 'ApptBundlePolicy', 'ApptBundlePolicySvcTerr', 'ApptBundlePropagatePolicy', 'ApptBundleRestrictPolicy', 'ApptBundleSortPolicy', 'Asset', 'AssetDowntimePeriod', 'AssetRelationship', 'AssetWarranty', 'AssociatedLocation', 'AttributeDefinition', 'AuthorizationForm', 'AuthorizationFormConsent', 'AuthorizationFormDataUse', 'AuthorizationFormText', 'BusinessBrand', 'CalendarView', 'Campaign', 'CampaignMember', 'CardPaymentMethod', 'Case', 'CollaborationGroup', 'CollaborationGroupRecord', 'CommSubscription', 'CommSubscriptionChannelType', 'CommSubscriptionConsent', 'CommSubscriptionTiming', 'ConsumptionRate', 'ConsumptionSchedule', 'Contact', 'ContactPointAddress', 'ContactPointConsent', 'ContactPointEmail', 'ContactPointPhone', 'ContactPointTypeConsent', 'ContactRequest', 'ContentVersion', 'Contract', 'ContractGroupPlan', 'ContractGroupPlanGroupClass', 'ContractLineItem', 'Customer', 'DataUseLegalBasis', 'DataUsePurpose', 'DigitalWallet', 'DuplicateRecordItem', 'DuplicateRecordSet', 'EngagementChannelType', 'Entitlement', 'EntitlementContact', 'Error_Handler__c', 'Event', 'Expense', 'ExpenseReport', 'ExpenseReportEntry', 'ExpressionFilter', 'ExpressionFilterCriteria', 'FinanceTransaction', 'FlowRecordRelation', 'GroupCensus', 'GroupCensusMember', 'GroupCensusMemberPlan', 'GroupClass', 'GroupClassContribution', 'Idea', 'Image', 'Individual', 'InsuranceContract', 'JobProfile', 'Lead', 'LegalEntity', 'ListEmail', 'ListEmailIndividualRecipient', 'ListEmailRecipientSource', 'Location', 'LocationGroup', 'LocationGroupAssignment', 'Macro', 'MacroInstruction', 'MaintenanceAsset', 'MaintenancePlan', 'MaintenanceWorkRule', 'Opportunity', 'Order', 'OrgMetric', 'OrgMetricScanResult', 'OrgMetricScanSummary', 'PartyConsent', 'Payment', 'PaymentAuthAdjustment', 'PaymentAuthorization', 'PaymentGateway', 'PaymentGatewayLog', 'PaymentGroup', 'PaymentLineInvoice', 'Pricebook2', 'ProcessException', 'Product2', 'ProductConsumed', 'ProductConsumptionSchedule', 'ProductItem', 'ProductRequest', 'ProductRequestLineItem', 'ProductRequired', 'ProductServiceCampaign', 'ProductServiceCampaignItem', 'ProductTransfer', 'ProductWarrantyTerm', 'ProfileSkill', 'ProfileSkillEndorsement', 'ProfileSkillUser', 'PromptAction', 'PromptError', 'QuickText', 'Recommendation', 'RecommendationResponse', 'RecordAction', 'Refund', 'RefundLinePayment', 'ResourceAbsence', 'ReturnOrder', 'ReturnOrderLineItem', 'SchedulingConstraint', 'Scorecard', 'ScorecardAssociation', 'ScorecardMetric', 'SearchPromotionRule', 'Seller', 'SerializedProduct', 'ServiceAppointment', 'ServiceContract', 'ServiceCrew', 'ServiceCrewMember', 'ServiceResource', 'ServiceResourcePreference', 'ServiceTerritory', 'ServiceTerritoryLocation', 'SetupAssistantStep', 'Shift', 'ShiftTemplate', 'Shipment', 'ShipmentItem', 'Solution', 'Task', 'TimeSheet', 'TimeSheetEntry', 'TravelMode', 'UnitOfMeasure', 'UserEmailPreferredPerson', 'WarrantyTerm', 'WorkAccess', 'WorkBadge', 'WorkBadgeDefinition', 'WorkOrder', 'WorkOrderLineItem', 'WorkPlan', 'WorkPlanSelectionRule', 'WorkPlanTemplate', 'WorkPlanTemplateEntry', 'WorkStep', 'WorkStepTemplate', 'WorkThanks', 'WorkType', 'WorkTypeGroup', 'WorkTypeGroupMember' };
+            Map<String, String> objectIconMap = new Map<String, String>{ 'Account' => 'standard:account', 'Address' => 'standard:address', 'AlternativePaymentMethod' => 'standard:payment_gateway', 'Announcement' => 'standard:announcement', 'AppAnalyticsQueryRequest' => 'standard:care_request_reviewer', 'AppointmentTopicTimeSlot' => 'standard:timeslot', 'ApptBundleAggrDurDnscale' => 'standard:event', 'ApptBundleAggrPolicy' => 'standard:aggregation_policy', 'ApptBundleConfig' => 'standard:bundle_config', 'ApptBundlePolicy' => 'standard:bundle_policy', 'ApptBundlePolicySvcTerr' => 'standard:service_territory_policy', 'ApptBundlePropagatePolicy' => 'standard:propagation_policy', 'ApptBundleRestrictPolicy' => 'standard:restriction_policy', 'ApptBundleSortPolicy' => 'standard:sort_policy', 'Asset' => 'standard:asset_object', 'AssetDowntimePeriod' => 'standard:asset_downtime_period', 'AssetRelationship' => 'standard:asset_relationship', 'AssetWarranty' => 'standard:asset_warranty', 'AssociatedLocation' => 'standard:location', 'AttributeDefinition' => 'standard:variation_attribute_setup', 'AuthorizationForm' => 'standard:form', 'AuthorizationFormConsent' => 'standard:form', 'AuthorizationFormDataUse' => 'standard:form', 'AuthorizationFormText' => 'standard:form', 'BusinessBrand' => 'standard:store', 'CalendarView' => 'standard:date_input', 'Campaign' => 'standard:campaign', 'CampaignMember' => 'standard:campaign_members', 'CardPaymentMethod' => 'standard:contract_payment', 'Case' => 'standard:case', 'CollaborationGroup' => 'standard:live_chat', 'CollaborationGroupRecord' => 'standard:live_chat', 'CommSubscription' => 'standard:product_consumed', 'CommSubscriptionChannelType' => 'standard:channel_program_levels', 'CommSubscriptionConsent' => 'standard:product_consumed', 'CommSubscriptionTiming' => 'standard:channel_program_history', 'ConsumptionRate' => 'standard:product_consumed_state', 'ConsumptionSchedule' => 'standard:product_consumed_state', 'Contact' => 'standard:contact', 'ContactPointAddress' => 'standard:address', 'ContactPointConsent' => 'standard:address', 'ContactPointEmail' => 'standard:email', 'ContactPointPhone' => 'standard:call', 'ContactPointTypeConsent' => 'standard:contact', 'ContactRequest' => 'standard:contact_request', 'ContentVersion' => 'standard:file', 'Contract' => 'standard:contract', 'ContractGroupPlan' => 'standard:contract', 'ContractGroupPlanGroupClass' => 'standard:contract', 'ContractLineItem' => 'standard:contract_line_item', 'Customer' => 'standard:customer', 'DataUseLegalBasis' => 'standard:product_consumed', 'DataUsePurpose' => 'standard:product_consumed', 'DigitalWallet' => 'standard:connect_wallet', 'DuplicateRecordItem' => 'custom:custom49', 'DuplicateRecordSet' => 'standard:record', 'EngagementChannelType' => 'standard:channel_programs', 'Entitlement' => 'standard:entitlement', 'EntitlementContact' => 'standard:people', 'Event' => 'standard:event', 'Expense' => 'standard:expense', 'ExpenseReport' => 'standard:expense_report', 'ExpenseReportEntry' => 'standard:expense_report_entry', 'ExpressionFilter' => 'standard:filter', 'ExpressionFilterCriteria' => 'standard:filter_criteria', 'FinanceTransaction' => 'standard:crypto_transaction', 'FlowRecordRelation' => 'standard:flow', 'GroupCensus' => 'standard:groups', 'GroupCensusMember' => 'standard:groups', 'GroupCensusMemberPlan' => 'standard:groups', 'GroupClass' => 'standard:groups', 'GroupClassContribution' => 'standard:groups', 'Idea' => 'standard:solution', 'Image' => 'custom:custom38', 'Individual' => 'standard:individual', 'InsuranceContract' => 'standard:entitlement_policy', 'JobProfile' => 'standard:job_profile', 'Lead' => 'standard:lead', 'LegalEntity' => 'standard:entity', 'ListEmail' => 'standard:list_email', 'ListEmailIndividualRecipient' => 'standard:email', 'ListEmailRecipientSource' => 'standard:email', 'Location' => 'standard:location', 'LocationGroup' => 'standard:location', 'LocationGroupAssignment' => 'standard:location', 'Macro' => 'standard:macros', 'MacroInstruction' => 'standard:macros', 'MaintenanceAsset' => 'standard:maintenance_asset', 'MaintenancePlan' => 'standard:maintenance_plan', 'MaintenanceWorkRule' => 'standard:maintenance_work_rule', 'Opportunity' => 'standard:opportunity', 'Order' => 'standard:orders', 'OrgMetric' => 'standard:dashboard', 'OrgMetricScanResult' => 'standard:dashboard_ea', 'OrgMetricScanSummary' => 'standard:dashboard_component', 'PartyConsent' => 'custom:custom69', 'Payment' => 'standard:contract_payment', 'PaymentAuthAdjustment' => 'standard:contract_payment', 'PaymentAuthorization' => 'standard:contract_payment', 'PaymentGateway' => 'standard:payment_gateway', 'PaymentGatewayLog' => 'standard:payment_gateway', 'PaymentGroup' => 'standard:partner_fund_request', 'PaymentLineInvoice' => 'standard:payment_gateway', 'Pricebook2' => 'standard:pricebook', 'ProcessException' => 'standard:process_exception', 'Product2' => 'standard:product', 'ProductConsumed' => 'standard:product_consumed', 'ProductConsumptionSchedule' => 'standard:product_consumed', 'ProductItem' => 'standard:product_item', 'ProductRequest' => 'standard:product_request', 'ProductRequestLineItem' => 'standard:product_request_line_item', 'ProductRequired' => 'standard:product_required', 'ProductServiceCampaign' => 'standard:product_service_campaign', 'ProductServiceCampaignItem' => 'standard:product_service_campaign_item', 'ProductTransfer' => 'standard:product_transfer', 'ProductWarrantyTerm' => 'standard:product_warranty_term', 'ProfileSkill' => 'standard:skill', 'ProfileSkillEndorsement' => 'standard:skill_entity', 'ProfileSkillUser' => 'standard:skill_entity', 'PromptAction' => 'standard:prompt', 'PromptError' => 'standard:prompt', 'QuickText' => 'standard:quick_text', 'Recommendation' => 'standard:feedback', 'RecommendationResponse' => 'standard:feedback', 'RecordAction' => 'standard:record', 'Refund' => 'standard:contract_payment', 'RefundLinePayment' => 'standard:contract_payment', 'ResourceAbsence' => 'standard:resource_absence', 'ReturnOrder' => 'standard:return_order', 'ReturnOrderLineItem' => 'standard:return_order_line_item', 'SchedulingConstraint' => 'standard:scheduling_constraint', 'Scorecard' => 'standard:scan_card', 'ScorecardAssociation' => 'standard:scan_card', 'ScorecardMetric' => 'standard:scan_card', 'SearchPromotionRule' => 'standard:search', 'Seller' => 'standard:partner_fund_allocation', 'SerializedProduct' => 'standard:serialized_product', 'ServiceAppointment' => 'standard:service_appointment', 'ServiceContract' => 'standard:service_contract', 'ServiceCrew' => 'standard:service_crew', 'ServiceCrewMember' => 'standard:service_crew_member', 'ServiceResource' => 'standard:service_resource', 'ServiceResourcePreference' => 'standard:service_territory', 'ServiceTerritory' => 'standard:service_territory', 'ServiceTerritoryLocation' => 'standard:location', 'SetupAssistantStep' => 'standard:setup_modal', 'Shift' => 'standard:shift', 'ShiftTemplate' => 'standard:shift_template', 'Shipment' => 'standard:shipment', 'ShipmentItem' => 'standard:shipment', 'Solution' => 'standard:solution', 'Task' => 'standard:task', 'TimeSheet' => 'standard:timesheet', 'TimeSheetEntry' => 'standard:timesheet_entry', 'TravelMode' => 'standard:location', 'UnitOfMeasure' => 'custom:custom79', 'UserEmailPreferredPerson' => 'standard:people', 'WarrantyTerm' => 'standard:warranty_term', 'WorkAccess' => 'standard:work_queue', 'WorkBadge' => 'standard:skill_requirement', 'WorkBadgeDefinition' => 'standard:skill_requirement', 'WorkOrder' => 'standard:work_order', 'WorkOrderLineItem' => 'standard:work_order_item', 'WorkPlan' => 'standard:work_plan', 'WorkPlanSelectionRule' => 'standard:work_plan_rule', 'WorkPlanTemplate' => 'standard:work_plan_template', 'WorkPlanTemplateEntry' => 'standard:work_plan_template_entry', 'WorkStep' => 'standard:work_step', 'WorkStepTemplate' => 'standard:work_step_template', 'WorkThanks' => 'standard:thanks', 'WorkType' => 'standard:work_type', 'WorkTypeGroup' => 'standard:work_type_group', 'WorkTypeGroupMember' => 'standard:team_member' };
+
+            if (objectIconMap.containsKey(Objects)){
+                rw.objicon = objectIconMap.get(Objects);
+            } else{
+                rw.objicon = 'custom:custom3';
+            }
+
+            return rw;
+        } catch (Exception e){
+            // error_handler.insert_errordata(e,'FormBuilderController','getreferencevalue');
+            return null;
+            // throw new AuraHandledException(e.getMessage());
+        }
+    }
+
+    @AuraEnabled
+    public static Map<String, String> getpicklistvalue(Id id){
+        try{
+
+            Form_Fields__c MappedObject = [SELECT Id, Mapped_Obj__c, Field_Mapping__c
+                                           FROM Form_Fields__c
+                                           WHERE Id = :id];
+            String mappedfield = MappedObject.Field_Mapping__c.split('<!@!>')[0];
+            Map<String, Schema.SObjectType> gd = Schema.getGlobalDescribe();
+            Set<String> objectKeys = gd.keySet();
+            Map<String, String> picklistvalue = new Map<String, String>();
+
+            //Iterate through all objects to locate ACCOUNT Object
+
+            Schema.SObjectType systemObjectType = gd.get(MappedObject.Mapped_Obj__c);
+            Schema.DescribeSObjectResult r = systemObjectType.getDescribe();
+            Map<String, Schema.SObjectField> M = r.fields.getMap();
+            Set<String> fieldNames = M.keySet();
+            Schema.SObjectField field = M.get(mappedfield);
+            Schema.DescribeFieldResult fieldDesc = field.getDescribe();
+
+
+            //extract the picklist values
+            // System.debug(fieldDesc.getPicklistValues() + ' ::::::::::::::::::::::::::::::::::: ') ;
+            for (Integer i = 0; i < fieldDesc.getPicklistValues().size(); i++){
+                picklistvalue.put(fieldDesc.getPicklistValues()[i].getLabel(), fieldDesc.getPicklistValues()[i].getValue());
+            }
+
+
+            return picklistvalue;
+        } catch (Exception e){
+            // throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','getpicklistvalue');
+            return null;
+        }
+    }
+
+    @AuraEnabled
+    public static String signatureSave(String fieldId, String fieldData){
+        try{
+            // Form_Fields__c formField = [SELECT Id, Form__c
+            //                             FROM Form_Fields__c
+            //                             WHERE Id = :fieldId];
+            String s = fieldData.replaceFirst('data:image/png;base64,', '');
+            ContentVersion conVer = new ContentVersion();
+            conVer.title = 'signature1456';
+            conVer.versionData = EncodingUtil.base64decode(s);
+            conVer.PathOnClient = 'signature16.png';
+            insert conVer;
+            System.debug('yash shsh');
+
+            String contentId = [select id, ContentDocumentId
+                                from ContentVersion
+                                WHERE Id = :conVer.Id].ContentDocumentId;
+            ContentDocumentLink cl = new ContentDocumentLink();
+            cl.ContentDocumentId = contentId;
+            cl.LinkedEntityId = fieldId;
+            cl.ShareType = 'V';
+            cl.Visibility = 'AllUsers';
+            insert cl;
+            System.debug('yash shsh tests' + contentId);
+
+            // return contentId;
+            return conVer.Id;
+        } catch (Exception e){
+            // GenericException Exp = ExceptionHandler.logException(e, 'QFFormFieldComponentController', 'signatureSave');
+            System.debug('error :-' + e);
+            return null;
+        }
+    }
+
+    @AuraEnabled
+    public static Id SaveFile(String fieldId, String fileName, String base64Data, String contentType){
+        try{
+            base64Data = EncodingUtil.urlDecode(base64Data, 'UTF-8');
+            ContentVersion cv = new ContentVersion();
+            cv.Title = fileName;
+            cv.PathOnClient = fileName;
+            cv.VersionData = EncodingUtil.base64Decode(base64Data);
+            cv.IsMajorVersion = true;
+            Insert cv;
+
+            Form_Fields__c formField = [SELECT Id, Form__c
+                                        FROM Form_Fields__c
+                                        WHERE Id = :fieldId];
+            String conDocId = [SELECT ContentDocumentId
+                               FROM ContentVersion
+                               WHERE Id = :cv.Id].ContentDocumentId;
+            ContentDocumentLink cl = new ContentDocumentLink();
+            cl.ContentDocumentId = conDocId;
+            cl.LinkedEntityId = formField.Form__c;
+            cl.ShareType = 'V';
+            cl.Visibility = 'AllUsers';
+            insert cl;
+
+            return conDocId;
+        } catch (Exception e){
+            // GenericException Exp = ExceptionHandler.logException(e, 'QFFormFieldComponentController', 'SaveFile');
+            // error_handler.insert_errordata(e,'FormBuilderController','SaveFile');
+            return null;
+        }
+    }
+
+    public class referencewrapper{
+        @AuraEnabled
+        public list<SObject> referenceval{ get; set; }
+
+        @AuraEnabled
+        public String objicon{ get; set; }
+
+    }
+
+    @AuraEnabled
+    public static List<Form_Fields__c> getFieldsRecords_page(Id id){
+        try{
+            List<Form_Fields__c> page_fild_list = [SELECT Name, Field_Mapping__c, Field_Validations__c
+                                                   From Form_Fields__c
+                                                   where Form_Page__c = :ID];
+
+            return page_fild_list;
+
+        } catch (Exception e){
+            // throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','getreferencevalue');
+            return null;
+        }
+    }
+
+    @AuraEnabled
+    public static List<Form__c> GetFormObject(String id){
+        try{
+            List<Form__c> form_obj = [SELECT Mapped_Objects__c
+                                      From Form__c
+                                      where ID = :Id];
+
+            return form_obj;
+
+        } catch (Exception e){
+            // throw new AuraHandledException(e.getMessage());
+            // error_handler.insert_errordata(e,'FormBuilderController','getreferencevalue');
+            return null;
+        }
+    }
+
+    @AuraEnabled
+    public static SubId createrecord(Form_Submission__c acc, SObject first_obj_list, String sin_id){
+        // public static void createrecord(Account acc){
+        try{
+            System.debug('yasj ' + acc);
+            System.debug('yasj first_obj_list' + first_obj_list);
+            System.debug(acc.name);
+            String signatureid;
+            insert acc;
+            insert first_obj_list;
+            Form__c form = [SELECT Total_Submissions__c
+                            FROM Form__c
+                            WHERE Id = :acc.Form__c];
+            form.Total_Submissions__c += 1;
+            update form;
+            String sub_id = acc.Id;
+            if (sin_id != 'undefined' || sin_id != '' || sin_id != null){
+                signatureid = signatureSave(sub_id, sin_id);
+                System.debug('test nimit :- ' + signatureid);
+            }
+            SubId ids = new SubId();
+            ids.SubmissionId = acc.Id;
+            ids.SignatureId = signatureid;
+            return ids;
+        } catch (Exception e){
+            System.debug('error --> ' + e);
+            // error_handler.insert_errordata(e,'FormBuilderController','createrecord');
+            return null;
+        }
+    }
+
+    @AuraEnabled
+    public static SubId createrecord_for_secod_object(Form_Submission__c acc, SObject first_obj_list, SObject list_second_obj, String sin_id){
+        try{
+            System.debug('yasj ' + acc);
+            System.debug(acc.name);
+            String signatureid;
+            insert acc;
+            System.debug('yasj first_obj_list' + first_obj_list);
+            insert first_obj_list;
+            System.debug('yasj first_obj_list' + list_second_obj);
+            // Contact acctest = new Contact();
+            // acctest.AccountId =first_obj_list.id;
+            // list_second_obj.add(acctest);
+            // List<sobject> tasks = new List<sobject>();
+            // tasks.AccountId=first_obj_list.id;
+            // // list_second_obj.'AccountId' =first_obj_list.id;
+            insert list_second_obj;
+            Form__c form = [SELECT Total_Submissions__c
+                            FROM Form__c
+                            WHERE Id = :acc.Form__c];
+            form.Total_Submissions__c += 1;
+            update form;
+            String sub_id = acc.Id;
+            if (sin_id != 'undefined' || sin_id != '' || sin_id != null){
+                signatureid = signatureSave(sub_id, sin_id);
+            }
+            SubId ids = new SubId();
+            ids.SubmissionId = acc.Id;
+            ids.SignatureId = signatureid;
+            return ids;
+        } catch (Exception e){
+            System.debug('error --> ' + e);
+            // error_handler.insert_errordata(e,'FormBuilderController','createrecord_for_secod_object');
+            return null;
+        }
+    }
+
+    @AuraEnabled
+    public static SubId createrecord_for_third_object(Form_Submission__c acc, SObject first_obj_list, SObject list_second_obj, SObject list_third_obj, String sin_id){
+        try{
+            System.debug('yasj ' + acc);
+            System.debug('yasj first_obj_list' + first_obj_list);
+            System.debug(acc.name);
+            String signatureid;
+            insert acc;
+            insert first_obj_list;
+            insert list_second_obj;
+            insert list_third_obj;
+            Form__c form = [SELECT Total_Submissions__c
+                            FROM Form__c
+                            WHERE Id = :acc.Form__c];
+            form.Total_Submissions__c += 1;
+            update form;
+            String sub_id = acc.Id;
+            if (sin_id != 'undefined' || sin_id != '' || sin_id != null){
+                signatureid = signatureSave(sub_id, sin_id);
+            }
+            SubId ids = new SubId();
+            ids.SubmissionId = acc.Id;
+            ids.SignatureId = signatureid;
+            return ids;
+        } catch (Exception e){
+            System.debug('error --> ' + e);
+            // error_handler.insert_errordata(e,'FormBuilderController','createrecord_for_third_object');
+            return null;
+        }
+    }
+
+    @AuraEnabled
+    public static List<Form_Fields__c> GetFormValidation(String form_id){
+        try{
+            List<Form_Fields__c> form_val_list = [SELECT Field_Mapping__c, Field_Validations__c
+                                                  FROM Form_Fields__c
+                                                  WHERE Form__c = :form_id];
+
+            return form_val_list;
+
+        } catch (Exception e){
             throw new AuraHandledException(e.getMessage());
         }
+    }
+
+    @AuraEnabled
+    public static String update_ext_list(String acc2, String submit_id){
+        // public static void createrecord(Account acc){
+        try{
+            System.debug('firsttttt');
+            System.debug('firsttttt' + submit_id);
+            Form_Submission__c form_sub = [SELECT Other_fields_data__c
+                                           FROM Form_Submission__c
+                                           WHERE Id = :submit_id];
+            System.debug('firsttttt' + acc2);
+            System.debug('firsttttt sql list' + form_sub);
+            // form_sub.Other_fields_data__c = string.valueOf(acc2);
+            form_sub.Other_fields_data__c = acc2;
+
+            update form_sub;
+            System.debug('adddd');
+            return null;
+
+        } catch (Exception e){
+            System.debug('error --> ' + e);
+            return null;
+        }
+    }
+
+    public class SubId{
+        @AuraEnabled
+        public String SubmissionId{ get; set; }
+
+        @AuraEnabled
+        public String SignatureId{ get; set; }
+
     }
 
 }

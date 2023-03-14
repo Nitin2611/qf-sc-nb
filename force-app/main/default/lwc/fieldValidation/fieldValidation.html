@@ -371,6 +371,9 @@
                         <lightning-input type="date" label="Maximum Value" data-title="MaximumDate" value={maximumdate}
                             onchange={validatingvalue}></lightning-input>
                     </div>
+                    <div class="resetbtns" onclick={resetdatetime} data-title="ResetDate">
+                        <p class="resettext"> Reset </p>
+                    </div>
                 </template>
 
                 <!-- TIME -->
@@ -383,6 +386,9 @@
                     <div class="styletext">
                         <lightning-input type="time" label="Maximum Value" data-title="MaximumDate" value={maximumdate}
                             onchange={validatingvalue}></lightning-input>
+                    </div>
+                    <div class="resetbtns" onclick={resetdatetime} data-title="ResetTime">
+                        <p class="resettext"> Reset </p>
                     </div>
                 </template>
 
@@ -398,7 +404,9 @@
                         <lightning-input type="datetime" label="Maximum Value" data-title="MaximumDate"
                             value={maximumdate} onchange={validatingvalue}></lightning-input>
                     </div>
-
+                    <div class="resetbtns" onclick={resetdatetime} data-title="ResetDateTime">
+                        <p class="resettext"> Reset </p>
+                    </div>
                 </template>
 
                 <!-- Scale Rating -->
@@ -424,7 +432,7 @@
                 <template if:true={fields.QFTERMSOFSERVICE}>
                     <div class="textlabel">Options</div>
 
-                    <div class="richstyle">
+                    <div class="richstyle" style="display:flex;justify-content:center;">
                         <lightning-button class="richbutton" label="Edit Agreement Text" onclick={handlevalidation}
                             data-title="RichText"></lightning-button>
                     </div>
@@ -432,35 +440,38 @@
                         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
                             aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
                             <div class="slds-modal__container">
-                                <header class="slds-modal__header">
+                                <header class="slds-modal__header richtextheader">
                                     <lightning-button-icon icon-name="utility:close" onclick={closerichtext}
                                         alternative-text="close" variant="bare-inverse"
                                         class="slds-modal__close"></lightning-button-icon>
-                                    <h2 data-id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">HTML
-                                        Block</h2>
+                                    <h2 data-id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Edit Agreement Text</h2>
                                 </header>
-
-                                <lightning-tabset variant="scoped">
-                                    <lightning-tab label="Edit Rich Text">
+                               <div class="richtextContent">
+                                <lightning-tabset variant="scoped" class="slds-tabs_scoped__nav">
+                                    <lightning-tab class="richtextTab" label="Edit Rich Text">
                                         <lightning-input-rich-text formats="['font', 'size', 'bold', 'italic', 'underline', 'strike', 'list', 'indent', 'align', 'link', 'clean', 'table', 
                                 'header', 'color', 'background']" value={Richtextvalue} data-id="editor"
-                                            placeholder="Type something"
+                                            placeholder="Type something" class="labelinput slds-nowrap"
                                             onchange={RichTextData}></lightning-input-rich-text>
                                     </lightning-tab>
-                                    <lightning-tab label="Edit HTML Text">
+                                    <lightning-tab class="htmlTab" label="Edit HTML Text">
                                         <lightning-textarea label="HTML Text" value={Richtextvalue} name="Html"
                                             onchange={RichTextData}></lightning-textarea>
                                     </lightning-tab>
-                                    <lightning-tab label="Output">
-                                        <lightning-formatted-rich-text
+                                    <lightning-tab class="outputTab" label="Output">
+                                        <lightning-formatted-rich-text class="slds-text-longform slds-nowrap"
                                             value={Richtextvalue}></lightning-formatted-rich-text>
                                     </lightning-tab>
                                 </lightning-tabset>
-                                <footer class="slds-modal__footer">
-                                    <lightning-button variant="neutral" label="Cancel" title="Cancel"
+                               </div>
+                                <footer class="slds-modal__footer richtextfooter" >
+                                    <!-- <lightning-button variant="neutral" label="Cancel" title="Cancel"
                                         onclick={closerichtext}></lightning-button>
                                     <lightning-button variant="brand" label="OK" title="OK"
-                                        onclick={closerichtext}></lightning-button>
+                                        onclick={closerichtext}></lightning-button> -->
+                                         <button label="Cancel" class="cancelModelButton"
+                                        onclick={closerichtext}>Cancel</button>
+                                    <button label="Save" class="saveModelButton" onclick={closerichtext}>Save</button>
                                 </footer>
                             </div>
                         </section>

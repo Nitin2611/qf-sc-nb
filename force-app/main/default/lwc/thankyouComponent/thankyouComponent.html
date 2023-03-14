@@ -15,41 +15,7 @@
         </div>
     </template>
     <div class="thanksMainDiv">
-        <!-- <template if:true={editlabelcheck}>
-        <section data-id="Modal" role="dialog" tabindex="-1" aria-labelledby="ModalHeading" aria-modal="true" aria-describedby="ModalBody" class="slds-modal editlabel" onclick={hideFolderList}>
-            <div class="richtextModel">
-                <div class="richtextMainDiv">
-                    <div class="richtextDiv">
-                        <div class="richtextLabel">
-                            <div>
-                                Edit Label
-                            </div>
-                        </div>
-                        <div class="richtextContent">
-                            <lightning-tabset variant="scoped">
-                                <lightning-tab class="richtextTab" label="Edit Rich Text">
-                                    <lightning-input-rich-text formats="['font', 'size', 'bold', 'italic', 'underline', 'strike', 'list', 'indent', 'align', 'link', 'clean', 'table', 
-                                'header', 'color', 'background']" value={changelabel} data-id="editor" placeholder="Type something" class="labelinput slds-nowrap" onchange={labelinput} ></lightning-input-rich-text>
-                                </lightning-tab>
-                                <lightning-tab class="htmlTab" label="Edit HTML Text">
-                                    <lightning-textarea label="HTML Text" value={changelabel} name="Html" onchange={labelinput} ></lightning-textarea>
-                                </lightning-tab>
-                                <lightning-tab class="outputTab" label="Output">
-                                    <lightning-formatted-rich-text class="slds-text-longform" value={changelabel}></lightning-formatted-rich-text>
-                                </lightning-tab>
-                            </lightning-tabset>
-                        </div>
-                        <div class="richtextButtonDiv">
-                            <div class="richtextButton">
-                                <button label="Cancel" class="cancelModelButton" onclick={closeLabel}>Cancel</button>
-                                <button label="Save" class="saveModelButton" onclick={saveLabel}>Save</button> 
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        </template> -->
+        <template if:true={editing}>
         <div data-id="ModalBackdrop" class="slds-backdrop"></div>
         <div class="thanksChoice">
             <div class="thanksLabelDiv">
@@ -122,7 +88,7 @@
                     </div>
                 </div>
                 <div class="hrLine"></div>
-                <div class="form-check">
+                <!-- <div class="form-check">
                     <div class="thanks-optiondiv">
                         <div class="thanks-option">
                             <input class="form-check-input" type="radio" name="flexRadioDefault" id="ThankYou_Report"
@@ -134,7 +100,7 @@
                     </div>
                     <div id="Input4"></div>
                 </div>
-                <div class="hrLine"></div>
+                <div class="hrLine"></div> -->
                 <div class="form-check">
                     <div class="thanks-optiondiv">
                         <div class="thanks-option">
@@ -152,14 +118,16 @@
                 </div>
             </div>
         </div>
+    </template>
         <div class="thanksPreviewDiv">
+            <template if:true={editing}>
 
             <div class="thanksEditButton">
                 <button label="Edit Text" icon-position="left" onclick={editlabel} class="saveBtn editBtn"> <img
                         src={whitepen} alt="" class="penicon"> Edit Label</button>
             </div>
 
-
+        </template>
             <template if:true={editlabelcheck}>
                 <!-- <section data-id="Modal" role="dialog" tabindex="-1" aria-labelledby="ModalHeading" aria-modal="true" aria-describedby="ModalBody" class="slds-modal editlabel" onclick={hideFolderList}> -->
                 <div class="richtextModel">
@@ -224,10 +192,12 @@
                     </div>
                 </template>
             </div>
+            <template if:true={editing}>
             <div class="saveButton">
                 <button class="cancelBtn" onclick={cancelThanksData}>Cancel</button>
                 <button class="saveBtn" onclick={saveThanksData}>Save</button>
             </div>
+        </template>
         </div>
     </div>
 </template>
