@@ -1,8 +1,5 @@
 <template>
-
-
     <c-toast-component></c-toast-component>
-
     <template if:true={spinnerDataTable}>
         <div data-id="spinnerId" class="slds-spinner_container" style="overflow: hidden;">
             <div class="spinner-main-div">
@@ -43,26 +40,24 @@
 
                         <template for:each={page.FieldData} for:item="field">
 
-                            <div id={field.Id} class="field" draggable="true"
-                                            data-order-id={field.Field_Order__c} data-page-record={field.Form_Page__c}
-                                            data-record={field.Id} data-ref="inner" ondragstart={onDragStart}
-                                            data-record-count={fieldcount} onclick={openfieldvalidation} key={field.Id}
-                                            data-field-name={field.Name} data-field-id={field.Id} data-id={field.Id} >
-                                            <c-quickformfieldcomponent formid={ParentMessage} t-view={field.Name}
-                                                compview="Full" disable-field="true" field-attribute=""
-                                                field-attribute-value="" field-id={field.Id}
-                                                page-id={page.ParentMessage} data-field-id={field.Id}
-                                                onstartsppiner={stopspinner}
-                                                is-reqired={field.Field_Validations__c.isRequired}
-                                                helptextcheck={field.Field_Validations__c.isHelptext}
-                                                labelcheck={field.Field_Validations__c.isLabel}
-                                                labelvalue={field.Field_Validations__c.Label}
-                                                helptextvalue={field.Field_Validations__c.HelpText}
-                                                salutationvalue={field.Field_Validations__c.Salutation}
-                                                isdisabled={field.Field_Validations__c.isDisabled}
-                                                placeholder={field.Field_Validations__c.Placeholder}
-                                                fieldtype={field.Field_Validations__c.fieldtype}></c-quickformfieldcomponent>
-                                        </div>
+                            <div id={field.formid} class="field" draggable="true" data-order-id={field.Field_Order__c}
+                                data-page-record={field.Form_Page__c} data-record={field.formid} data-ref="inner"
+                                ondragstart={onDragStart} data-record-count={fieldcount} onclick={openfieldvalidation}
+                                key={field.formid} data-field-name={field.Name} data-id={field.Id}>
+
+                                <c-quickformfieldcomponent formid={formid} t-view={field.Name} compview="Full"
+                                    disable-field="true" field-attribute="" field-attribute-value="" field-id={field.Id}
+                                    page-id={page.formid} is-reqired={field.Field_Validations__c.isRequired}
+                                    helptextcheck={field.Field_Validations__c.isHelptext}
+                                    labelcheck={field.Field_Validations__c.isLabel}
+                                    labelvalue={field.Field_Validations__c.Label}
+                                    helptextvalue={field.Field_Validations__c.HelpText}
+                                    salutationvalue={field.Field_Validations__c.Salutation}
+                                    isdisabled={field.Field_Validations__c.isDisabled}
+                                    placeholder={field.Field_Validations__c.Placeholder}
+                                    fieldtype={field.Field_Validations__c.Fieldtype}></c-quickformfieldcomponent>
+
+                            </div>
                         </template>
                         <div class="field captchafield">
                             <template if:true={isIndexLast}>
@@ -75,33 +70,28 @@
 
                         <template if:true={isIndexZero}>
                             <template if:false={isIndexLast}>
-                                <button data-name="next" variant="brand" label="Next" title="Next" onclick={onaddpage1}
-                                    class="btn1">Next</button>
+                                <button data-name="next" variant="brand" label="Next" title="Next"
+                                    onclick={handlepagination} class="btn1">Next</button>
                             </template>
                             <template if:true={isIndexLast}>
-                                <button variant="brand" label="Submit" title="Submit" onclick={onaddpage1} class="btn1"
-                                    data-name="submit">Submit</button>
+                                <button variant="brand" label="Submit" title="Submit" onclick={handlepagination}
+                                    class="btn1" data-name="submit">Submit</button>
                             </template>
                         </template>
 
                         <template if:false={isIndexZero}>
                             <button data-name="previous" variant="brand" label="Previous" title="Previous"
-                                onclick={onaddpage1} class="btn1">Previous</button>
+                                onclick={handlepagination} class="btn1">Previous</button>
 
                             <template if:false={isIndexLast}>
-                                <button data-name="next" variant="brand" label="Next" title="Next" onclick={onaddpage1}
-                                    class="btn1">Next</button>
+                                <button data-name="next" variant="brand" label="Next" title="Next"
+                                    onclick={handlepagination} class="btn1">Next</button>
                             </template>
                             <template if:true={isIndexLast}>
-                                <button variant="brand" label="Submit" title="Submit" onclick={onaddpage1} class="btn1"
-                                    data-name="submit">Submit</button>
+                                <button variant="brand" label="Submit" title="Submit" onclick={handlepagination}
+                                    class="btn1" data-name="submit">Submit</button>
                             </template>
                         </template>
-
-                        <!-- <template if:true={isIndexLast}>
-                    <button variant="brand" label="Submit" title="Submit" 
-                    onclick={onaddpage1} class="btn1" data-name = "submit"></button>
-                </template> -->
                     </div>
                 </div>
             </div>
