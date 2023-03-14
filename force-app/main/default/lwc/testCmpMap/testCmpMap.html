@@ -1,0 +1,27 @@
+<template>
+    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_col-bordered slds-table_striped">
+        <thead>
+            <tr class="slds-text-title_caps">
+                <th scope="col">
+                    <div title="Key">Icon Name</div>
+                </th>
+                <th scope="col">
+                    <div title="Value">Icon</div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <template for:each={mapData} for:item="map">
+                <tr key={map.key}>
+                    <th scope="col">
+                        <div title={map.key}>{map.key}</div>
+                    </th>
+                    <th scope="col">
+                        <lightning-icon class="icon" icon-name={map.value} title={map.value}
+                                         size="medium"> </lightning-icon> 
+                    </th>
+                </tr>
+            </template>
+        </tbody>
+    </table>            
+</template>

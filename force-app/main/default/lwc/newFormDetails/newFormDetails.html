@@ -37,8 +37,9 @@
                                     :
                                 </div>
                                 <div class="slds-col slds-size_6-of-12">
-                                    <lightning-input variant="label-hidden" onchange={changeFormTitle} onkeypress={handleFocus} type="text"
-                                        name="form_title" class="nameCls" value={formtitle}></lightning-input>
+                                    <lightning-input variant="label-hidden" onchange={changeFormTitle}
+                                        onkeypress={handleFocus} type="text" name="form_title" class="nameCls"
+                                        value={formtitle}></lightning-input>
                                 </div>
                             </div>
                         </div>
@@ -92,7 +93,7 @@
                                 </div>
                                 <div class="slds-col slds-size_6-of-12">
                                     <lightning-textarea variant="label-hidden" name="description"
-                                        onchange={changeDescription} class="desc"></lightning-textarea>
+                                        onchange={changeDescription} value={description} class="desc"></lightning-textarea>
                                 </div>
                             </div>
                         </div>
@@ -136,9 +137,9 @@
             </div>
             <!-- END Form Details -->
             <!-- Object Selection -->
-            
-                <c-toast-component></c-toast-component>
-        
+
+            <c-toast-component></c-toast-component>
+
             <div class="slds-modal__container" if:true={objectselection}>
                 <header class="slds-modal__header">
                     <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
@@ -179,11 +180,14 @@
                             <div class="pop_up2" if:true={popup_2}>
                                 <!-- spinner -->
                                 <template if:true={spinnerDataTable}>
-                                    <div data-id="spinnerId" class="slds-spinner_container" style="overflow: hidden;">
-                                        <div class="spinner-main-div">
-                                            <div class="loader--ripple">
-                                                <div></div>
-                                                <div></div>
+                                    <div class="newformdetails_spiner">
+                                        <div data-id="spinnerId" class="slds-spinner_container"
+                                            style="overflow: hidden;">
+                                            <div class="spinner-main-div">
+                                                <div class="loader--ripple">
+                                                    <div></div>
+                                                    <div></div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

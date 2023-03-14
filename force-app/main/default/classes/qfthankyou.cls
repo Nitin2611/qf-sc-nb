@@ -7,7 +7,7 @@
 // # Version No.     Author          Date            Change Description            Jira Ticket
 // #    1.           Nimit         18/01/2023           Home Page UI 		     QUIC-18, QUIC-27
 // =================================== 
-public with sharing class qfthankyou {
+public without sharing class qfthankyou {
 
     // <!-- ===================================
     // # MV Clouds Private Limited
@@ -24,7 +24,8 @@ public with sharing class qfthankyou {
                 }
                 return null;
             } catch (Exception e) {
-                
+                // error_handler.insert_errordata(e,'qfthankyou','getthankyoupage');
+                System.debug(e.getMessage());
                 return null;            
             }
         }
@@ -37,7 +38,7 @@ public with sharing class qfthankyou {
     // # Description: Used to Update or insert thank you page 
     // =================================== -->
        @AuraEnabled
-   public static string insertrecord(String picklist, String label, String classtext, String formId, String url, Id currentthankyouid){
+   public static string insertrecord(String Name,String picklist, String label, String classtext, String formId, String url, Id currentthankyouid){
         try {
             
             // Thankyou_Page__c tp = [SELECT Id FROM Thankyou_Page__c WHERE Form__c =:formId LIMIT 1];
@@ -45,7 +46,7 @@ public with sharing class qfthankyou {
 
             // }
             // if(String.isNotBlank(classtext)){
-                Thankyou_Page__c insertrecord = new Thankyou_Page__c( Form__c = formId, ThankYou_Label__c = label, Thank_you_URL__c = url, Thankyou_Text__c = classtext, Thankyou_Page_Type__c = picklist, Name = 'Thank you', Id = currentthankyouid ); 
+                Thankyou_Page__c insertrecord = new Thankyou_Page__c( Name = Name, Form__c = formId, ThankYou_Label__c = label, Thank_you_URL__c = url, Thankyou_Text__c = classtext, Thankyou_Page_Type__c = picklist, Id = currentthankyouid ); 
                 Database.upsert(insertrecord);
             // }
             // else{
@@ -55,6 +56,7 @@ public with sharing class qfthankyou {
             return null;
         } catch (Exception e) {
             System.debug(e.getMessage());
+            error_handler.insert_errordata(e,'qfthankyou','insertrecord');
             return null;
         }
        }
@@ -73,6 +75,7 @@ public with sharing class qfthankyou {
                 return null;
             }
         } catch (Exception e) {
+            // error_handler.insert_errordata(e,'qfthankyou','getrecordslist');
             return null;
         }
        }

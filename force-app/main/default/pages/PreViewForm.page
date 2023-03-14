@@ -1,4 +1,118 @@
 <apex:page controller="customMetadata" showHeader="false" sidebar="false" standardStylesheets="false">
+    <style type="text/css">
+        .slds-rise-from-ground{
+            visibility: visible;
+            opacity: 1;
+            transform: translate(0%, 0%);
+            transition: opacity var(--lwc-durationQuickly,0.1s) linear,visibility var(--lwc-durationQuickly,0.1s) linear,transform var(--lwc-durationQuickly,0.1s) linear;
+            will-change: transform;
+        }
+        .slds-popover {
+            position: relative;
+            border-radius: var(--lwc-borderRadiusMedium,0.25rem);
+            width: var(--lwc-sizeMedium,20rem);
+            min-height: 2rem;
+            z-index: var(--slds-c-popover-position-zindex, var(--lwc-zIndexDialog,6000));
+            background-color: var(--slds-g-color-neutral-base-100, var(--lwc-colorBackgroundAlt,rgb(255, 255, 255)));
+            display: inline-block;
+            box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16);
+            border: var(--lwc-borderWidthThin,1px) solid var(--slds-g-color-border-base-1, var(--lwc-colorBorder,rgb(229, 229, 229)));
+        }
+        
+        .slds-popover_tooltip, .slds-popover--tooltip{
+            width: auto;
+            max-width: var(--slds-c-tooltip-sizing-max-width, var(--sds-c-tooltip-sizing-max-width, var(--lwc-sizeMedium,20rem)));
+            background-color: var(--slds-c-tooltip-color-background, var(--sds-c-tooltip-color-background, var(--slds-g-color-brand-base-20, var(--lwc-colorBackgroundAltInverse,rgb(3, 45, 96)))));
+            border: 0;
+        }
+        .slds-fall-into-ground{
+            visibility: hidden;
+            opacity: 0;
+            transform: translate(0%, 0%);
+            transition: opacity var(--lwc-durationQuickly,0.1s) linear,visibility var(--lwc-durationQuickly,0.1s) linear,transform var(--lwc-durationQuickly,0.1s) linear;
+            will-change: transform;
+        }
+        .slds-hide {
+            display: none!important;
+        }
+        .slds-popover_tooltip .slds-popover__body, .slds-popover--tooltip .slds-popover__body {
+            font-size: var(--slds-c-tooltip-font-size, var(--sds-c-tooltip-font-size, var(--lwc-fontSize2,0.75rem)));
+            color: var(--slds-c-tooltip-text-color, var(--sds-c-tooltip-text-color, var(--slds-g-color-neutral-base-100, var(--lwc-colorTextInverse,rgb(255, 255, 255)))));
+        }
+        .slds-popover__body, .slds-popover__header, .slds-popover__footer{
+            position: relative;
+            padding: var(--lwc-spacingXSmall,0.5rem) var(--lwc-spacingSmall,0.75rem);
+            word-wrap: break-word;
+        }
+        .slds-nubbin_bottom-left:after, .slds-nubbin--bottom-left:after, .slds-nubbin_bottom-left-corner:after{
+            box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.16);
+            z-index: -1;
+        }
+        .slds-nubbin_bottom-left:before, .slds-nubbin--bottom-left:before, .slds-nubbin_bottom-left-corner:before{
+            width: 1rem;
+            height: 1rem;
+            position: absolute;
+            transform: rotate(45deg);
+            content: '';
+            background-color: inherit;
+            left: 50%;
+            bottom: -0.5rem;
+            margin-left: -0.5rem;
+        }
+        .slds-nubbin_bottom-left:after, .slds-nubbin--bottom-left:after, .slds-nubbin_bottom-left-corner:after{
+            width: 1rem;
+            height: 1rem;
+            position: absolute;
+            transform: rotate(45deg);
+            content: '';
+            background-color: inherit;
+            left: 50%;
+            bottom: -0.5rem;
+            margin-left: -0.5rem;
+        }
+        .slds-nubbin_bottom-left:before, .slds-nubbin_bottom-left:after, .slds-nubbin--bottom-left:before, .slds-nubbin--bottom-left:after, .slds-nubbin_bottom-left-corner:before, .slds-nubbin_bottom-left-corner:after{
+            left: var(--lwc-spacingLarge,1.5rem);
+            top: 100%;
+            margin-top: -0.5rem;
+        }
+
+.slds-nubbin_bottom-right:before,.slds-nubbin--bottom-right:before,.slds-nubbin_bottom-right-corner:before {
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    transform: rotate(45deg);
+    content: '';
+    background-color: inherit;
+    left: 50%;
+    bottom: -.5rem;
+    margin-left: -.5rem
+}
+
+.slds-nubbin_bottom-right:after,.slds-nubbin--bottom-right:after,.slds-nubbin_bottom-right-corner:after {
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    transform: rotate(45deg);
+    content: '';
+    background-color: inherit;
+    left: 50%;
+    bottom: -.5rem;
+    margin-left: -.5rem
+}
+
+.slds-nubbin_bottom-right:after,.slds-nubbin--bottom-right:after,.slds-nubbin_bottom-right-corner:after {
+    box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.16);
+    z-index: -1
+}
+
+.slds-nubbin_bottom-right:before,.slds-nubbin_bottom-right:after,.slds-nubbin--bottom-right:before,.slds-nubbin--bottom-right:after,.slds-nubbin_bottom-right-corner:before,.slds-nubbin_bottom-right-corner:after {
+    left: auto;
+    right: var(--lwc-spacingLarge,1.5rem);
+    top: 100%;
+    margin-top: -.5rem;
+    margin-right: -.5rem
+}
+    </style>
     <apex:includeLightning />   
     <!--Lightning Container-->
     <div id="LightningContainer"/>
