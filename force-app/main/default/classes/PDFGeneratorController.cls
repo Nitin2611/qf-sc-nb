@@ -12,10 +12,8 @@ public with sharing class PDFGeneratorController {
     public boolean isSecondObject {get; set;}
     public boolean isThirdObject {get; set;}
     public boolean isOtherObject {get; set;}
-    // add by smit 
-    // public String documentId { get; set; }
-    // public String verId {get; set;}
-    public List<Id> versionIds {get; set;}
+    public boolean isSignature {get; set;}
+    public boolean isFileupload {get; set;}
 
     public void getPagesOfForm() {
         fromSubmisionData = new Form_Submission__c();
@@ -31,6 +29,10 @@ public with sharing class PDFGeneratorController {
 
         Map<String, Object> mapofOtherObject = new Map<String, Object>();
         Map<String, String> mapofOtherObjectData = new Map<String, String>();
+        Map<String, String> mapofExtraFieldsData = new Map<String, String>();
+
+        Map<String, String> mapofSignatureData = new Map<String, String>();
+        Map<String, String> mapofFileUploadData = new Map<String, String>();
 
         try {
             // Getting Form_Submission__c record id using page referenc
@@ -86,37 +88,35 @@ public with sharing class PDFGeneratorController {
             }
             System.debug('*** mapofOtherObjectData ==>' + mapofOtherObjectData);
 
-            // Signature that contains in submission of form
-            List<ContentDocument> signList = new List<ContentDocument>();
-            List<ContentDocumentLink> contentDocLinkList = new List<ContentDocumentLink>();
-            Set<Id> contentDocIdSet = new Set<Id>();
-
-            contentDocLinkList = [SELECT ContentDocumentId FROM ContentDocumentLink WHERE LinkedEntityId =: submissionId];
-            for (ContentDocumentLink cdl : contentDocLinkList) {
-                contentDocIdSet.add(cdl.ContentDocumentId);
-            }
-            signList = [SELECT Id, Title, LatestPublishedVersionId, LatestPublishedVersion.VersionData FROM ContentDocument WHERE Id IN : contentDocIdSet];
-            System.debug('*** signList size ==>' + signList.size() + '-- signList ==>' + signList);
-            // add by smit 
-            // documentId = contentDocLinkList[0].ContentDocumentId;
-
-            String result = '';
-            // ContentVersion cv = [SELECT Id,VersionData FROM ContentVersion WHERE Id =: '0681y0000005NCxAAM'];
-
-            // single versionId 
-            // ContentVersion cv = [SELECT Id, VersionData FROM ContentVersion WHERE ContentDocumentId = : documentId];
-            // verId = cv.Id;
-
-            // list of versionId
-            List<ContentVersion> contentVersions = [SELECT Id FROM ContentVersion WHERE ContentDocumentId IN :contentDocIdSet];
-             versionIds = new List<Id>();
             
-            for (ContentVersion version : contentVersions) {
-                versionIds.add(version.Id);
+            List<Form_Fields__c> formFildsList = new List<Form_Fields__c>();
+            formFildsList = [SELECT Id, Name, Form__c, Form_Page__c FROM Form_Fields__c WHERE Form__c =: formSubmissionRecord.Form__c];
+            System.debug('*** formFildsList Size ==>' + formFildsList.size() + ' -- formFildsList ==>' + formFildsList);
+
+            for (String key : mapofOtherObjectData.keySet()) {
+                if (key == 'sobjectType') {
+                    mapofExtraFieldsData.put(key, mapofOtherObjectData.get(key));
+                } else {
+                    for (Form_Fields__c ff : formFildsList) {
+                        if (ff.Id == key && ff.Name.Contains('QFSIGNATURE')) {
+                            System.debug('in the QFSIGNATURE part ==>' + ff.Name);
+                            mapofSignatureData.put('Signature', mapofOtherObjectData.get(key));
+                            isSignature = true;
+                        } else if (ff.Id == key && ff.Name.Contains('QFFILEUPLOAD')) {
+                            System.debug('in the QFFILEUPLOAD part ==>' + ff.Name);
+                            mapofFileUploadData.put('Files', mapofOtherObjectData.get(key));
+                            isFileupload = true;
+                        } else if (ff.Id == key){
+                            System.debug('in the else part ==>' + ff.Name);
+                            mapofExtraFieldsData.put(key, mapofOtherObjectData.get(key));
+                        }
+                    }
+                }
             }
 
-            // result += 'url("data:image/png;base64,'+ EncodingUtil.base64Encode(cv.VersionData) + ')';
-            // result += '"data:image/png;base64,'+ EncodingUtil.base64Encode(cv.VersionData) + '"'; //cmt
+            System.debug('*** mapofSignatureData ==>' + mapofSignatureData);
+            System.debug('*** mapofFileUploadData ==>' + mapofFileUploadData);
+            System.debug('*** mapofExtraFieldsData ==>' + mapofExtraFieldsData);
 
 
             // getting list of pages of the submited form
@@ -129,12 +129,9 @@ public with sharing class PDFGeneratorController {
             formData.firstObjectFieldMap = mapofFirstObjectData;
             formData.secondObjectFieldMap = mapofSecondObjectData;
             formData.thirdObjectFieldMap = mapofThirdObjectData;
-            formData.otherObjectFieldMap = mapofOtherObjectData;
-            formData.signatureList = signList;
-            // formData.signId = documentId;
-            // formData.versionId = verId;
-            // formData.verIds = versionIds;
-            formData.cvData = result;
+            formData.otherObjectFieldMap = mapofExtraFieldsData;
+            formData.signatureFieldMap = mapofSignatureData;
+            formData.fileUploadFieldMap = mapofFileUploadData;
             
         } catch (Exception e) {
             System.debug('In the catch block of getPagesOfForm ==>');
@@ -146,17 +143,13 @@ public with sharing class PDFGeneratorController {
     // This wrapper used to show all datat in pdf 
     public class formDataWrapper {
         public String formName {get; set;} // form name of submmited data
-        public String cvData {get; set;} // form name of submmited data
         public List<Form_Page__c> formPages {get; set;} //List of pages of form
         public Map<String, String> firstObjectFieldMap {get; set;} // Map of submitted data of first object
         public Map<String, String> secondObjectFieldMap {get; set;} // Map of submitted data of second object
         public Map<String, String> thirdObjectFieldMap {get; set;} // Map of submitted data of third object
         public Map<String, String> otherObjectFieldMap {get; set;} // Map of submitted data of other object
-        public List<ContentDocument> signatureList {get; set;} //List of signature in the submission data
-        // add by smit 
-        // public String signId {get; set;}
-        // public String versionId {get; set;}
-        // public List<Id> verIds {get; set;}
+        public Map<String, String> signatureFieldMap {get; set;} // Map of submitted data of other object
+        public Map<String, String> fileUploadFieldMap {get; set;} // Map of submitted data of other object
     }
 
 }
