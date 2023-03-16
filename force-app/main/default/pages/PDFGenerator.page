@@ -63,6 +63,11 @@
                 width: 200px;
             }
 
+            .img-cls {
+                height: 300px;
+                width : 350px;
+            }
+
         </style>
     </head>
 
@@ -129,7 +134,7 @@
                         <apex:repeat value="{!formData.otherObjectFieldMap}" var="field">
                             <apex:outputPanel rendered="{!field !='sobjectType'}">
                                 <tr>
-                                    <td class="field-txt">{!field}</td>
+                                    <td class="field-txt">{!formData.otherObjectFieldLabelsMap[field]}</td>
                                     <td class="field-txt-data"> : {!formData.otherObjectFieldMap[field]}</td>
                                 </tr>
                             </apex:outputPanel>
@@ -142,7 +147,7 @@
                             <apex:repeat value="{!formData.signatureFieldMap}" var="field">
                                 <apex:outputPanel rendered="{!field !='sobjectType'}">
                                     <tr>
-                                        <td class="field-txt">{!field}</td>
+                                        <td class="field-txt">{!formData.otherObjectFieldLabelsMap[field]}</td>
                                         <td class="field-txt-data">
                                             <apex:image url="/sfc/servlet.shepherd/version/download/{!formData.signatureFieldMap[field]}"/>
                                         </td>
@@ -158,9 +163,9 @@
                             <apex:repeat value="{!formData.fileUploadFieldMap}" var="field">
                                 <apex:outputPanel rendered="{!field !='sobjectType'}">
                                     <tr>
-                                        <td class="field-txt">{!field}</td>
+                                        <td class="field-txt">{!formData.otherObjectFieldLabelsMap[field]}</td>
                                         <td class="field-txt-data">
-                                            <apex:image url="/sfc/servlet.shepherd/version/download/{!formData.fileUploadFieldMap[field]}"/>
+                                            <apex:image styleClass="img-cls" url="/sfc/servlet.shepherd/version/download/{!formData.fileUploadFieldMap[field]}"/>
                                         </td>
                                     </tr>
                                 </apex:outputPanel>
