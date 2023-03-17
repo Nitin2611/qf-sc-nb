@@ -106,20 +106,20 @@ public without sharing class objectSelection{
     @AuraEnabled
     public static List<String> temp3(List<String> Parent){
         try{
-        List<String> Temp3 = new List<String>();
-        List<String> Test = new List<String>();
-        // Test = fetchParentObject();
-        Test = Parent;
-        Map<String, List<String>> ParentObjects = new Map<String, List<String>>();
-        ParentObjects = fetchChildObject1(Test) ;
-        for (String lst : ParentObjects.keySet()){
-            if ((ParentObjects.get(lst)).size() >= 2){
-                Temp3.add(lst);
+            List<String> Temp3 = new List<String>();
+            List<String> Test = new List<String>();
+            // Test = fetchParentObject();
+            Test = Parent;
+            Map<String, List<String>> ParentObjects = new Map<String, List<String>>();
+            ParentObjects = fetchChildObject1(Test) ;
+            for (String lst : ParentObjects.keySet()){
+                if ((ParentObjects.get(lst)).size() >= 2){
+                    Temp3.add(lst);
+                }
             }
-        }
-        return Temp3;
+            return Temp3;
         } catch (Exception e){
-            error_handler.insert_errordata(e, 'objectSelection', 'saveMapped_object');
+            error_handler.insert_errordata(e, 'objectSelection', 'temp3');
             //throw new AuraHandledException(e.getMessage());
             return null;
         }

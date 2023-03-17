@@ -78,6 +78,7 @@ export default class FieldsSectionComponent extends LightningElement {
         getFields({
             id: this.formid
         }).then(result => {
+            console.log('*** getFields reult from Apex ==>', result);
             let LabelList = [];
             let OnlyLabelList = [];
             for (let i = 0; i < result.length; i++) {

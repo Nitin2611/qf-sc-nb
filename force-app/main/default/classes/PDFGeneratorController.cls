@@ -33,6 +33,7 @@ public with sharing class PDFGeneratorController {
 
         Map<String, String> mapofSignatureData = new Map<String, String>();
         Map<String, String> mapofFileUploadData = new Map<String, String>();
+        Map<String, String> mapofOtherFieldsLabelData = new Map<String, String>();
 
         try {
             // Getting Form_Submission__c record id using page referenc
@@ -90,7 +91,7 @@ public with sharing class PDFGeneratorController {
 
             
             List<Form_Fields__c> formFildsList = new List<Form_Fields__c>();
-            formFildsList = [SELECT Id, Name, Form__c, Form_Page__c FROM Form_Fields__c WHERE Form__c =: formSubmissionRecord.Form__c];
+            formFildsList = [SELECT Id, Name, Form__c, Form_Page__c, Field_Label__c FROM Form_Fields__c WHERE Form__c =: formSubmissionRecord.Form__c];
             System.debug('*** formFildsList Size ==>' + formFildsList.size() + ' -- formFildsList ==>' + formFildsList);
 
             for (String key : mapofOtherObjectData.keySet()) {
@@ -100,15 +101,24 @@ public with sharing class PDFGeneratorController {
                     for (Form_Fields__c ff : formFildsList) {
                         if (ff.Id == key && ff.Name.Contains('QFSIGNATURE')) {
                             System.debug('in the QFSIGNATURE part ==>' + ff.Name);
-                            mapofSignatureData.put('Signature', mapofOtherObjectData.get(key));
+                            mapofSignatureData.put(key, mapofOtherObjectData.get(key));
                             isSignature = true;
                         } else if (ff.Id == key && ff.Name.Contains('QFFILEUPLOAD')) {
                             System.debug('in the QFFILEUPLOAD part ==>' + ff.Name);
-                            mapofFileUploadData.put('Files', mapofOtherObjectData.get(key));
+                            mapofFileUploadData.put(key, mapofOtherObjectData.get(key));
                             isFileupload = true;
                         } else if (ff.Id == key){
                             System.debug('in the else part ==>' + ff.Name);
                             mapofExtraFieldsData.put(key, mapofOtherObjectData.get(key));
+                        }
+                        
+                        // Storing Fields label in map to display in vf page
+                        if (ff.Id == key) {
+                            if (String.isNotBlank(ff.Field_Label__c)) {
+                                mapofOtherFieldsLabelData.put(key, ff.Field_Label__c);
+                            } else {
+                                mapofOtherFieldsLabelData.put(key, key);
+                            }
                         }
                     }
                 }
@@ -117,6 +127,7 @@ public with sharing class PDFGeneratorController {
             System.debug('*** mapofSignatureData ==>' + mapofSignatureData);
             System.debug('*** mapofFileUploadData ==>' + mapofFileUploadData);
             System.debug('*** mapofExtraFieldsData ==>' + mapofExtraFieldsData);
+            System.debug('*** mapofOtherFieldsLabelData ==>' + mapofOtherFieldsLabelData);
 
 
             // getting list of pages of the submited form
@@ -132,6 +143,7 @@ public with sharing class PDFGeneratorController {
             formData.otherObjectFieldMap = mapofExtraFieldsData;
             formData.signatureFieldMap = mapofSignatureData;
             formData.fileUploadFieldMap = mapofFileUploadData;
+            formData.otherObjectFieldLabelsMap = mapofOtherFieldsLabelData;
             
         } catch (Exception e) {
             System.debug('In the catch block of getPagesOfForm ==>');
@@ -150,6 +162,7 @@ public with sharing class PDFGeneratorController {
         public Map<String, String> otherObjectFieldMap {get; set;} // Map of submitted data of other object
         public Map<String, String> signatureFieldMap {get; set;} // Map of submitted data of other object
         public Map<String, String> fileUploadFieldMap {get; set;} // Map of submitted data of other object
+        public Map<String, String> otherObjectFieldLabelsMap {get; set;} // Map of submitted data's Labes of other object
     }
 
 }
