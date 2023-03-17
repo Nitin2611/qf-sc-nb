@@ -1,11 +1,16 @@
-import { LightningElement,track, wire } from 'lwc';
+import {
+    api,
+    LightningElement,
+    track,
+    wire
+} from 'lwc';
 import ParentObject from '@salesforce/apex/objectSelection.fetchParentObject';
 import section_One from '@salesforce/resourceUrl/Section1';
 import section_Two from '@salesforce/resourceUrl/Section2';
 import section_Three from '@salesforce/resourceUrl/Section3';
 import section_Four from '@salesforce/resourceUrl/Section4';
 import section_Five from '@salesforce/resourceUrl/Section5';
-import section_Six from '@salesforce/resourceUrl/Section6';  
+import section_Six from '@salesforce/resourceUrl/Section6';
 import fetchChildObject1 from '@salesforce/apex/objectSelection.fetchChildObject1';
 
 export default class QfPopUp extends LightningElement {
@@ -28,67 +33,86 @@ export default class QfPopUp extends LightningElement {
     @track options_object3 = [];
     @track isModalOpen = false;
 
-    renderedCallback(){
+    //error_popup
+    @api error_popup = false;
+    message;
+
+    renderedCallback() {
         ParentObject()
-        .then( result => {
-            console.log({result});
-            this.primaryObject = result;
-        })
+            .then(result => {
+                console.log({
+                    result
+                });
+                this.primaryObject = result;
+            }).catch(error => {
+                this.message = 'Something Went Wrong In Popup Page';
+                this.showerror(this.message);
+            })
     }
-    
-    firstTemp(){
-        this.temp_One = true;    
+
+    firstTemp() {
+        this.temp_One = true;
         this.temp_Two = false;
         this.temp_Third = false;
 
         let opp = [];
-        for(var i=0;i<this.primaryObject.length;i++)
-        {
-            opp.push({label : this.primaryObject[i] , value: this.primaryObject[i]});
+        for (var i = 0; i < this.primaryObject.length; i++) {
+            opp.push({
+                label: this.primaryObject[i],
+                value: this.primaryObject[i]
+            });
         }
         this.options_object1 = opp;
         // console.log('Options = ' + this.options_object1);
     }
 
-    secondTemp(){
+    secondTemp() {
         this.temp_One = false;
         this.temp_Two = true;
         this.temp_Third = false;
 
         let opp = [];
-        for(var i=0;i<this.primaryObject.length;i++)
-        {
-            opp.push({label : this.primaryObject[i] , value: this.primaryObject[i]});
+        for (var i = 0; i < this.primaryObject.length; i++) {
+            opp.push({
+                label: this.primaryObject[i],
+                value: this.primaryObject[i]
+            });
         }
         this.options_object1 = opp;
         // console.log('Options = ' + this.options_object1);
 
         let opp1 = [];
-        for(var i=0;i<this.childObject1.length;i++)
-        {
-            opp1.push({label : this.childObject1[i] , value: this.childObject1[i]});
+        for (var i = 0; i < this.childObject1.length; i++) {
+            opp1.push({
+                label: this.childObject1[i],
+                value: this.childObject1[i]
+            });
         }
         this.options_object2 = opp1;
         // console.log('Options = ' + this.options_object2);
     }
 
-    thirdTemp(){
+    thirdTemp() {
         this.temp_One = false;
         this.temp_Two = false;
         this.temp_Third = true;
 
         let opp = [];
-        for(var i=0;i<this.primaryObject.length;i++)
-        {
-            opp.push({label : this.primaryObject[i] , value: this.primaryObject[i]});
+        for (var i = 0; i < this.primaryObject.length; i++) {
+            opp.push({
+                label: this.primaryObject[i],
+                value: this.primaryObject[i]
+            });
         }
         this.options_object2 = opp1;
         // console.log('Options = ' + this.options_object2);
 
         let opp1 = [];
-        for(var i=0;i<this.childObject1.length;i++)
-        {
-            opp1.push({label : this.childObject1[i] , value: this.childObject1[i]});
+        for (var i = 0; i < this.childObject1.length; i++) {
+            opp1.push({
+                label: this.childObject1[i],
+                value: this.childObject1[i]
+            });
         }
         this.options_object2 = opp1;
         // console.log('Options = ' + this.options_object2);
@@ -103,50 +127,87 @@ export default class QfPopUp extends LightningElement {
         this.isModalOpen = false;
     }
 
-    object1(event){
+    object1(event) {
         this.value1 = event.detail.value;
-        if(this.value1 != '')
-        {
-            fetchChildObject1({parent : this.value1})
-            .then( result => {
-                console.log('result ='+result);
-                this.childObject1 = result;
-            })
+        if (this.value1 != '') {
+            fetchChildObject1({
+                    parent: this.value1
+                })
+                .then(result => {
+                    console.log('result =' + result);
+                    this.childObject1 = result;
+                }).catch(error => {
+                    this.message = 'Something Went Wrong In Popup Page';
+                    this.showerror(this.message);
+                })
             let opp = [];
-            for(var i=0;i<this.primaryObject.length;i++)
-            {
-                opp.push({label : this.primaryObject[i] , value: this.primaryObject[i]});
+            for (var i = 0; i < this.primaryObject.length; i++) {
+                opp.push({
+                    label: this.primaryObject[i],
+                    value: this.primaryObject[i]
+                });
             }
             this.options_object1 = opp;
             // console.log('Options = ' + this.options_object1);
-            }
+        }
     }
-    object2_1(event){
+    object2_1(event) {
         this.value2 = event.detail.value;
-        if(this.value1 != '')
-        {
-            fetchChildObject1({parent : this.value1})
-            .then( result => {
-                this.childObject1 = result;
-            })
+        if (this.value1 != '') {
+            fetchChildObject1({
+                    parent: this.value1
+                })
+                .then(result => {
+                    this.childObject1 = result;
+                }).catch(error => {
+                    this.message = 'Something Went Wrong In Popup Page';
+                    this.showerror(this.message);
+                })
             let opp = [];
-            for(var i=0;i<this.primaryObject.length;i++)
-            {
-                opp.push({label : this.primaryObject[i] , value: this.primaryObject[i]});
+            for (var i = 0; i < this.primaryObject.length; i++) {
+                opp.push({
+                    label: this.primaryObject[i],
+                    value: this.primaryObject[i]
+                });
             }
             this.options_object1 = opp;
             // console.log('Options = ' + this.options_object1);
 
             let opp1 = [];
-            for(var i=0;i<this.childObject1.length;i++)
-            {
-                opp1.push({label : this.childObject1[i] , value: this.childObject1[i]});
+            for (var i = 0; i < this.childObject1.length; i++) {
+                opp1.push({
+                    label: this.childObject1[i],
+                    value: this.childObject1[i]
+                });
             }
             this.options_object2 = opp1;
             console.log('Options 1 = ' + JSON.stringify(this.options_object2));
         }
     }
-    object2_2(event){
+    object2_2(event) {
         this.value3 = event.detail.value;
     }
+
+    errorpopupcall(event) {
+        location.reload();
+    }
+
+    @api showerror() {
+        console.log('this.error_popup => ', this.error_popup);
+        this.error_popup = true;
+        let errordata = {
+            header_type: 'Popup Page',
+            Message: this.message
+        };
+        const showpopup = new CustomEvent('showerrorpopup', {
+            detail: errordata
+        });
+        this.dispatchEvent(showpopup);
+    }
+
+    showerrorpopup(event) {
+        console.log('showerrorpopup', event.detail.Message);
+        this.template.querySelector('c-errorpopup').errormessagee(event.detail.header_type, event.detail.Message);
+    }
+
 }

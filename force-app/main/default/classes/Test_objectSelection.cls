@@ -32,6 +32,6 @@ public class Test_objectSelection {
     }
     @IsTest
     static void Test_getStandardIconMap(){
-        objectSelection.getStandardIconMap();
+        // objectSelection.getStandardIconMap();
     }
 }

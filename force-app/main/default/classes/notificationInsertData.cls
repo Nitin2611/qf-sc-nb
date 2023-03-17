@@ -70,13 +70,40 @@ public without sharing class notificationInsertData {
 
         try{
         return[
-            SELECT Attachment__c, CC_Recipients__c, Email_Body__c, To_Recipients__c,ID,Subject__c,BCC_Recipients__c FROM Notification__c WHERE Form__c =: form_id
+            SELECT Attachment__c, CC_Recipients__c, Email_Body__c, To_Recipients__c,ID,Subject__c,BCC_Recipients__c,Status__c FROM Notification__c WHERE Form__c =: form_id
         ];
         }
         catch(Exception e){
             // error_handler.insert_errordata(e,'notificationInsertData','getContactList');
             // System.debug(e.getMessage());
             return null;
+        }
+    }
+    
+     // <!-- ===================================
+    // # MV Clouds Private Limited
+    // # Author: Smit patel
+    // # Create Date: 14/03/2023
+    // # Description: Used to Send email for active Notification page
+    // =================================== -->
+
+    @AuraEnabled
+    public static Notification__c getNotificationByStatus(Id form_id, Boolean Status){
+        try{
+
+            Notification__c Notification = [SELECT Id, Status__c, Form__c FROM Notification__c WHERE Form__c = :form_id];
+
+            Notification.Status__c = Status;
+
+            update Notification;
+
+            return Notification;
+        }
+        catch (Exception e){
+            error_handler.insert_errordata(e, 'notificationInsertData', 'getNotificationByStatus');
+            System.debug(e.getMessage());
+            return null;
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 }

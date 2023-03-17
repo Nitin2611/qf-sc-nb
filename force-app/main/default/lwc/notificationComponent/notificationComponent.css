@@ -1,7 +1,9 @@
 .main {
     width: 100%;
     height: calc(100vh);
-    background-color: #fff;
+    /* background-color: #fff; */
+    background-image: url("/resource/Notification_BG_Image");
+    background-size: cover;
 }
 
 .notification_titel {
@@ -19,6 +21,96 @@
 .puls_icon {
     height: 16px;
     width: 16px;
+}
+
+.tableStatusCol {
+    text-align: center;
+    width: 70%;
+    float: right;
+    margin-top: 2%;
+    margin-left: 2%;
+    display: flex;
+    justify-content: end;
+}
+
+/* .togglebutton{
+    border: 1px black;
+} */
+
+.container{
+    position: relative;
+    top: 4px;
+}
+/* 1400 */
+
+.content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .switch input {
+    display: none;
+}
+
+ .switch small {
+    align-items: center;
+    display: inline-block;
+    width: 65px;
+    height: 20px;
+    background: #455a64;
+    border-radius: 30px;
+    position: relative;
+    cursor: pointer;
+}
+
+ .switch small:after {
+    content: "Disable";
+    position: absolute;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    width: 100%;
+    left: 0px;
+    text-align: right;
+    padding: 1px 5px;
+    box-sizing: border-box;
+    line-height: 18px;
+}
+
+ .switch small:before {
+    align-items: center;
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border-radius: 50%;
+    top: 5px;
+    left: 5px;
+    transition: .3s;
+    box-shadow: -3px 0 3px rgba(0, 0, 0, 0.1);
+}
+
+ .switch input:checked~small {
+    background: #6699CC;
+    transition: .3s;
+}
+
+ .switch input:checked~small:before {
+    transform: translate(46px, 0px);
+    transition: .3s;
+}
+
+ .switch input:checked~small:after {
+    content: "Enable";
+    text-align: left;
+    padding-left: 10px;
+}
+
+.helptext{
+    /* margin-top: 2px; */
+    margin-left: 8px
 }
 
 .addcc_addbcc {
@@ -51,14 +143,17 @@ c-email-input {
 
 .titel {
     color: rgb(0, 0, 0, 0.56);
+    width: 30%;
     font-size: 30px;
     font-weight: 800;
-    font-family: 'Roboto';
+    /* font-family: 'Roboto'; */
     line-height: 25px;
     /* margin: 1%; */
     margin-top: 30px;
     margin-left: 15px;
     margin-bottom: 10px;
+    letter-spacing: 1px;
+    font-family: sans-serif;
 }
 
 .input_label {
@@ -126,7 +221,6 @@ abbr {
 }
 
 .bt-center {
-    background-color: #ffffff;
     width: 100%;
     padding: var(--lwc-spacingMedium, 1rem);
     /* margin-top: 1%; */

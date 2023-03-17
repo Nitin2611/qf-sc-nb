@@ -214,8 +214,8 @@ div.child2 {
     /* Internet Explorer 10+ */
     scrollbar-width: none;
     /* Firefox */
-    box-shadow: 1px 1px 10px 1px;
-    box-shadow: #9d9f9f;
+    /* box-shadow: 1px 1px 10px 1px;
+    box-shadow: #9d9f9f; */
 }
 
 .page::-webkit-scrollbar {
@@ -428,7 +428,7 @@ img {
 
 .formName {
     width: 75%;
-    font-family: 'Roboto';
+    /* font-family: 'Roboto'; */
     font-style: normal;
     font-weight: 800;
     font-size: 30px;
@@ -437,6 +437,8 @@ img {
     display: flex;
     align-items: center;
     color: #0C0000;
+    letter-spacing: 1px;
+    font-family: sans-serif;
 }
 
 .addFormTitle {
@@ -471,10 +473,11 @@ img {
 .InnerFormtitle {
     display: flex;
     padding: 1%;
-    margin-left: 2%;
-    margin-right: 2%;
+    /* margin-left: 2%;
+    margin-right: 2%; */
     width: 96%;
     border-bottom: 1px solid rgba(0, 0, 0, 0.39);
+    margin: 2% 0% 0 2%;
 }
 
 .icon {
@@ -2305,4 +2308,8 @@ img {
     color: rgba(0, 0, 0, 0) !important;
     background-color: rgba(0, 0, 0, 0)!important;
     border-color:  rgba(0, 0, 0, 0) !important;
+}
+
+.helptext{
+    margin-bottom: 5px;
 }

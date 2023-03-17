@@ -1,3 +1,12 @@
+.textarea1{
+    resize: none;
+}
+
+.textarea2{
+    resize: none;
+    height: 60px;
+}
+
 .labeldiv{
     display: flex;
 }
@@ -23,7 +32,6 @@
 
 lightning-input,
 lightning-select,
-lightning-textarea,
 lightning-checkbox-group,
 lightning-radio-group,
 lightning-formatted-rich-text,
@@ -229,35 +237,6 @@ lightning-input-address {
     padding-bottom: 0px;
 }
 
-.slds-textarea[disabled],
-.slds-select,
-/* .slds-input[disabled], */
-.outrichstyle,
-/* input, */
-/* textarea, */
-/* select, */
-/* .slds-input {
-background-color: var(--bgcolorfield, 'white');
-border-color: var(--bordercolorfield, 'black');
-border-style: var(--borderstylefield, solid);
-border-width: var(--borderwidthfield, 1px);
-border-radius: var(--borderradiusfield, 1px);
-padding-top: var(--bordervtpaddingfield, 1px);
-padding-bottom: var(--bordervbpaddingfield, 0px);
-padding-left: var(--borderhlpaddingfield, 0px);
-padding-right: var(--borderhrpaddingfield, 0px);
-color: var(--bordertextcolor, black);
-line-height: var(--inputlineheight, normal);
-font-size: var(--inputfontsize, normal);
-font-style: var(--inputfontstyle, normal);
-font-weight: var(--inputfontweight, normal);
-font-family: var(--inputfontfamily, sans-serif);
-} */
-
-/* input:hover {
-    background-color: black;
-    color: white;
-} */
 
 .slds-popover--tooltip {
     background-color: transparent;
@@ -614,3 +593,11 @@ span.deleteicon input {
     font-style: italic;
     font-size: inherit;
 }
+
+.transparentbg{
+    background-color: transparent !important; 
+}
+
+.backclass {
+    font-size: 10px;
+  }

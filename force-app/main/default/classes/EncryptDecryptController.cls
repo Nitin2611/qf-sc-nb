@@ -2,6 +2,7 @@ public without sharing class EncryptDecryptController {
 
     private Blob cryptoKey = blob.valueOf('QuickForm//Application//MVClouds');
 
+    @AuraEnabled
     public static String processEncryption(Id recId) {
         String encryptedData = '';
         try{

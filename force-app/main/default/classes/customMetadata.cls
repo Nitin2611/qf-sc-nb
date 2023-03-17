@@ -68,17 +68,17 @@ public without sharing class customMetadata {
             System.debug('Method Name : customMetadata.siteUrl');
             System.debug('Form ID: '+ Formid);
             List<Form__c> formRecord = new List<Form__c>([SELECT Id, Name, Form_Published_URL__c FROM Form__c WHERE Id = :Formid]);
-            if(formRecord.size() > 0 && !String.isBlank(formRecord[0].Form_Published_URL__c)) {
+            QuickForm_Administration__c customsetting = QuickForm_Administration__c.getInstance();
+            System.debug('-> '+customsetting.SecureUrl__c); 
+            
+            if(String.isBlank(customsetting.SecureUrl__c)) {
+                publishedURL = 'Please select site from User Configuration tab to publish form.';
+            }else if(formRecord.size() > 0 && !String.isBlank(formRecord[0].Form_Published_URL__c) && formRecord[0].Form_Published_URL__c.contains(customsetting.SecureUrl__c)) {
                 publishedURL = formRecord[0].Form_Published_URL__c;
-            } else {
-                //Getting Site details
-                Site mySite = [select Id from Site where Status = 'Active'];
-                SiteDetail mySiteDetail = [select SecureURL from SiteDetail where DurableId = :mySite.Id];
-                String modifiedSecureURL = mySiteDetail.SecureURL;
+            }else if(!String.isBlank(customsetting.SecureUrl__c)) {
+                String modifiedSecureURL = customsetting.SecureUrl__c;
                 System.debug('modifiedSecureURL --> '+modifiedSecureURL);
-                // if (modifiedSecureURL.endsWith('/')) {
-                //     modifiedSecureURL = modifiedSecureURL.substring(0, modifiedSecureURL.length() - 1);
-                // }
+
                 // Form Id Encryption 
                 String encryptedData = EncryptDecryptController.processEncryption(Formid);
                 publishedURL = modifiedSecureURL+'PreViewForm?access_key='+encryptedData;
@@ -86,6 +86,8 @@ public without sharing class customMetadata {
                 Form__c formRec = new Form__c(Id = Formid);
                 formRec.Form_Published_URL__c = publishedURL;
                 update formRec;
+            }else {
+                publishedURL = 'Please select site from User Configuration tab to publish form.';
             }
         } catch (Exception e) {
             // error_handler.insert_errordata(e,'customMetadata','siteUrl');

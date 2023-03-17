@@ -50,7 +50,7 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
     @track isIndexZero = true;
     @track isIndexLast = false;
     @track isPageNotFoud = false;
-    @track isPreviewForm = false;
+    @track isPreviewForm = true;
     @track Progressbarvalue;
     @track captchavalue;
     @track verify;
@@ -98,6 +98,18 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
     @track list_ext_obj = {
         'sobjectType': 'Extra'
     };
+    @track all_filde_value = {
+        'sobjectType': 'filde_vlue'
+    };
+    @track all_filde_value_second = {
+        'sobjectType': 'filde_vlue'
+    };
+    @track all_filde_value_third = {
+        'sobjectType': 'filde_vlue'
+    };
+    @track all_filde_value_ext = {
+        'sobjectType': 'Extra'
+    };
     @track list_validetion = {};
     @track checkbool = true;
     @track current_bt;
@@ -113,6 +125,19 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
     @track sig_con_id;
     @track sig_filde_id;
     @track sub_id;
+    formname = '';
+    @track add_input_val;
+    @track show_captchavalue = true;
+    @track file_upload = {};
+    // FormBuilderController.createrecord(file_upload);
+    @track file_upload_fildeid = [];
+    @track file_upload_id;
+    @track file_upload_url;
+    // @track file_u_map = new Map();
+    @track file_u_map = {};
+    @track sig_u_map = {};
+    @track sig_upload = {};
+    @track sig_fildeid = [];
 
     // error_josn_key_list = new Set();
     @track error_josn_key_list = [];
@@ -128,7 +153,7 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
         console.log('pageURL ---> ', pageURL);
 
         if (pageURL.includes("?access_key=")) {
-            var accessKey = pageURL.split("access_key=")[1];
+            var accessKey = pageURL.split("?access_key=")[1];
             console.log('accessKey ---> ', accessKey);
             processDecryption({
                     encryptedData: accessKey
@@ -136,12 +161,10 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
                 .then(result => {
                     console.log('result ---> ', result);
                     this.formid = result;
-                    // this.InActiveForm(this.formid);
-                    this.FormData();
+                    this.FormData(pageURL);
                 });
         } else {
-            this.FormData();
-            // this.InActiveForm();
+            this.FormData('');
         }
 
         // add by yash
@@ -198,36 +221,11 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
         }
     }
 
-    // InActiveForm(fid) {
-    //     console.log('OUTPUT id: ', fid);
-    //     console.log('OUTPUT isPageNotFoud: ', this.isPageNotFoud);
-    //     getInactiveForms({
-    //             id: fid
-    //         })
-    //         // console.log("Id of InActiveForm",id)
-    //         .then(result => {
-    //             console.log("InActiveForm Result : ", result);
-    //             if (result == true) {
-    //                 console.log('OUTPUT isPageNotFoud 1: ', this.isPageNotFoud);
-    //                 this.isPageNotFoud = true;
-    //                 console.log('OUTPUT isPageNotFoud 2: ', this.isPageNotFoud);
-    //                 this.isPreviewForm = false;
-    //                 this.spinnerDataTable = false;
-    //                 this.id = result;
-    //             } else {
-    //                 console.log('OUTPUT isPageNotFoud 3: ', this.isPageNotFoud);
-    //                 this.isPreviewView = true;
-    //                 this.isPageNotFoud = false;
-    //                 this.spinnerDataTable = false;
-    //             }
-    //         });
-    // }
-
-    FormData() {
-        this.isPreviewForm = true;
+    FormData(pageURL) {
         try {
             formdetails({
-                    id: this.formid
+                    id: this.formid,
+                    webUrl: pageURL
                 })
                 .then(result => {
                     console.log('OUTPUT : Status -- ', result.Status__c);
@@ -248,9 +246,17 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
                         let value;
                         let pagebg = result.PageBgID__c;
                         let formbg = result.FormBgID__c;
+                        this.formname = result.Name;
 
                         console.log('OUTPUT : PageCSS --> ', this.PageCSS);
+                        if(this.captchavalue == 'None'){
+                            this.show_captchavalue = false;
 
+                        }
+                        else{
+                            this.show_captchavalue = true;
+                        }
+                        //  close add by yash
                         if (formbg != null && formbg != undefined) {
                             bgimages({
                                     id: formbg,
@@ -333,6 +339,18 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
                                 const element = array[i];
                                 element.style = value;
                             }
+                        }
+                        if (this.activepreviews == false) {
+                            var element = this.template.querySelector('.scroll');
+                            element.style = 'overflow-y:scroll; height: 79vh';
+                            element = this.template.querySelector('.fieldDiv1');
+                            element.style = 'overflow-y: scroll';
+
+                        } else {
+                            var element = this.template.querySelector('.scroll');
+                            element.style = 'height: 72vh';
+                            // element = this.template.querySelector('.fieldDiv1');
+                            // element.style = 'overflow-y: scroll';
                         }
 
                         this.PageData();
@@ -614,10 +632,13 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
         // console.log('form_mapped_Objects :- ',this.form_mapped_Objects[0]);
         this.first_object = this.form_mapped_Objects[0];
         this.list_first_obj.sobjectType = this.form_mapped_Objects[0];
+        this.all_filde_value.sobjectType = this.form_mapped_Objects[0];
         this.second_object = this.form_mapped_Objects[1];
         this.list_second_obj.sobjectType = this.form_mapped_Objects[1];
+        this.all_filde_value_second.sobjectType = this.form_mapped_Objects[1];
         this.third_object = this.form_mapped_Objects[2];
         this.list_third_obj.sobjectType = this.form_mapped_Objects[2];
+        this.all_filde_value_third.sobjectType = this.form_mapped_Objects[2];
         // console.log('first_object: ',this.first_object );
         // console.log(' this.second_object: ',this.second_object );
         // console.log('third_object: ',this.third_object );
@@ -648,10 +669,10 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
             console.log('second_object : ', this.second_object);
 
             if (this.first_object == objectAPI) {
-                console.log(' u r in next if condition ');
+                console.log(' u r in next if condition 1');
                 console.log('fildAPI : ', fildAPI);
-                console.log('OUTPUT sec_ob : ', JSON.stringify(this.list_first_obj[fildAPI]));
-                let fil_val = JSON.stringify(this.list_first_obj[fildAPI]);
+                console.log('OUTPUT sec_ob : ', JSON.stringify(this.all_filde_value[fildAPI]));
+                let fil_val = JSON.stringify(this.all_filde_value[fildAPI]);
                 console.log('fil_val OUTPUT : ', fil_val);
                 if (req_value == 'true') {
                     console.log('fil_val OUTPUT in if condition : ', fil_val);
@@ -667,10 +688,10 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
                     }
                 }
             } else if (this.second_object == objectAPI) {
-                console.log(' u r in next if condition ');
+                console.log(' u r in next if condition 2');
                 console.log('fildAPI : ', fildAPI);
-                console.log('OUTPUT sec_ob : ', JSON.stringify(this.list_second_obj[fildAPI]));
-                let fil_val = JSON.stringify(this.list_second_obj[fildAPI]);
+                console.log('OUTPUT sec_ob : ', JSON.stringify(this.all_filde_value_second[fildAPI]));
+                let fil_val = JSON.stringify(this.all_filde_value_second[fildAPI]);
                 console.log('fil_val OUTPUT : ', fil_val);
                 if (req_value == 'true') {
                     if (fil_val != '' && fil_val != null && fil_val != ' ' && fil_val != undefined && fil_val != '""') {
@@ -685,10 +706,10 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
                 }
 
             } else if (this.third_object == objectAPI) {
-                console.log(' u r in next if condition ');
+                console.log(' u r in next if condition 3');
                 console.log('fildAPI : ', fildAPI);
-                console.log('OUTPUT sec_ob : ', JSON.stringify(this.list_third_obj[fildAPI]));
-                let fil_val = JSON.stringify(this.list_third_obj[fildAPI]);
+                console.log('OUTPUT sec_ob : ', JSON.stringify(this.all_filde_value_third[fildAPI]));
+                let fil_val = JSON.stringify(this.all_filde_value_third[fildAPI]);
                 console.log('fil_val OUTPUT : ', fil_val);
                 if (req_value == 'true') {
                     if (fil_val != '' && fil_val != null && fil_val != ' ' && fil_val != undefined && fil_val != '""') {
@@ -704,11 +725,13 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
                 }
 
             } else {
-                console.log(' u r in next if condition ');
+                console.log(' u r in next if condition 4');
                 console.log('fildAPI : ', fildAPI);
-                console.log('OUTPUT sec_ob : ', JSON.stringify(this.list_ext_obj[fildAPI]));
-                let fil_val = JSON.stringify(this.list_ext_obj[fildAPI]);
-                console.log('fil_val OUTPUT : ', fil_val);
+                console.log('OUTPUT sec_ob : ', JSON.stringify(this.all_filde_value_ext[fildAPI]));
+                let fil_val = JSON.stringify(this.all_filde_value_ext[fildAPI]);
+                // console.log('fil_val OUTPUT : ', fil_val);
+                // var error = this.template.querySelector(`[data-id="${test2}"]`).value;
+                console.log(' crent fid val :- ',fil_val);
                 if (req_value == 'true') {
                     console.log('fil_val OUTPUT in if condition : ', fil_val);
                     if (fil_val != '' && fil_val != null && fil_val != ' ' && fil_val != undefined && fil_val != '""' && fil_val != 'undefined') {
@@ -755,21 +778,43 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
                 this.template.querySelector('c-progress-indicator').calculation(this.Progressbarvalue, this.pageindex, this.PageList.length);
             } else if (this.current_bt == 'submit') {
                 console.log('u r clike submit bt ', );
+                if(this.captchavalue == 'None'){
+                    this.remove_separator();
+
+                }
+                else{
                 if (this.verify == true) {
+                        this.remove_separator();
+                    } else {
+                        let toast_error_msg = 'Invalid Captcha';
+                        this.template.querySelector('c-toast-component').showToast('error', toast_error_msg, 3000);
+                    }
+
+                }
+               
+
+            }
+        }
+    } catch (error) {
+        this.message = 'Something Went Wrong In Preview Form Page';
+        this.showerror(this.message);
+    }
+    remove_separator() {
                     console.log(this.verify);
-                    let toast_error_msg = 'you enter Verify Captcha';
+        let toast_error_msg = 'your form is submitted successfully';
                     this.template.querySelector('c-toast-component').showToast('success', toast_error_msg, 3000);
                     // this.first_object_4_pdf = this.list_first_obj;
                     // this.second_object_4_pdf = this.list_second_obj;
                     // this.third_object_4_pdf = this.list_third_obj;
                     // this.ext_object_4_pdf = this.ext_object;
-
+        console.log(' this.first_list :- ',JSON.stringify(this.first_list));
                     for (let j = 0; j < this.first_list.length; j++) {
                         // console.log(' u r in test val loop');
                         var test_f_val = this.list_first_obj[this.first_list[j]];
                         // console.log('test_f_val :- ',test_f_val);
                         var f_valArr = test_f_val.split('<QF>');
                         var first_val = f_valArr[0];
+            console.log('first_val------- ',first_val);
                         if (first_val == 'select-one') {
                             this.list_first_obj[this.first_list[j]] = f_valArr[1];
 
@@ -785,6 +830,7 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
                             this.list_first_obj[this.first_list[j]] = addres;
 
                         } else if (first_val == 'm_pick') {
+                            console.log('y r in m_pic');
                             let full_m_val = '';
                             for (let k = 1; k < f_valArr.length; k++) {
                                 if (f_valArr[k] != '' || f_valArr[k] != undefined) {
@@ -824,7 +870,7 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
 
                     }
                     console.log('clos 1');
-                    console.log('Store field data OUTPUT : ', JSON.parse(JSON.stringify(this.list_first_obj)));
+                    console.log('Store field data OUTPUT 1 : ', JSON.parse(JSON.stringify(this.list_first_obj)));
                     for (let j = 0; j < this.second_list.length; j++) {
                         // console.log(' u r in test val loop');
                         var test_f_val = this.list_second_obj[this.second_list[j]];
@@ -864,7 +910,7 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
 
                             }
                             // var val_m_pick = f_valArr[1]+f_valArr[2]+f_valArr[3];
-                            this.list_first_obj[this.second_list[j]] = full_m_val;
+                this.list_second_obj[this.second_list[j]] = full_m_val;
                             console.log('after clin :- ', full_m_val);
 
                         } else if (first_val == 'chk_box') {
@@ -1015,50 +1061,10 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
                     console.log('clos 4');
                     console.log('Store field data OUTPUT : ', JSON.parse(JSON.stringify(this.list_ext_obj)));
                     this.onsubmit();
-                } else {
-                    let toast_error_msg = 'Invalid Captcha';
-                    this.template.querySelector('c-toast-component').showToast('error', toast_error_msg, 3000);
-                }
-
-            }
-        }
-    } catch (error) {
-        this.message = 'Something Went Wrong In Preview Form Page';
-        this.showerror(this.message);
     }
-    remove_separator() {
-        // var valueArr = .split('<!@!>');
-        // if(valueArr[0] == 'select-one'){
 
-        // }
-    }
-    add_sig(event) {
-        // sig_filde_id
-        // alert('yash');
-        console.log('this.sig_filde_id :- ', this.sig_filde_id);
-        this.list_ext_obj[this.sig_filde_id] = this.sig_con_id;
-        console.log(' last ex object list :- ', JSON.stringify(this.list_ext_obj));
-        var ex_object_list = JSON.stringify(this.list_ext_obj);
-        // let list_submission_obj_2 = {};
-        // list_submission_obj_2['Other_fields_data__c'] = JSON.stringify(this.list_ext_obj);
-        console.log('submit_id :- ', this.sub_id);
-        update_ext_list({
-                acc2: ex_object_list,
-                submit_id: this.sub_id
-            })
-            .then(data => {
-                console.log(data);
-
-            })
-            .catch(error => {
-                console.log({
-                    error
-                });
-            })
-
-    }
     onsubmit(event) {
-        console.log(' url data :- ', this.sin_data_id);
+        // console.log(' url data :- ', this.sin_data_id);
         var submissionid;
 
         let list_submission_obj = {
@@ -1074,21 +1080,30 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
         console.log('form_mapped_Objects.length :- ', this.form_mapped_Objects.length);
         if (this.form_mapped_Objects.length == 1) {
             console.log('y r in form_mapped_Objects.length = 1 if');
+            var jsonString = JSON.stringify(this.file_upload);
+            console.log('file upload in create record :- ',JSON.stringify(this.file_upload));
+            console.log('file upload in create record :- ',JSON.stringify(this.file_upload));
+            
             createrecord({
                     acc: list_submission_obj,
                     first_obj_list: this.list_first_obj,
-                    sin_id: this.sin_data_id
+                    // sin_id: this.sin_data_id,
+                    sig_upload_jsone: JSON.stringify(this.sig_upload),
+                    sig_upload_fid_list: this.sig_fildeid,
+                    file_upload_jsone: JSON.stringify(this.file_upload),
+                    file_upload_fid_list: this.file_upload_fildeid                   
+
                 })
                 .then(data => {
-
-                    // submissionid = data.SubmissionId;
                     this.sub_id = data.SubmissionId;
-                    console.log(data.SubmissionId + '  Submissionas');
-                    console.log(data.SignatureId + '   Signature');
-                    this.sig_con_id = data.SignatureId;
                     this.redirecttothankyou(submissionid);
                     this.sendnotification(submissionid);
-                    // console.log((submissionid) + 'ids');
+                    this.file_u_map = data.File_upload_map;
+                    this.sig_u_map = data.Sig_upload_map;
+                    // console.log('size of the map is 3 :- ', JSON.stringify(data.File_upload_map));
+                    // console.log('size of the map is 4 :- ', JSON.stringify(this.file_u_map));
+                    // console.log('size of the map is 1 :- ', JSON.stringify(data.Sig_upload_map));
+                    // console.log('size of the map is 2 :- ', JSON.stringify(this.sig_u_map));
                     this.add_sig();
 
                 })
@@ -1103,15 +1118,21 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
                     acc: list_submission_obj,
                     first_obj_list: this.list_first_obj,
                     list_second_obj: this.list_second_obj,
-                    sin_id: this.sin_data_id
+                    // sin_id: this.sin_data_id,
+                    sig_upload_jsone: JSON.stringify(this.sig_upload),
+                    sig_upload_fid_list: this.sig_fildeid,
+                    file_upload_jsone: JSON.stringify(this.file_upload),
+                    file_upload_fid_list: this.file_upload_fildeid 
                 })
                 .then(data => {
                     console.log({
                         data
                     });
                     this.sub_id = data.SubmissionId;
-                    this.sig_con_id = data.SignatureId;
-                    submissionid = data;
+                    // this.sig_con_id = data.SignatureId;
+                    // submissionid = data;
+                    this.file_u_map = data.File_upload_map;
+                    this.sig_u_map = data.Sig_upload_map;
                     this.redirecttothankyou(submissionid);
                     this.sendnotification(submissionid);
                     this.add_sig();
@@ -1131,15 +1152,21 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
                     first_obj_list: this.list_first_obj,
                     list_second_obj: this.list_second_obj,
                     list_third_obj: this.list_third_obj,
-                    sin_id: this.sin_data_id
+                    // sin_id: this.sin_data_id
+                    sig_upload_jsone: JSON.stringify(this.sig_upload),
+                    sig_upload_fid_list: this.sig_fildeid,
+                    file_upload_jsone: JSON.stringify(this.file_upload),
+                    file_upload_fid_list: this.file_upload_fildeid 
                 })
                 .then(data => {
                     console.log({
                         data
                     });
                     this.sub_id = data.SubmissionId;
-                    this.sig_con_id = data.SignatureId;
-                    submissionid = data;
+                    // this.sig_con_id = data.SignatureId;
+                    // submissionid = data;
+                    this.file_u_map = data.File_upload_map;
+                    this.sig_u_map = data.Sig_upload_map;
                     console.log(submissionid);
                     this.redirecttothankyou(submissionid);
                     this.sendnotification(submissionid);
@@ -1152,10 +1179,12 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
                         error
                     });
                 })
-
         }
+    }
 
 
+    errorpopupcall() {
+        location.reload();
     }
     next_val_by(event) {
         let key = event.detail;
@@ -1190,6 +1219,17 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
         // console.log('len t:-',Object.keys(this.error_josn_key_list).length);
 
     }
+    add_input_val_josn(event){
+        let newval = event.detail;
+        var newvalArr = newval.split('<!@!>');
+        this.add_input_val = newvalArr[2];
+        console.log('new val :- ',newval);
+        // alert('yash');
+        // alert('yash',newvalArr[2]);
+        console.log(' newvalArr[2] :- ',newvalArr[2]);
+        console.log(' newvalArr[2] :- ',this.add_input_val );
+
+    }
 
     storefielddata(event) {
         console.log('OUTPUT yash test : ', event.detail);
@@ -1212,10 +1252,14 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
             if (testt == 'yes') {
                 console.log(' u r in testt if');
                 this.list_first_obj[ind].filde_vlue = nameArr[2];
+                this.all_filde_value[ind].filde_vlue = this.add_input_val;
 
             } else {
+                console.log(' newvalArr[2] :- ',this.add_input_val );
                 console.log(' u r in testt else');
                 this.list_first_obj[nameArr[0]] = nameArr[2];
+                console.log('all_filde_value[nameArr[0]] :- ',this.add_input_val);
+                this.all_filde_value[nameArr[0]] = this.add_input_val;
 
                 let pass_key = 'no';
                 for (let i = 0; i < this.first_list.length; i++) {
@@ -1239,11 +1283,14 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
             if (testt == 'yes') {
                 console.log(' u r in testt if');
                 this.list_second_obj[ind].filde_vlue = nameArr[2];
+                this.all_filde_value_second[ind].filde_vlue = this.add_input_val;
 
             } else {
                 console.log(' u r in testt else');
                 this.list_second_obj[nameArr[0]] = nameArr[2];
-                // this.second_list.push(nameArr[0]);
+                this.all_filde_value_second[nameArr[0]] = this.add_input_val;
+
+                this.second_list.push(nameArr[0]);
                 let pass_key = 'no';
                 for (let i = 0; i < this.second_list.length; i++) {
                     if (nameArr[0] == this.second_list[i]) {
@@ -1266,11 +1313,14 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
             if (testt == 'yes') {
                 console.log(' u r in testt if');
                 this.list_third_obj[ind].filde_vlue = nameArr[2];
+                this.all_filde_value_third[ind].filde_vlue = this.add_input_val;
+
 
             } else {
                 console.log(' u r in testt else');
                 this.list_third_obj[nameArr[0]] = nameArr[2];
-                // this.third_list.push(nameArr[0]);
+                this.all_filde_value_third[nameArr[0]] = this.add_input_val;
+                this.third_list.push(nameArr[0]);
                 let pass_key = 'no';
                 for (let i = 0; i < this.third_list.length; i++) {
                     if (nameArr[0] == this.third_list[i]) {
@@ -1293,11 +1343,13 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
             if (testt == 'yes') {
                 console.log(' u r in testt if');
                 this.list_ext_obj[ind].filde_vlue = nameArr[2];
+                this.all_filde_value_ext[ind].filde_vlue = this.add_input_val;
 
             } else {
                 console.log(' u r in testt else');
                 this.list_ext_obj[nameArr[0]] = nameArr[2];
-                // this.ex_list.push(nameArr[0]);
+                this.all_filde_value_ext[nameArr[0]] = this.add_input_val;
+                this.ex_list.push(nameArr[0]);
                 let pass_key = 'no';
                 for (let i = 0; i < this.ex_list.length; i++) {
                     if (nameArr[0] == this.ex_list[i]) {
@@ -1318,10 +1370,58 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
 
 
 
-        console.log('first_list :- ', JSON.stringify(this.first_list));
-        console.log('second_list :- ', JSON.stringify(this.second_list));
-        console.log('third_list :- ', JSON.stringify(this.third_list));
-        console.log('ex_list :- ', JSON.stringify(this.ex_list));
+        console.log('first_list :- ', JSON.stringify(this.all_filde_value));
+        console.log('second_list :- ', JSON.stringify(this.all_filde_value_second));
+        console.log('third_list :- ', JSON.stringify(this.all_filde_value_third));
+        console.log('ex_list :- ', JSON.stringify(this.all_filde_value_ext));
+
+    }
+    add_sig(event) {
+        // sig_filde_id
+        // alert('yash');
+        // console.log('this.sig_filde_id :- ', this.sig_filde_id);
+        // this.list_ext_obj[this.sig_filde_id] = this.sig_con_id;
+        
+        // console.log(' file uplode json 1111 :- ',JSON.stringify(this.file_upload_fildeid));
+        // let list_submission_obj_2 = {};
+        // list_submission_obj_2['Other_fields_data__c'] = JSON.stringify(this.list_ext_obj);
+        for(let k=0; k<this.sig_fildeid.length; k++){
+            var sig_f_id = this.sig_fildeid[k];
+            console.log('test :- ',sig_f_id);
+            var sig_con_id = this.sig_u_map[sig_f_id];
+            this.list_ext_obj[sig_f_id] = sig_con_id;
+        }
+        // for(let i=0; i<this.sig_fildeid.length; i++){
+        //     var sigfildeid = this.sig_fildeid[i];
+        //     // var only_f_id = fildeid.split('<!QF!>');
+        //     console.log('for loop fildeid :- ',sigfildeid);
+        //     var sigcon_id = this.sig_u_map[sigfildeid];
+        //     this.list_ext_obj[sigfildeid] = sigcon_id;
+        // }
+        for(let i=0; i<this.file_upload_fildeid.length; i++){
+            var fildeid = this.file_upload_fildeid[i];
+            var only_f_id = fildeid.split('<!QF!>');
+            console.log('for loop fildeid :- ',only_f_id[0]);
+            var con_id = this.file_u_map[only_f_id[0]];
+            this.list_ext_obj[only_f_id[0]] = con_id;
+        }
+        console.log(' last ex object list :- ', JSON.stringify(this.list_ext_obj));
+        var ex_object_list = JSON.stringify(this.list_ext_obj);
+
+        console.log('submit_id :- ', this.sub_id);
+        update_ext_list({
+                acc2: ex_object_list,
+                submit_id: this.sub_id
+            })
+            .then(data => {
+                console.log(data);
+
+            })
+            .catch(error => {
+                console.log({
+                    error
+                });
+            })
 
     }
 
@@ -1412,9 +1512,73 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
     convertedDataURIsin(event) {
         this.sin_data_id = event.detail.con_id;
         this.sig_filde_id = event.detail.filde_id;
+        // console.log(' u r in per :- ', this.sin_data_id);
+        // console.log(' u r in per sig_filde_id:- ', this.sig_filde_id);
 
-        console.log(' u r in per :- ', this.sin_data_id);
-        console.log(' u r in per sig_filde_id:- ', this.sig_filde_id);
+        // @track sig_upload = {};
+        // @track sig_fildeid = [];
+        this.sig_upload[this.sig_filde_id] = this.sin_data_id;
+        let add_id ='yes';
+        if(this.sig_fildeid.length == 0){
+            // this.sig_fildeid.push(this.file_upload_id); 
+            this.sig_fildeid.push(this.sig_filde_id); 
+        }
+        for(let i=0; i<this.sig_fildeid.length; i++){
+            // alert('u r in loop');
+            // if(this.file_upload_fildeid[i] == this.file_upload_id){
+            if(this.sig_fildeid[i] == this.sig_filde_id){
+                // alert('u r in in of no');
+                add_id ='no';
+            }
+        }
+        if(add_id == 'yes'){
+            // alert('u r in in of yes');
+            // this.sig_fildeid.push(this.file_upload_id); 
+            this.sig_fildeid.push(this.sig_filde_id); 
+
+        }
+        console.log(' file uplode json 1111 :- ',JSON.stringify(this.sig_upload));
+        console.log(' file uplode json 1111 :- ',JSON.stringify(this.sig_fildeid));
+    }
+    add_file_upload_josn(event) {
+        //     @track file_upload = {};
+        // @track file_upload_fildeid = [];
+        this.file_upload_id = event.detail.filde_id;
+        this.file_upload_url = event.detail.con_id;
+        let file_name = event.detail.fileName;
+        let file_titel = event.detail.contentType;
+        let add_id ='yes';
+        let full_id = this.file_upload_id+'<!QF!>'+file_name+'<!QF!>'+file_titel;
+        console.log('full id :- ',full_id);
+            // this.sin_data_id = event.detail.con_id;
+            // this.sig_filde_id = event.detail.filde_id;
+
+
+        // this.file_upload[this.file_upload_id] = this.file_upload_url;
+        this.file_upload[full_id] = this.file_upload_url;
+        console.log(' file uplode json :- ',JSON.stringify(this.file_upload));
+        if(this.file_upload_fildeid.length == 0){
+            // this.file_upload_fildeid.push(this.file_upload_id); 
+            this.file_upload_fildeid.push(full_id); 
+        }
+        for(let i=0; i<this.file_upload_fildeid.length; i++){
+            // alert('u r in loop');
+            // if(this.file_upload_fildeid[i] == this.file_upload_id){
+            if(this.file_upload_fildeid[i] == full_id){
+                // alert('u r in in of no');
+                add_id ='no';
+            }
+        }
+        if(add_id == 'yes'){
+            // alert('u r in in of yes');
+            // this.file_upload_fildeid.push(this.file_upload_id); 
+            this.file_upload_fildeid.push(full_id); 
+
+        }
+        console.log(' file uplode json 1111 :- ',JSON.stringify(this.file_upload_fildeid));
+
+        // console.log(' u r in per :- ', this.sin_data_id);
+        // console.log(' u r in per sig_filde_id:- ', this.sig_filde_id);
     }
 
     @api showerror() {
@@ -1429,4 +1593,5 @@ export default class PreviewFormCmp extends NavigationMixin(LightningElement) {
         });
         this.dispatchEvent(showpopup);
     }
+    
 }

@@ -4,8 +4,7 @@ public class Test_qfthankyou {
     static void create_record(){
         Form__c form = new Form__c();
         form.Name = 'Test';
-        form.Status__c = true;
-        form.Total_Submissions__c = 2;
+        form.Status__c = true;        
         insert form; 
         
         Thankyou_Page__c th = new Thankyou_Page__c();
@@ -22,7 +21,7 @@ public class Test_qfthankyou {
     static void Test_getthankyoupage(){
         Test.startTest();
 
-        Form__c form_data = [SELECT ID,Name,Status__c,Total_Submissions__c FROM Form__C WHERE Name = 'Test' LIMIT 1];
+        Form__c form_data = [SELECT ID,Name,Status__c FROM Form__C WHERE Name = 'Test' LIMIT 1];
         Thankyou_Page__c Thankyou_data = [SELECT ID,Thankyou_Page_Type__c,ThankYou_Label__c,Thankyou_Text__c,Thank_you_URL__c,Form__c FROM Thankyou_Page__C WHERE Form__C =: form_data.ID];
 		
         string form_id = null;
@@ -37,7 +36,7 @@ public class Test_qfthankyou {
     static void Test_insertrecord(){
         Test.StartTest();
 
-        Form__c form_data = [SELECT ID,Name,Status__c,Total_Submissions__c FROM Form__C WHERE Name = 'Test' LIMIT 1];
+        Form__c form_data = [SELECT ID,Name,Status__c FROM Form__C WHERE Name = 'Test' LIMIT 1];
         Thankyou_Page__c Thankyou_data = [SELECT ID,Name,Thankyou_Page_Type__c,ThankYou_Label__c,Thankyou_Text__c,Thank_you_URL__c,Form__c FROM Thankyou_Page__C WHERE Form__C =: form_data.ID];
 
         qfthankyou.insertrecord(Thankyou_data.Name,Thankyou_data.Thankyou_Page_Type__c,Thankyou_data.ThankYou_Label__c,Thankyou_data.Thankyou_Text__c,Thankyou_data.Form__c,Thankyou_data.Thank_you_URL__c,Thankyou_data.Id);
@@ -51,7 +50,7 @@ public class Test_qfthankyou {
     static void Test_getrecordslist(){
         Test.StartTest();
         
-        Form__c form_data = [SELECT ID,Name,Status__c,Total_Submissions__c FROM Form__C WHERE Name = 'Test' LIMIT 1];
+        Form__c form_data = [SELECT ID,Name,Status__c FROM Form__C WHERE Name = 'Test' LIMIT 1];
         Thankyou_Page__c Thankyou_data = [SELECT ID,Thankyou_Page_Type__c,ThankYou_Label__c,Thankyou_Text__c,Thank_you_URL__c,Form__c FROM Thankyou_Page__C WHERE Form__C =: form_data.ID];
  		String id = null;
         

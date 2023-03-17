@@ -73,9 +73,12 @@ public without sharing class FormBuilderController{
                             if (hasAddress){
                                 type1 = 'QFADDRESS';
                             }
+                            // Here not adding contact objects Name field
+                            if (type != 'Contact' && temp != 'Name') {
                             compoundFields.add(temp + './.' + type1);
                         }
                     }
+                }
                 }
                 Fields.addAll(compoundFields);
                 allFields.add(Fields);
@@ -1571,7 +1574,7 @@ public without sharing class FormBuilderController{
     }
 
     @AuraEnabled
-    public static Id SaveFile(String fieldId, String fileName, String base64Data, String contentType){
+    public static String SaveFile(String fieldId, String fileName, String base64Data, String contentType){
         try{
             base64Data = EncodingUtil.urlDecode(base64Data, 'UTF-8');
             ContentVersion cv = new ContentVersion();
@@ -1581,20 +1584,21 @@ public without sharing class FormBuilderController{
             cv.IsMajorVersion = true;
             Insert cv;
 
-            Form_Fields__c formField = [SELECT Id, Form__c
-                                        FROM Form_Fields__c
-                                        WHERE Id = :fieldId];
+            // Form_Fields__c formField = [SELECT Id, Form__c
+            //                             FROM Form_Fields__c
+            //                             WHERE Id = :fieldId];
             String conDocId = [SELECT ContentDocumentId
                                FROM ContentVersion
                                WHERE Id = :cv.Id].ContentDocumentId;
             ContentDocumentLink cl = new ContentDocumentLink();
             cl.ContentDocumentId = conDocId;
-            cl.LinkedEntityId = formField.Form__c;
+            // cl.LinkedEntityId = formField.Form__c;
+            cl.LinkedEntityId = fieldId;
             cl.ShareType = 'V';
             cl.Visibility = 'AllUsers';
             insert cl;
 
-            return conDocId;
+            return cv.Id;
         } catch (Exception e){
             // GenericException Exp = ExceptionHandler.logException(e, 'QFFormFieldComponentController', 'SaveFile');
             // error_handler.insert_errordata(e,'FormBuilderController','SaveFile');
@@ -1644,28 +1648,65 @@ public without sharing class FormBuilderController{
     }
 
     @AuraEnabled
-    public static SubId createrecord(Form_Submission__c acc, SObject first_obj_list, String sin_id){
+    public static SubId createrecord(Form_Submission__c acc, SObject first_obj_list, String sig_upload_jsone, List<String> sig_upload_fid_list, String file_upload_jsone, List<String> file_upload_fid_list){
         // public static void createrecord(Account acc){
         try{
-            System.debug('yasj ' + acc);
-            System.debug('yasj first_obj_list' + first_obj_list);
-            System.debug(acc.name);
+            // System.debug('yasj ' + acc);
+            // System.debug('yasj first_obj_list' + first_obj_list);
+            // System.debug(acc.name);
+            // System.debug('sigdid list:- '+sig_upload_fid_list);
+            // System.debug('fildid list:- '+file_upload_fid_list);
+            // System.debug(acc.name);
             String signatureid;
+            String fildid;
+            Map<String, Object> file_upload_map = new Map<String, Object>();
+            Map<String, Object> sig_upload_map = new Map<String, Object>();
+            // System.debug('test sing json '+file_upload_jsone);
+            // System.debug('test file json '+file_upload_jsone);
+            Map<String, Object> sig_map = (Map<String, Object>)JSON.deserializeUntyped(sig_upload_jsone);
+            Map<String, Object> m = (Map<String, Object>)JSON.deserializeUntyped(file_upload_jsone);
+            // System.debug(sig_upload_jsone);
+            // System.debug(sig_upload_jsone);
             insert acc;
             insert first_obj_list;
-            Form__c form = [SELECT Total_Submissions__c
-                            FROM Form__c
-                            WHERE Id = :acc.Form__c];
-            form.Total_Submissions__c += 1;
-            update form;
             String sub_id = acc.Id;
-            if (sin_id != 'undefined' || sin_id != '' || sin_id != null){
-                signatureid = signatureSave(sub_id, sin_id);
-                System.debug('test nimit :- ' + signatureid);
+
+            // if (sin_id != 'undefined' || sin_id != '' || sin_id != null){
+            //     signatureid = signatureSave(sub_id, sin_id);
+            //     System.debug('test nimit :- ' + signatureid);
+            // }
+            Integer sig_list_len = sig_upload_fid_list.size();
+            if (sig_list_len > 0) {
+                for (String sig_type : sig_upload_fid_list) {
+                    String sig_baseid = (String)sig_map.get(sig_type);
+                    // fildid = SaveFile(sub_id, f_name, baseid, f_type);
+                    signatureid = signatureSave(sub_id, sig_baseid);
+                    System.debug('aftre :- '+signatureid);
+                    sig_upload_map.put(sig_type,signatureid);
+            }
+                System.debug('finel id :- '+sig_upload_map);
+            }
+
+            Integer list_len = file_upload_fid_list.size();
+            if (list_len > 0) {
+                for (String type : file_upload_fid_list) {
+                    String[] address = type.split('<!QF!>');
+                    String f_name = address[1];
+                    String f_type = address[2];
+                    String baseid = (String)m.get(type);
+                    fildid = SaveFile(sub_id, f_name, baseid, f_type);
+                    System.debug('aftre :- '+fildid);
+                    file_upload_map.put(address[0],fildid);
+                }
+                System.debug('finel id :- '+file_upload_map);
             }
             SubId ids = new SubId();
             ids.SubmissionId = acc.Id;
             ids.SignatureId = signatureid;
+                ids.Sig_upload_map = sig_upload_map;
+                ids.File_upload_map = file_upload_map;
+            // System.debug('idsss :-'+ids);
+            // insert ids;
             return ids;
         } catch (Exception e){
             System.debug('error --> ' + e);
@@ -1675,15 +1716,20 @@ public without sharing class FormBuilderController{
     }
 
     @AuraEnabled
-    public static SubId createrecord_for_secod_object(Form_Submission__c acc, SObject first_obj_list, SObject list_second_obj, String sin_id){
+    public static SubId createrecord_for_secod_object(Form_Submission__c acc, SObject first_obj_list, SObject list_second_obj,String sig_upload_jsone, List<String> sig_upload_fid_list, String file_upload_jsone, List<String> file_upload_fid_list){
         try{
             System.debug('yasj ' + acc);
             System.debug(acc.name);
             String signatureid;
+            String fildid;
+            Map<String, Object> file_upload_map = new Map<String, Object>();
+            Map<String, Object> sig_upload_map = new Map<String, Object>();
+            Map<String, Object> sig_map = (Map<String, Object>)JSON.deserializeUntyped(sig_upload_jsone);
+            Map<String, Object> m = (Map<String, Object>)JSON.deserializeUntyped(file_upload_jsone);
             insert acc;
-            System.debug('yasj first_obj_list' + first_obj_list);
+            // System.debug('yasj first_obj_list' + first_obj_list);
             insert first_obj_list;
-            System.debug('yasj first_obj_list' + list_second_obj);
+            // System.debug('yasj first_obj_list' + list_second_obj);
             // Contact acctest = new Contact();
             // acctest.AccountId =first_obj_list.id;
             // list_second_obj.add(acctest);
@@ -1691,18 +1737,37 @@ public without sharing class FormBuilderController{
             // tasks.AccountId=first_obj_list.id;
             // // list_second_obj.'AccountId' =first_obj_list.id;
             insert list_second_obj;
-            Form__c form = [SELECT Total_Submissions__c
-                            FROM Form__c
-                            WHERE Id = :acc.Form__c];
-            form.Total_Submissions__c += 1;
-            update form;
             String sub_id = acc.Id;
-            if (sin_id != 'undefined' || sin_id != '' || sin_id != null){
-                signatureid = signatureSave(sub_id, sin_id);
+            Integer sig_list_len = sig_upload_fid_list.size();
+            if (sig_list_len > 0) {
+                for (String sig_type : sig_upload_fid_list) {
+                    String sig_baseid = (String)sig_map.get(sig_type);
+                    // fildid = SaveFile(sub_id, f_name, baseid, f_type);
+                    signatureid = signatureSave(sub_id, sig_baseid);
+                    System.debug('aftre :- '+signatureid);
+                    sig_upload_map.put(sig_type,signatureid);
+                }
+                System.debug('finel id :- '+sig_upload_map);
+            }
+
+            Integer list_len = file_upload_fid_list.size();
+            if (list_len > 0) {
+                for (String type : file_upload_fid_list) {
+                    String[] address = type.split('<!QF!>');
+                    String f_name = address[1];
+                    String f_type = address[2];
+                    String baseid = (String)m.get(type);
+                    fildid = SaveFile(sub_id, f_name, baseid, f_type);
+                    System.debug('aftre :- '+fildid);
+                    file_upload_map.put(address[0],fildid);
+                }
+                System.debug('finel id :- '+file_upload_map);
             }
             SubId ids = new SubId();
             ids.SubmissionId = acc.Id;
             ids.SignatureId = signatureid;
+            ids.Sig_upload_map = sig_upload_map;
+            ids.File_upload_map = file_upload_map;
             return ids;
         } catch (Exception e){
             System.debug('error --> ' + e);
@@ -1712,28 +1777,53 @@ public without sharing class FormBuilderController{
     }
 
     @AuraEnabled
-    public static SubId createrecord_for_third_object(Form_Submission__c acc, SObject first_obj_list, SObject list_second_obj, SObject list_third_obj, String sin_id){
+    public static SubId createrecord_for_third_object(Form_Submission__c acc, SObject first_obj_list, SObject list_second_obj, SObject list_third_obj,String sig_upload_jsone, List<String> sig_upload_fid_list, String file_upload_jsone, List<String> file_upload_fid_list){
         try{
             System.debug('yasj ' + acc);
             System.debug('yasj first_obj_list' + first_obj_list);
             System.debug(acc.name);
             String signatureid;
+            String fildid;
+            Map<String, Object> file_upload_map = new Map<String, Object>();
+            Map<String, Object> sig_upload_map = new Map<String, Object>();
+            Map<String, Object> sig_map = (Map<String, Object>)JSON.deserializeUntyped(sig_upload_jsone);
+            Map<String, Object> m = (Map<String, Object>)JSON.deserializeUntyped(file_upload_jsone);
             insert acc;
             insert first_obj_list;
             insert list_second_obj;
             insert list_third_obj;
-            Form__c form = [SELECT Total_Submissions__c
-                            FROM Form__c
-                            WHERE Id = :acc.Form__c];
-            form.Total_Submissions__c += 1;
-            update form;
             String sub_id = acc.Id;
-            if (sin_id != 'undefined' || sin_id != '' || sin_id != null){
-                signatureid = signatureSave(sub_id, sin_id);
+            Integer sig_list_len = sig_upload_fid_list.size();
+            if (sig_list_len > 0) {
+                for (String sig_type : sig_upload_fid_list) {
+                    String sig_baseid = (String)sig_map.get(sig_type);
+                    // fildid = SaveFile(sub_id, f_name, baseid, f_type);
+                    signatureid = signatureSave(sub_id, sig_baseid);
+                    System.debug('aftre :- '+signatureid);
+                    sig_upload_map.put(sig_type,signatureid);
+                }
+                System.debug('finel id :- '+sig_upload_map);
             }
+
+            Integer list_len = file_upload_fid_list.size();
+            if (list_len > 0) {
+                for (String type : file_upload_fid_list) {
+                    String[] address = type.split('<!QF!>');
+                    String f_name = address[1];
+                    String f_type = address[2];
+                    String baseid = (String)m.get(type);
+                    fildid = SaveFile(sub_id, f_name, baseid, f_type);
+                    System.debug('aftre :- '+fildid);
+                    file_upload_map.put(address[0],fildid);
+                }
+                System.debug('finel id :- '+file_upload_map);
+            }
+            
             SubId ids = new SubId();
             ids.SubmissionId = acc.Id;
             ids.SignatureId = signatureid;
+            ids.Sig_upload_map = sig_upload_map;
+            ids.File_upload_map = file_upload_map;
             return ids;
         } catch (Exception e){
             System.debug('error --> ' + e);
@@ -1786,6 +1876,14 @@ public without sharing class FormBuilderController{
 
         @AuraEnabled
         public String SignatureId{ get; set; }
+
+        @AuraEnabled
+        public Map<String,Object> Sig_upload_map { get; set; }
+
+        @AuraEnabled
+        public Map<String,Object> File_upload_map { get; set; }
+
+        
 
     }
 

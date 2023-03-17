@@ -73,23 +73,23 @@
                                 <!-- Replace the variable name obj and used record as per the sheet(qf_home.html - 4) -->
 
                                 <template for:each={PaginationList} for:item="record">
-                                    <div class="tableBody" key={record.Id}>
+                                    <div class="tableBody" key={record.formlist.Id}>
                                         <div class="tableIndexCol">
                                             {index}
                                         </div>
-                                        <div class="tableTitleCol"  data-id={record.Id} data-name={record.Name} onmouseover={showpen} onmouseleave={hidepen} >
-                                            <div class="slds-truncate titlename " data-id={record.Id} data-name={record.Name} ondblclick={new_rename}>
+                                        <div class="tableTitleCol"  data-id={record.formlist.Id} data-name={record.formlist.Name} onmouseover={showpen} onmouseleave={hidepen} >
+                                            <div class="slds-truncate titlename " data-id={record.formlist.Id} data-name={record.formlist.Name} ondblclick={new_rename}>
                                                 <div class="name">
-                                                    <lightning-formatted-text value={record.Name} class="slds-col title_name" title={record.Name} data-id={record.Id}></lightning-formatted-text>
+                                                    <lightning-formatted-text value={record.formlist.Name} class="slds-col title_name" title={record.formlist.Name} data-id={record.formlist.Id}></lightning-formatted-text>
                                                 </div>
-                                                <div class="slds-col slds-grid slds-wrap rename_div" data-name={record.Id}>
-                                                    <lightning-input type="text" value={formname} data-id={record.Id} onchange={rename} onkeypress={key} onclick={insideClick} class="rename_input"></lightning-input>
+                                                <div class="slds-col slds-grid slds-wrap rename_div" data-name={record.formlist.Id}>
+                                                    <lightning-input type="text" value={formname} data-id={record.formlist.Id} onchange={rename} onkeypress={key} onclick={insideClick} class="rename_input"></lightning-input>
                                                         <div class="right" onclick={renameForm}><img src={right} alt=""></div><div class="wrong" onclick={cancleRenameForm}>
                                                             <img src={cross} alt="">
                                                         </div>
                                                 </div>
                                             </div>
-                                            <span class="editpen" data-id={record.Id} data-name={record.Name} onclick={new_rename} title="Rename" ><img src={editpen} class="penicon"></span>
+                                            <span class="editpen" data-id={record.formlist.Id} data-name={record.formlist.Name} onclick={new_rename} title="Rename" ><img src={editpen} class="penicon"></span>
                                         </div>
                                         <div class="tableStatusCol">
                                             <div class="slds-truncate">
@@ -97,9 +97,9 @@
                                                     <div class="content">
                                                         <label class="switch">
                                                             <input type="checkbox"
-                                                                checked={record.Status__c}
-                                                                name={record.Id}
-                                                                data-id={record.Id}
+                                                                checked={record.formlist.Status__c}
+                                                                name={record.formlist.Id}
+                                                                data-id={record.formlist.Id}
                                                                 onchange={changestatus}
                                                                 />
                                                             <small></small>
@@ -110,17 +110,17 @@
                                         </div>
                                         <div class="tableSubmissionCol">
                                             <div class="slds-truncate">
-                                                {record.Total_Submissions__c}
+                                                {record.submission_count}
                                             </div>
                                         </div>
                                         <div class="tablePreviewCol">
-                                            <div class="previewIcon" data-id={record.Id} onclick={onpreview}>
-                                                <img src={previewicon} name={record.Id} width="22" />
+                                            <div class="previewIcon" data-id={record.formlist.Id} onclick={onpreview}>
+                                                <img src={previewicon} name={record.formlist.Id} width="22" />
                                             </div>
                                         </div>
                                         <div class="tableActionCol">
                                             <lightning-button-menu class="buttonMenu" variant="container"
-                                                name={record.Id} value={record.Name} data-id={record.Id} data-name={record.Name}
+                                                name={record.formlist.Id} value={record.formlist.Name} data-id={record.formlist.Id} data-name={record.formlist.Name}
                                                 onselect={handleSelectAction} menu-alignment="top-left">
                                                 <lightning-menu-item value="Edit" label="Edit"
                                                     prefix-icon-name="utility:edit_form"></lightning-menu-item> 

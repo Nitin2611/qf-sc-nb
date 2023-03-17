@@ -1,16 +1,31 @@
 public without sharing class previewFormcmp {
 
     @AuraEnabled
-    public static Form__c formdetails(Id id){
+    public static Form__c formdetails(Id id, String webUrl, Boolean isPreview){
+        Form__c nform = new Form__c();
         try{
-        Form__c nform = [SELECT Id,Name,Progress_Indicator__c,Captcha_Type__c,Button_CSS__c,Button_Position__c,
-        Page_CSS__c,Form_Styling__c, All_Field_Hover__c, All_Field_Focus__c,All_Field_Styling__c,Label_CSS__c,FormBgID__c,PageBgID__c, Status__c FROM Form__c WHERE Id =: id];
-        return nform;
+            nform = [SELECT Id,Name,Progress_Indicator__c,Captcha_Type__c,Button_CSS__c,Button_Position__c,Page_CSS__c,Form_Styling__c, 
+                    All_Field_Hover__c, All_Field_Focus__c,All_Field_Styling__c,Label_CSS__c,FormBgID__c,PageBgID__c, Status__c 
+                    FROM Form__c WHERE Id =: id];
+            System.debug('webUrl --> '+webUrl);
+            if(nform.Status__c && webUrl != null && webUrl != '') {
+                String baseUrl = webUrl.split('PreViewForm?')[0];
+                System.debug('baseUrl ---> '+baseUrl);
+                
+                QuickForm_Administration__c customsetting = QuickForm_Administration__c.getOrgDefaults();
+                System.debug('SecureUrl-'+customsetting.SecureUrl__c);
+                if(baseUrl != customsetting.SecureUrl__c) {
+                    nform.Status__c = false;
+                }
+            }else if(webUrl == null || webUrl == ''){
+                nform.Status__c = true;
+            }
         } catch (Exception e) {
             // error_handler.insert_errordata(e,'previewFormcmp','formdetails');
             // throw new AuraHandledException(e.getMessage());
             return null;
         }
+        return nform;
     }
 
     @AuraEnabled
@@ -75,9 +90,11 @@ public without sharing class previewFormcmp {
         }
     }
     @AuraEnabled
-    public static string sendemailaftersubmission(Id formid, Id submissionid){
+    public static void sendemailaftersubmission(Id formid, Id submissionid){
         try {
-            Notification__c notify = [SELECT Id,To_Recipients__c,CC_Recipients__c,BCC_Recipients__c,Subject__c,Email_Body__c,Attachment__c FROM Notification__c WHERE Form__c =: formid];
+            Notification__c notify = [SELECT Id,To_Recipients__c,CC_Recipients__c,BCC_Recipients__c,Subject__c,Email_Body__c,Attachment__c,Status__c  FROM Notification__c WHERE Form__c =: formid];
+            if(notify.Status__c == true){
+                System.debug('Inside Notify Condition : ');
             if(notify != null || notify.Id != null){
             String recipientList = notify.To_Recipients__c;
             String ccmaillist = notify.CC_Recipients__c;
@@ -126,11 +143,12 @@ public without sharing class previewFormcmp {
                 Messaging.SendEmailResult [] results = Messaging.sendEmail(new Messaging.SingleEmailMessage[] {emailNotification});
             }
         }
-            return 'Success';
+        }
+            // return 'Success';
         } catch (Exception e) {
              // error_handler.insert_errordata(e,'previewFormcmp','sendemailaftersubmission');
             // throw new AuraHandledException(e.getMessage());
-            return null;
+            // return null;
         }
     }
 }

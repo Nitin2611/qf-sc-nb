@@ -38,6 +38,11 @@ import editFormSubmit from '@salesforce/apex/FormBuilderController.editFormSubmi
 // Importing Apec Metods
 import reOrderField from '@salesforce/apex/FormBuilderController.reOrderField';
 import formdetails from '@salesforce/apex/FormBuilderController.formdetails';
+import {
+    loadStyle,
+    loadScript
+} from 'lightning/platformResourceLoader';
+import helptextcss from '@salesforce/resourceUrl/helptextcss'
 
 export default class FormBuilder extends NavigationMixin(LightningElement) {
 
@@ -118,6 +123,10 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
     @track btncss;
     @track isFieldView;
 
+    //error_popup
+    @api error_popup = false;
+    message;
+
     connectedCallback() {
 
         formdetails({
@@ -131,10 +140,15 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
                 this.focuscss = result.All_Field_Focus__c
                 this.fcss = result.All_Field_Styling__c;
                 this.lcss = result.Label_CSS__c;
+
+            }).catch(error => {
+                this.message = 'Something Went Wrong In Form BUilder Page';
+                this.showerror(this.message);
             })
         this.spinnerDataTable = true;
         this.activesidebar = true;
         this.reloadform();
+        loadStyle(this, helptextcss);
 
     }
 
@@ -151,6 +165,8 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
 
             }).catch(error => {
                 console.log(error);
+                this.message = 'Something Went Wrong In Form BUilder Page';
+                this.showerror(this.message);
             });
         getFieldsRecords({
                 id: this.ParentMessage
@@ -325,6 +341,9 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
 
     handlebtncss(event) {
         var str = event.detail;
+        if (event.detail == null || event.detail == undefined) {
+            str = this.btncss;
+        }
         console.log('btnpost :- ' + str);
         let Arr = this.template.querySelectorAll(".btn1");
         console.log('Arr btn pos:- ' + Arr.length);
@@ -363,6 +382,8 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
                 error
             });
             console.log('above error ==>' + error);
+            this.message = 'Something Went Wrong In Form BUilder Page';
+            this.showerror(this.message);
         }
     }
 
@@ -398,7 +419,7 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
                 }
             });
         } else if (event.currentTarget.dataset.title == 'tab-2' || event.currentTarget.dataset.title == 'tab-3') {
-            
+
             console.log('in tab-2 or tab-3 code-->');
             if (event.currentTarget.dataset.title == 'tab-2') {
                 if (this.fieldvalidationdiv == true) {
@@ -502,6 +523,8 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
                 error
             });
             console.log('above error ==>' + error);
+            this.message = 'Something Went Wrong In Form BUilder Page';
+            this.showerror(this.message);
         }
     }
 
@@ -716,6 +739,8 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
                 error
             });
             console.log('above error ==>' + error);
+            this.message = 'Something Went Wrong In Form BUilder Page';
+            this.showerror(this.message);
         }
 
     }
@@ -739,6 +764,8 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
 
         }).catch(err => {
             console.log(err);
+            this.message = 'Something Went Wrong In Form BUilder Page';
+            this.showerror(this.message);
         });
         this.template.querySelector("c-fields-section-component").removeField(fieldlabelname);
         console.log('log---------------->' + this.template.querySelector("c-fields-section-component"));
@@ -751,7 +778,7 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
             for (let i = 0; i < dropzone.length; i++) {
                 var field = dropzone[i].querySelectorAll('.field');
                 if (field.length == 0) {
-                    dropzone[i].style = "background-image: url('/resource/dropHere');background-size: cover;background-repeat: no-repeat;height:120px;";
+                    dropzone[i].style = "background-image: url('/resource/dropHere');background-size: cover;background-repeat: no-repeat;height:160px; weight:300px !important;";
                 } else {
                     dropzone[i].style = "opacity:0.4";
                 }
@@ -807,7 +834,7 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
                                 this.removeObjFields.push(fieldofObj[0]);
                             }
                         }
-                        console.log('removeObjFields --> ',JSON.stringify(this.removeObjFields));
+                        console.log('removeObjFields --> ', JSON.stringify(this.removeObjFields));
                         for (let index = 0; index < this.removeObjFields.length; index++) {
                             this.template.querySelector('c-fields-section-component').removeField(this.removeObjFields[index]);
                         }
@@ -898,6 +925,8 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
                 error
             });
             console.log('above error ==>' + error);
+            this.message = 'Something Went Wrong In Form BUilder Page';
+            this.showerror(this.message);
         }
 
     }
@@ -959,6 +988,8 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
 
             }).catch(err => {
                 console.log(err);
+                this.message = 'Something Went Wrong In Form BUilder Page';
+                this.showerror(this.message);
             })
         }
     }
@@ -1010,6 +1041,8 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
             }
         }).catch(err => {
             console.log(err);
+            this.message = 'Something Went Wrong In Form BUilder Page';
+            this.showerror(this.message);
         })
     }
 
@@ -1056,6 +1089,8 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
             }
         }).catch(err => {
             console.log(err);
+            this.message = 'Something Went Wrong In Form BUilder Page';
+            this.showerror(this.message);
         })
     }
 
@@ -1145,6 +1180,8 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
                 error
             });
             console.log('above error ==>' + error);
+            this.message = 'Something Went Wrong In Form BUilder Page';
+            this.showerror(this.message);
         }
     }
 
@@ -1184,6 +1221,8 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
                 let toast_error_msg = 'Error while creating page, Please try again later';
                 this.error_toast = true;
                 this.template.querySelector('c-toast-component').showToast('error', toast_error_msg, 3000);
+                this.message = 'Something Went Wrong In Form BUilder Page';
+                this.showerror(this.message);
             })
             this.isModalOpen1 = false;
             this.handleModalClose();
@@ -1193,6 +1232,8 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
                 error
             });
             console.log('above error ==>' + error);
+            this.message = 'Something Went Wrong In Form BUilder Page';
+            this.showerror(this.message);
         }
     }
 
@@ -1227,6 +1268,9 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
             } else {
                 this.template.querySelector('c-toast-component').showToast('success', 'Page deleted successfully', 3000);
             }
+        }).catch(error => {
+            this.message = 'Something Went Wrong In Form BUilder Page';
+            this.showerror(this.message);
         })
     }
 
@@ -1296,6 +1340,8 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
             console.log({
                 error
             });
+            this.message = 'Something Went Wrong In Form BUilder Page';
+            this.showerror(this.message);
         }
     }
 
@@ -1319,6 +1365,8 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
             console.log({
                 error
             });
+            this.message = 'Something Went Wrong In Form BUilder Page';
+            this.showerror(this.message);
         }
 
     }
@@ -1350,9 +1398,13 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
 
             } catch (error) {
                 console.error('check error here', error);
+                this.message = 'Something Went Wrong In Form BUilder Page';
+                this.showerror(this.message);
             }
         } else if (error) {
             console.error('check error here', error);
+            this.message = 'Something Went Wrong In Form BUilder Page';
+            this.showerror(this.message);
         }
 
     }
@@ -1387,9 +1439,13 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
 
             } catch (error) {
                 console.error('check error here', error);
+                this.message = 'Something Went Wrong In Form BUilder Page';
+                this.showerror(this.message);
             }
         } else if (error) {
             console.error('check error here', error);
+            this.message = 'Something Went Wrong In Form BUilder Page';
+            this.showerror(this.message);
         }
 
     }
@@ -1472,17 +1528,17 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
         let cmpDef = {
             componentDef: "c:formBuilder",
             attributes: {
-              ParentMessage: this.ParentMessage != "" ? this.ParentMessage : "No Record Created",
-              FormName: this.FormName != "" ? this.FormName : "No Name Given"
+                ParentMessage: this.ParentMessage != "" ? this.ParentMessage : "No Record Created",
+                FormName: this.FormName != "" ? this.FormName : "No Name Given"
             }
-          };
-          let encodedDef = btoa(JSON.stringify(cmpDef));
-          this[NavigationMixin.Navigate]({
+        };
+        let encodedDef = btoa(JSON.stringify(cmpDef));
+        this[NavigationMixin.Navigate]({
             type: "standard__webPage",
             attributes: {
-              url: "/one/one.app#" + encodedDef
+                url: "/one/one.app#" + encodedDef
             }
-          });
+        });
         // console.log('after delete event --> ' + event.detail);
         // console.log(this.activesidebar);
         // this.spinnerDataTable = true;
@@ -1538,7 +1594,7 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
         //     var allDiv = this.template.querySelector('.tab-2');
         //     allDiv.style = 'background-color: #8EBFF0;padding: 12%;border-radius: 50%;';
         // });
-            // this.tempararyfun();
+        // this.tempararyfun();
     }
 
     bin = iconsZip + '/Iconfolder/bin.png';
@@ -1571,6 +1627,9 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
                 this.error_toast = true;
                 this.template.querySelector('c-toast-component').showToast('success', toast_error_msg, 3000);
             }
+        }).catch(error => {
+            this.message = 'Something Went Wrong In Form BUilder Page';
+            this.showerror(this.message);
         })
     }
 
@@ -1578,4 +1637,38 @@ export default class FormBuilder extends NavigationMixin(LightningElement) {
         this.deletepopup = false;
         this.error_toast = false;
     }
+
+    errorpopupcall(event) {
+        location.reload();
+    }
+
+    @track errordata;
+    showerror() {
+        console.log('this.error_popup => ', this.error_popup);
+        this.error_popup = true;
+        this.errordata = {
+            header_type: 'Form Builder',
+            Message: this.message
+        };
+        const showpopup = new CustomEvent('showerrorpopup', {
+            detail: this.errordata
+        });
+        console.log('showpopup ==>', showpopup);
+        this.dispatchEvent(showpopup);
+        console.log('dispatchEvent  ==>');
+        this.showerrorpopup(showpopup);
+        console.log('showerrorpopup  ==>');
+    }
+
+    @api
+    showerrorpopup(event) {
+        try {
+            console.log('showerrorpopup', event.detail.Message);
+            this.error_popup = true;
+            this.template.querySelector('c-errorpopup').errormessagee(event.detail.header_type, event.detail.Message);
+        } catch (error) {
+            console.log('error in show err>>>', error);
+        }
+    }
+
 }

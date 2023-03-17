@@ -244,18 +244,18 @@
                                         </template>
                                     </template>
 
-                                    <template if:true={page.isIndexIsNotLast} style="gap:20px;">
+                                    <template if:true={page.isIndexIsNotLast} >
 
-                                        <button id={previousButton} variant="brand" value="Previous" title="Previous"
+                                            <button id={previousButton} variant="brand" value="Previous" title="Previous"
                                             onclick={onaddpage1} class="btn1">Previous</button>
-                                        <button id={nextButton} variant="brand" value="Next" title="Next"
+                                            <button id={nextButton} variant="brand" value="Next" title="Next"
                                             onclick={onaddpage1} class="btn1">Next</button>
 
                                     </template>
                                     
-                                    <template if:true={page.isIndexLast} style="gap:20px;">
+                                    <template if:true={page.isIndexLast}>
 
-                                        <button variant="brand" value="Previous" title="Previous" onclick={onaddpage1}
+                                            <button variant="brand" value="Previous" title="Previous" onclick={onaddpage1}
                                             class="btn1">Previous</button>
                                         <button variant="brand" value="Submit" title="Submit" onclick={onaddpage1}
                                             class="btn1">Submit</button>
@@ -330,7 +330,7 @@
                                 <div class="slds-col slds-size_5-of-12">
                                     <label class="input_field-label">Progress Indicator <lightning-helptext
                                             variant="label-hidden"
-                                            content="To display the form using the Progress bar or Steps"></lightning-helptext></label>
+                                            content="To display the form using the Progress bar or Steps" class="helptext"></lightning-helptext></label>
                                 </div>
                                 <div class="slds-col slds-size_1-of-12">
                                     :
@@ -349,7 +349,7 @@
                             <div class="slds-grid slds-wrap">
                                 <div class="slds-col slds-size_5-of-12">
                                     <label class="input_field-label">Captcha Type <lightning-helptext
-                                            content="Choose a captcha type to display a generic test to the user to determine whether or not they are human."></lightning-helptext></label>
+                                            content="Choose a captcha type to display a generic test to the user to determine whether or not they are human." class="helptext"></lightning-helptext></label>
                                 </div>
                                 <div class="slds-col slds-size_1-of-12">
                                     :
@@ -448,7 +448,7 @@
                                 <div class="slds-col slds-size_5-of-12">
                                     <label class="input_field-label"><abbr>*</abbr>Page Title <lightning-helptext
                                             variant="label-hidden"
-                                            content="To display the page title"></lightning-helptext></label>
+                                            content="To display the page title" class="helptext"></lightning-helptext></label>
                                 </div>
                                 <div class="slds-col slds-size_1-of-12">
                                     :
@@ -467,7 +467,7 @@
                                 <div class="slds-col slds-size_5-of-12">
                                     <label class="input_field-label">Page Number <lightning-helptext
                                             variant="label-hidden"
-                                            content="To place the new page on any index number. "></lightning-helptext></label>
+                                            content="To place the new page on any index number. " class="helptext"></lightning-helptext></label>
                                 </div>
                                 <div class="slds-col slds-size_1-of-12">
                                     :
@@ -523,7 +523,7 @@
                                 <div class="slds-col slds-size_5-of-12">
                                     <label class="input_field-label"><abbr>*</abbr>Page Title<lightning-helptext
                                             variant="label-hidden"
-                                            content="To display the page title"></lightning-helptext></label>
+                                            content="To display the page title" class="helptext"></lightning-helptext></label>
                                 </div>
                                 <div class="slds-col slds-size_1-of-12">
                                     :
@@ -542,7 +542,7 @@
                                 <div class="slds-col slds-size_5-of-12">
                                     <label class="input_field-label">Page Number<lightning-helptext
                                             variant="label-hidden"
-                                            content="To place the new page on any index number. "></lightning-helptext></label>
+                                            content="To place the new page on any index number. " class="helptext"></lightning-helptext></label>
                                 </div>
                                 <div class="slds-col slds-size_1-of-12">
                                     :

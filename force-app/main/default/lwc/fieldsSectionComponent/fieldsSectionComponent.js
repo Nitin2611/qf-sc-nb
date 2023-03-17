@@ -39,6 +39,10 @@ export default class FieldsSectionComponent extends LightningElement {
     @track FormTitle = 'tempvlaue';
     @track FieldList = [];
     @api formid;
+
+    //error_popup
+    @api error_popup = false;
+    message;
     connectedCallback() {
         console.log('>>>>> ' + this.formid);
 
@@ -73,12 +77,13 @@ export default class FieldsSectionComponent extends LightningElement {
             }
         }).catch(error => {
             console.log(error);
+            this.message = 'Something Went Wrong In Field Section Page';
+            this.showerror(this.message);
         })
 
         getFields({
             id: this.formid
         }).then(result => {
-            console.log('*** getFields reult from Apex ==>', result);
             let LabelList = [];
             let OnlyLabelList = [];
             for (let i = 0; i < result.length; i++) {
@@ -132,6 +137,8 @@ export default class FieldsSectionComponent extends LightningElement {
             console.log({
                 error
             });
+            this.message = 'Something Went Wrong In Field Section Page';
+            this.showerror(this.message);
         });
 
         GetFieldsMetaData()
@@ -173,14 +180,15 @@ export default class FieldsSectionComponent extends LightningElement {
                 console.log('Event:-- ' + stopspinner);
                 this.dispatchEvent(stopspinner);
             }).catch(error => {
-
+                this.message = 'Something Went Wrong In Field Section Page';
+                this.showerror(this.message);
             });
     }
 
-    renderedCallback(){
+    renderedCallback() {
         var element = this.template.querySelector('.slds-icon-standard-account');
-        if (element != null){
-            console.log('queryselector slds-icon-standard-asset' , element.style);
+        if (element != null) {
+            console.log('queryselector slds-icon-standard-asset', element.style);
         }
 
     }
@@ -223,10 +231,13 @@ export default class FieldsSectionComponent extends LightningElement {
                 error
             });
             console.log('above error ==>' + error);
+            this.message = 'Something Went Wrong In Field Section Page';
+            this.showerror(this.message);
         }
     }
 
     onDragOver(event) {
+        try {
         console.log('ondrop starts in ondragOver');
         this.activeDropZone = false;
         const custEvent = new CustomEvent(
@@ -237,8 +248,15 @@ export default class FieldsSectionComponent extends LightningElement {
 
 
         event.preventDefault();
+
+        } catch (error) {
+            this.message = 'Something Went Wrong In Field Section Page';
+            this.showerror(this.message);
+        }
     }
     @api removeField(name) {
+        try {
+
         this.storeRemovedField.push(name);
         console.log('inside the remove field method' + name);
         let tempararyArray = [];
@@ -265,6 +283,10 @@ export default class FieldsSectionComponent extends LightningElement {
             }
         }
         this.oppfields = tempararyArray;
+        } catch {
+            this.message = 'Something Went Wrong In Field Section Page';
+            this.showerror(this.message);
+        }
 
     }
 
@@ -272,7 +294,7 @@ export default class FieldsSectionComponent extends LightningElement {
         console.log('Deleted field name --> ' + name);
         console.log('storeRemovedFields: ' + this.storeRemovedFields);
         const index = this.storeRemovedField.indexOf(name);
-        console.log('index of name:-'+index);
+        console.log('index of name:-' + index);
         if (index != -1) {
             this.storeRemovedField.splice(index, 1);
             console.log('storeRemovedField' + this.storeRemovedField);
@@ -308,7 +330,9 @@ export default class FieldsSectionComponent extends LightningElement {
             }
 
 
-            console.log({LabelList});
+            console.log({
+                LabelList
+            });
             console.log('FirstList' + JSON.stringify(LabelList[0]));
             console.log(typeof (result));
             this.accfields = LabelList[0];
@@ -330,6 +354,31 @@ export default class FieldsSectionComponent extends LightningElement {
             console.log({
                 error
             });
+            this.message = 'Something Went Wrong In Field Section Page';
+            this.showerror(this.message);
         });
     }
+
+    errorpopupcall(event) {
+        location.reload();
+    }
+
+    @api showerror() {
+        console.log('this.error_popup => ', this.error_popup);
+        this.error_popup = true;
+        let errordata = {
+            header_type: 'Fields Section',
+            Message: this.message
+        };
+        const showpopup = new CustomEvent('showerrorpopup', {
+            detail: errordata
+        });
+        this.dispatchEvent(showpopup);
+    }
+
+    showerrorpopup(event) {
+        console.log('showerrorpopup', event.detail.Message);
+        this.template.querySelector('c-errorpopup').errormessagee(event.detail.header_type, event.detail.Message);
+    }
+
 }
