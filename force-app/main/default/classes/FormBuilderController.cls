@@ -1084,7 +1084,8 @@ public without sharing class FormBuilderController{
                         Map<String, Schema.SObjectField> fieldMap = leadSchema.getDescribe().fields.getMap();
                         for (String fieldName : fieldMap.keySet()){
 
-                            if (fieldName == 'Name' || (!fieldMap.get(fieldName).getDescribe().isNillable() && !fieldMap.get(fieldName).getDescribe().isDefaultedOnCreate() && fieldMap.get(fieldName).getDescribe().isCreateable())){
+                            // if (fieldName == 'Name' || (!fieldMap.get(fieldName).getDescribe().isNillable() && !fieldMap.get(fieldName).getDescribe().isDefaultedOnCreate() && fieldMap.get(fieldName).getDescribe().isCreateable())){
+                            if (fieldName != 'OwnerId' && (!fieldMap.get(fieldName).getDescribe().isNillable() && fieldMap.get(fieldName).getDescribe().isUpdateable())){
                                 Position = Position + 1;
                                 System.debug('##Field API Name=' + fieldName);
                                 Form_Fields__c field = new Form_Fields__c();
