@@ -4,7 +4,7 @@
 ** Last Modified Date : 06/03/2023
 ** Description        : Used for genrating pdf of submission record
 ***************************************************************/
-public with sharing class PDFGeneratorController {
+public without sharing class PDFGeneratorController {
     
     public Form_Submission__c fromSubmisionData {get; set;}
     public formDataWrapper formData {get; set;}

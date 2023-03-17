@@ -4,8 +4,7 @@ public class Test_fieldvalidation {
     static void Test_classData_add(){
          Form__c form = new Form__c();
         form.Name = 'Test';
-        form.Status__c = true;
-        form.Total_Submissions__c = 2;
+        form.Status__c = true;        
         form.Mapped_Objects__c = 'text,data,demo';
         form.Form_Styling__c = 'demo:0;test:1;check:3';
         form.FormBgID__c = 'test';
@@ -32,7 +31,7 @@ public class Test_fieldvalidation {
         
         Test.startTest();
         
-        Form__C form_data = [SELECT ID,Name,Status__c,Total_Submissions__c, Mapped_Objects__c , Form_Styling__c, FormBgID__c,Page_CSS__C FROM Form__c WHERE Name = 'Test' Limit 1];
+        Form__C form_data = [SELECT ID,Name,Status__c, Mapped_Objects__c , Form_Styling__c, FormBgID__c,Page_CSS__C FROM Form__c WHERE Name = 'Test' Limit 1];
         Form_Fields__c formfield_data = [SELECT ID,Name,Form__c, Form_Page__C, Field_Order__c,Field_Validations__c FROM Form_Fields__c WHERE Form__c =: form_data.Id ];
         
         fieldvalidation fi = new fieldvalidation();
@@ -47,7 +46,7 @@ public class Test_fieldvalidation {
     static void deletefield_method(){
         Test.startTest();
         
-        Form__C form_data = [SELECT ID,Name,Status__c,Total_Submissions__c, Mapped_Objects__c , Form_Styling__c, FormBgID__c,Page_CSS__C FROM Form__c WHERE Name = 'Test' Limit 1];
+        Form__C form_data = [SELECT ID,Name,Status__c, Mapped_Objects__c , Form_Styling__c, FormBgID__c,Page_CSS__C FROM Form__c WHERE Name = 'Test' Limit 1];
         Form_Page__c formpage_data = [SELECT ID,Name,Page_Number__c, Form__c FROM Form_Page__c WHERE Form__c =: form_data.Id];
         Form_Fields__c formfield_data = [SELECT ID,Name,Form__c, Form_Page__C, Field_Order__c,Field_Validations__c FROM Form_Fields__c WHERE Form__c =: form_data.Id ];
         
@@ -61,7 +60,7 @@ public class Test_fieldvalidation {
     static void savevalidation_method(){
         Test.startTest();
         
-        Form__C form_data = [SELECT ID,Name,Status__c,Total_Submissions__c, Mapped_Objects__c , Form_Styling__c, FormBgID__c,Page_CSS__C FROM Form__c WHERE Name = 'Test' Limit 1];
+        Form__C form_data = [SELECT ID,Name,Status__c, Mapped_Objects__c , Form_Styling__c, FormBgID__c,Page_CSS__C FROM Form__c WHERE Name = 'Test' Limit 1];
         Form_Fields__c formfield_data = [SELECT ID,Name,Form__c, Form_Page__C, Field_Order__c,Field_Validations__c FROM Form_Fields__c WHERE Form__c =: form_data.Id ];
         
         fieldvalidation.savevalidation(formfield_data.ID,formfield_data.Field_Validations__c,'test');
@@ -74,7 +73,7 @@ public class Test_fieldvalidation {
     static void copyfield_method(){
         Test.startTest();
         
-        Form__C form_data = [SELECT ID,Name,Status__c,Total_Submissions__c, Mapped_Objects__c , Form_Styling__c, FormBgID__c,Page_CSS__C FROM Form__c WHERE Name = 'Test' Limit 1];
+        Form__C form_data = [SELECT ID,Name,Status__c, Mapped_Objects__c , Form_Styling__c, FormBgID__c,Page_CSS__C FROM Form__c WHERE Name = 'Test' Limit 1];
         Form_Fields__c formfield_data = [SELECT ID,Name,Form__c, Form_Page__C, Field_Order__c,Field_Validations__c FROM Form_Fields__c WHERE Form__c =: form_data.Id ];
         
         fieldvalidation.copyfield(formfield_data.ID);

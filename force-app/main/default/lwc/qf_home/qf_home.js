@@ -10,7 +10,8 @@
 import {
   LightningElement,
   wire,
-  track
+  track,
+  api
 } from 'lwc';
 
 // ALL ICONS OF HOME PAGE [START]
@@ -87,6 +88,10 @@ export default class Qf extends NavigationMixin(LightningElement) {
   bin = iconsZip + '/Iconfolder/bin.png';
   editpen = iconsZip + '/Iconfolder/editpen.png';
   // ICONS OF HOME PAGE [END] ============
+
+  //error_popup
+  @api error_popup = false;
+  message;
 
   // GET USER NAME [START] 
   @track currentUserName;
@@ -180,6 +185,8 @@ export default class Qf extends NavigationMixin(LightningElement) {
     } catch (error) {
       console.error(error);
       this.spinnerDataTable = false;
+      this.message = 'Something Went Wrong In Home Page';
+      this.showerror(this.message);
     }
   }
 
@@ -245,6 +252,8 @@ export default class Qf extends NavigationMixin(LightningElement) {
     } catch (error) {
       console.error(error);
       this.spinnerDataTable = false;
+      this.message = 'Something Went Wrong In Home Page';
+      this.showerror(this.message);
     }
   }
 
@@ -273,6 +282,8 @@ export default class Qf extends NavigationMixin(LightningElement) {
     } catch (error) {
       console.error(error);
       this.spinnerDataTable = false;
+      this.message = 'Something Went Wrong In Home Page';
+      this.showerror(this.message);
     }
   }
 
@@ -315,6 +326,8 @@ export default class Qf extends NavigationMixin(LightningElement) {
       }
     } catch (error) {
       console.error(error);
+      this.message = 'Something Went Wrong In Home Page';
+      this.showerror(this.message);
     }
 
   }
@@ -353,6 +366,8 @@ export default class Qf extends NavigationMixin(LightningElement) {
       }
     } catch (error) {
       console.error(error);
+      this.message = 'Something Went Wrong In Home Page';
+      this.showerror(this.message);
     }
   }
 
@@ -391,6 +406,9 @@ export default class Qf extends NavigationMixin(LightningElement) {
             this.spinnerDataTable = false;
             this.renamediv = true;
             this.pencheck = false;
+          }).catch(error => {
+            this.message = 'Something Went Wrong In Home Page';
+            this.showerror(this.message);
           })
         } else {
           this.error_toast = true;
@@ -398,6 +416,8 @@ export default class Qf extends NavigationMixin(LightningElement) {
       }
     } catch (error) {
       console.error(error);
+      this.message = 'Something Went Wrong In Home Page';
+      this.showerror(this.message);
     }
   }
 
@@ -419,6 +439,8 @@ export default class Qf extends NavigationMixin(LightningElement) {
       return false;
     } catch (error) {
       console.error(error);
+      this.message = 'Something Went Wrong In Home Page';
+      this.showerror(this.message);
     }
   }
 
@@ -464,6 +486,9 @@ export default class Qf extends NavigationMixin(LightningElement) {
         let toast_error_msg = 'Form is successfully deleted';
         this.error_toast = true;
         this.template.querySelector('c-toast-component').showToast('success', toast_error_msg, 3000);
+      }).catch(error => {
+        this.message = 'Something Went Wrong In Home Page';
+        this.showerror(this.message);
       });
 
     } catch (error) {
@@ -558,17 +583,33 @@ export default class Qf extends NavigationMixin(LightningElement) {
     this.template.querySelector('c-toast-component').showToast('error', toast_error_msg, 3000);
   }
 
-  userconfig(){
+  userconfig() {
     let cmpDef = {
-            componentDef: "c:qf_guide2"
-        };
-        let encodedDef = btoa(JSON.stringify(cmpDef));
-        this[NavigationMixin.Navigate]({
-            type: "standard__webPage",
-            attributes: {
-                url: "/one/one.app#" + encodedDef
-            }
-        });
+      componentDef: "c:qf_guide2"
+    };
+    let encodedDef = btoa(JSON.stringify(cmpDef));
+    this[NavigationMixin.Navigate]({
+      type: "standard__webPage",
+      attributes: {
+        url: "/one/one.app#" + encodedDef
+      }
+    });
+  }
+  errorpopupcall() {
+    location.reload();
+  }
+
+  @api showerror() {
+    console.log('this.error_popup => ', this.error_popup);
+    this.error_popup = true;
+    let errordata = {
+      header_type: 'Test Thank You page',
+      Message: this.message
+    }
+    const showpopup = new CustomEvent('showerrorpopup', {
+      detail: errordata
+    });
+    this.dispatchEvent(showpopup);
   }
 
 }

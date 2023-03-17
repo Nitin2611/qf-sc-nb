@@ -1,6 +1,6 @@
 import { api, LightningElement, track } from 'lwc';
 import fieldcancel from '@salesforce/resourceUrl/fieldcancel';
-import fielddelete from '@salesforce/resourceUrl/fielddelete';
+import fielddelete from '@salesforce/resourceUrl/Delete_icon';
 import fieldsave from '@salesforce/resourceUrl/fieldsave';
 import fieldduplicate from '@salesforce/resourceUrl/fieldduplicate';
 import deletefield from '@salesforce/apex/fieldvalidation.deletefield';
@@ -47,10 +47,10 @@ export default class FieldValidation extends LightningElement {
     fieldsave = fieldsave;
     fielddelete = fielddelete;
 
+     //error_popup
+     @api error_popup = false;
+     message;
 
-    //  renderedCallback() {
-    //     loadStyle(this, designcss);
-    // }
     @api
     get field() {
         try {
@@ -90,12 +90,15 @@ export default class FieldValidation extends LightningElement {
                     else if (element.Name == 'DATE') { element.QFDATE = true }
                     else if (element.Name == 'TIME') { element.QFTIME = true }
                     else if (element.Name == 'DATETIME') { element.QFDATETIME = true }
+                    else if (element.Name == 'URL') { element.QFLINK = true }
                 });
                 return mydata1;
             }
         } catch (error) {
             console.log(error + 'Validation Error');
             this.spinnerDataTable = false;
+            this.message = 'Something Went Wrong In Field Validation Page';
+            this.showerror(this.message);
         }
     }
 
@@ -186,6 +189,8 @@ export default class FieldValidation extends LightningElement {
         } catch (error) {
             console.log(error + 'Validation Error');
             this.spinnerDataTable = false;
+            this.message = 'Something Went Wrong In Field Validation Page';
+            this.showerror(this.message);
         }
     }
 
@@ -291,6 +296,8 @@ export default class FieldValidation extends LightningElement {
         } catch (error) {
             console.log(error + 'Validation Error');
             this.spinnerDataTable = false;
+            this.message = 'Something Went Wrong In Field Validation Page';
+            this.showerror(this.message);
         }
     }
 
@@ -354,6 +361,8 @@ export default class FieldValidation extends LightningElement {
         } catch (error) {
             console.log(error + 'Validation Error');
             this.spinnerDataTable = false;
+            this.message = 'Something Went Wrong In Field Validation Page';
+            this.showerror(this.message);
         }
     }
 
@@ -380,6 +389,8 @@ export default class FieldValidation extends LightningElement {
         } catch (error) {
             console.log(error + 'Validation Error');
             this.spinnerDataTable = false;
+            this.message = 'Something Went Wrong In Field Validation Page';
+            this.showerror(this.message);
         }
     }
 
@@ -401,10 +412,13 @@ export default class FieldValidation extends LightningElement {
         } catch (error) {
             console.log(error + 'Validation Error');
             this.spinnerDataTable = false;
+            this.message = 'Something Went Wrong In Field Validation Page';
+            this.showerror(this.message);
         }
     }
 
     isdisabled(event) {
+        try {
         this.isdisabledcheck = event.target.checked;
         if (this.standardrequired == 'isrequired') {
             if (this.isdisabledcheck == true) {
@@ -416,6 +430,11 @@ export default class FieldValidation extends LightningElement {
             if (this.isdisabledcheck == true) {
                 this.isRequiredcheck = false;
             }
+        }
+
+        } catch (error) {
+            this.message = 'Something Went Wrong In Field Validation Page';
+            this.showerror(this.message);
         }
     }
 
@@ -471,6 +490,8 @@ export default class FieldValidation extends LightningElement {
         } catch (error) {
             console.log(error + 'Validation Error');
             this.spinnerDataTable = false;
+            this.message = 'Something Went Wrong In Field Validation Page';
+            this.showerror(this.message);
         }
     }
     deletesalutation(event) {
@@ -487,4 +508,23 @@ export default class FieldValidation extends LightningElement {
         this.salutationvalue[event.currentTarget.dataset.id] = event.detail.value;
         this.salutation[event.currentTarget.dataset.id] = ({ id: event.currentTarget.dataset.id, salutation: this.salutationvalue[event.currentTarget.dataset.id] });
     }
+
+
+    errorpopupcall(event){
+        location.reload();
+    }
+
+    @api showerror(){
+        console.log('this.error_popup => ',this.error_popup);
+        this.error_popup = true;
+        let errordata = {header_type: 'Field Validation',Message : this.message};
+        const showpopup = new CustomEvent('showerrorpopup',{detail:errordata});
+        this.dispatchEvent(showpopup);
+    }
+    
+    showerrorpopup(event){
+        console.log('showerrorpopup',event.detail.Message);
+        this.template.querySelector('c-errorpopup').errormessagee(event.detail.header_type,event.detail.Message);
+    }
+
 }

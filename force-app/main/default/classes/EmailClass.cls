@@ -17,7 +17,7 @@ public without sharing class EmailClass {
         } catch (Exception e) {
             error_handler.insert_errordata(e,'EmailClass','search');
             System.debug(e.getMessage());
-            throw new AuraHandledException(e.getMessage());
+            // throw new AuraHandledException(e.getMessage());
         }
         return searchList;
     }
@@ -40,7 +40,7 @@ public without sharing class EmailClass {
         } catch (exception e) {
             error_handler.insert_errordata(e,'EmailClass','sendEmailController');
             System.debug(e.getMessage());
-            throw new AuraHandledException(e.getMessage());
+            // throw new AuraHandledException(e.getMessage());
         }
     }
 

@@ -1,4 +1,4 @@
-public with sharing class error_handler {
+public without sharing class error_handler {
     public Static String class_name = '';
     public Static String method_name = '';
     public static void insert_errordata(Exception e,String classname, String methodname) {

@@ -13,6 +13,10 @@
     /* Internet Explorer 10+ */
 }
 
+.example-draggable{
+    opacity: 0.9;
+}
+
 .main::-webkit-scrollbar {
     display: none;
     /* Safari and Chrome */
@@ -56,16 +60,21 @@
     padding: 0 !important;
 }
 
-.fieldname>p {
+.fieldname>p{
     color: rgb(0, 0, 0, 0.56);
     font-size: 30px;
     font-weight: 800;
-    font-family: 'Roboto';
+    /* font-family: 'Roboto'; */
     line-height: 25px;
     /* margin: 1%; */
-    margin-top: 30px;
-    margin-left: 15px;
-    margin-bottom: 10px;
+    /* margin-top: 30px; */
+    /* margin-left: 15px; */
+    /* margin-bottom: 10px;
+    text-align: center; */
+    letter-spacing: 1px;
+    font-family: sans-serif;
+    margin: 13% 0 6% 5%;
+
 }
 
 .Accord {
@@ -74,22 +83,11 @@
 
 /* .slds-box_xx-small:hover {
     background-color: #f0f0f0;
-}
+}*/
 
 .slds-box_xx-small {
-    border: 1px solid #046EAA;
-    align-items: center;
-    text-align: left;
-    flex-direction: row;
-    display: flex !important;
-    height: 40px !important;
-    border-radius: 28px !important;
-    font-size: 15px !important;
-    height: 35px !important;
-    padding: 0 12px !important;
-    white-space: revert;
-    margin: 0 15px 14px 5%;
-} */
+    opacity:0.9;
+} 
 
 .fieldOutlines:hover {
     background-color: #f0f0f0;

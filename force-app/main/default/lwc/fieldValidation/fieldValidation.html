@@ -83,17 +83,17 @@
         <template for:each={field.data} for:item="fields">
             <div key={fields.Name} title={fields.Name}>
                 <template if:true={fields.QFSHORTTEXT}>
-                    <div class="slider">
+                    <!-- <div class="slider">
                         <lightning-slider label="Min no of character" value={minimumvalue} min="0" max="256"
                             onchange={slider} data-title="Minimum"></lightning-slider>
                     </div>
                     <div class="slider">
                         <lightning-slider label="Max no of character" value={maximumvalue} min="0" max="256"
                             onchange={slider} data-title="Maximum"></lightning-slider>
-                    </div>
-                    <div class="resetbtn" onclick={slider} data-title="Reset">
+                    </div> -->
+                    <!-- <div class="resetbtn" onclick={slider} data-title="Reset">
                         <p class="resettext"> Reset Character Limit </p>
-                    </div>
+                    </div> -->
                     <div class="textlabel">Options</div>
                     <div class="togglebox">
                         <label>Add Placeholder text </label>
@@ -112,7 +112,7 @@
                 </template>
 
                 <template if:true={fields.QFLONGTEXT}>
-                    <div class="slider">
+                    <!-- <div class="slider">
                         <lightning-slider label="Min no of character" value={minimumvalue} min="0" max="256"
                             onchange={slider} data-title="Minimum"></lightning-slider>
                     </div>
@@ -122,7 +122,7 @@
                     </div>
                     <div class="resetbtn" onclick={slider} data-title="Reset">
                         <p class="resettext"> Reset Character Limit </p>
-                    </div>
+                    </div> -->
                     <div class="textlabel">Options</div>
                     <div class="togglebox">
                         <label>Add Placeholder text </label>
@@ -164,8 +164,8 @@
                     <div class="textlabel">Choices</div>
                     <div class="Item">
                         <lightning-input class="slds-size_5-of-6" variant="label-hidden" value={}></lightning-input>
-                        <lightning-button-icon class="slds-size_1-of-6" icon-name="utility:delete" size="medium" name={}
-                            onclick={handledelete}></lightning-button-icon>
+                        <lightning-button class="slds-s-right_xxx-small" icon-name="utility:delete" size="medium"
+                                    data-id={fields.id} onclick={deletesalutation}></lightning-button>
                     </div>
                     <div class="Itembutton">
                         <lightning-button icon-name="utility:add" title="Add" onclick={addvalue}></lightning-button>
@@ -180,8 +180,8 @@
                             <div class="Item" key={fields.id}>
                                 <lightning-input class="slds-size_5-of-6" variant="label-hidden" data-id={fields.id}
                                     value={fields.salutation} onchange={salutationvalues}></lightning-input>
-                                <lightning-button-icon class="slds-size_1-of-6" icon-name="utility:delete" size="medium"
-                                    data-id={fields.id} onclick={deletesalutation}></lightning-button-icon>
+                                <lightning-button class="slds-s-right_xxx-small" icon-name="utility:delete" size="medium"
+                                data-id={fields.id} onclick={deletesalutation}></lightning-button>
                             </div>
                         </template>
                         <div class="Itembutton">
@@ -199,8 +199,8 @@
                             <div class="Item" key={fields.id}>
                                 <lightning-input class="slds-size_5-of-6" variant="label-hidden" data-id={fields.id}
                                     value={fields.salutation} onchange={salutationvalues}></lightning-input>
-                                <lightning-button-icon class="slds-size_1-of-6" icon-name="utility:delete" size="medium"
-                                    data-id={fields.id} onclick={deletesalutation}></lightning-button-icon>
+                                <lightning-button class="slds-size_1-of-6" icon-name="utility:delete" size="medium"
+                                    data-id={fields.id} onclick={deletesalutation}></lightning-button>
                             </div>
                         </template>
                         <div class="Itembutton">
@@ -307,8 +307,9 @@
                             <div class="Item" key={fields.id}>
                                 <lightning-input class="slds-size_5-of-6" variant="label-hidden" data-id={fields.id}
                                     value={fields.salutation} onchange={salutationvalues}></lightning-input>
-                                <lightning-button-icon class="slds-size_1-of-6" icon-name="utility:delete" size="medium"
-                                    data-id={fields.id} onclick={deletesalutation}></lightning-button-icon>
+                                <lightning-button class="slds-s-right_xxx-small" icon-name="utility:delete" size="medium"
+                                    data-id={fields.id} onclick={deletesalutation} style="width: 45px;
+                                    padding-left: 0px; padding-right: 0px"></lightning-button>
                             </div>
                         </template>
                         <div class="Itembutton">
@@ -417,8 +418,8 @@
                             <div class="Item" key={fields.id}>
                                 <lightning-input class="slds-size_5-of-6" variant="label-hidden" data-id={fields.id}
                                     value={fields.salutation} onchange={salutationvalues}></lightning-input>
-                                <lightning-button-icon class="slds-size_1-of-6" icon-name="utility:delete" size="medium"
-                                    data-id={fields.id} onclick={deletesalutation}></lightning-button-icon>
+                                    <lightning-button class="slds-s-right_xxx-small" icon-name="utility:delete" size="medium"
+                                    data-id={fields.id} onclick={deletesalutation}></lightning-button>
                             </div>
                         </template>
                         <div class="Itembutton">
@@ -481,17 +482,17 @@
 
                 <!-- LINK -->
                 <template if:true={fields.QFLINK}>
-                    <div class="slider">
+                    <!-- <div class="slider">
                         <lightning-slider label="Min no of character" value={minimumvalue} min="0" max="256"
                             onchange={slider} data-title="Minimum"></lightning-slider>
                     </div>
                     <div class="slider">
                         <lightning-slider label="Max no of character" value={maximumvalue} min="0" max="256"
                             onchange={slider} data-title="Maximum"></lightning-slider>
-                    </div>
-                    <div class="resetbtn" onclick={slider} data-title="Reset">
+                    </div> -->
+                    <!-- <div class="resetbtn" onclick={slider} data-title="Reset">
                         <p class="resettext"> Reset Character Limit </p>
-                    </div>
+                    </div> -->
                     <div class="textlabel">Options</div>
                     <div class="togglebox">
                         <label>Add Placeholder text </label>

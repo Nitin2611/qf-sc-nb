@@ -9,9 +9,9 @@ import htmlIcon from '@salesforce/resourceUrl/html';
 import jsIcon from '@salesforce/resourceUrl/js';
 import cssIcon from '@salesforce/resourceUrl/css'; //static resource for copy url icon
 import siteUrl from "@salesforce/apex/customMetadata.siteUrl";
-import {
-    loadStyle
-} from 'lightning/platformResourceLoader';
+// import {
+//     loadStyle
+// } from 'lightning/platformResourceLoader';
 import GroupRadio from '@salesforce/resourceUrl/groupRadio';
 import qrcode from './qrcode.js';
 
@@ -33,7 +33,7 @@ export default class Qf_publish extends LightningElement {
     formAutoPopup;
     floatingButton;
     formQRCode;
-    @track formurl;
+    @track formurl = '';
     @track srcurl;
     @api currentformid;
     @track publishment_value = 'aura';
@@ -41,6 +41,11 @@ export default class Qf_publish extends LightningElement {
     @track img_b_color = "background-color: #ffffff;";
     @track auto_b_color = "background-color: #ffffff;";
     @track floating_b_color = "background-color: #ffffff;";
+    aura = false;
+    lwc = false;
+    iframe = false;
+    QRCode = false;
+    lightBox = false;
 
     connectedCallback() {
         this.spinner = true;
@@ -62,53 +67,56 @@ export default class Qf_publish extends LightningElement {
                 console.log({
                     error
                 });
+                this.message = 'Something Went Wrong In Publish Page';
+                this.showerror(this.message);
                 this.spinner = false;
             })
+        this.aura = true;
 
     }
 
 
     renderedCallback() {
 
-        Promise.all([
-                loadStyle(this, GroupRadio)
-            ]).then(() => {
-                console.log('Files loaded');
-            })
-            .catch(error => {
-                console.log(error.body.message);
-            });
+        // Promise.all([
+        //         loadStyle(this, GroupRadio)
+        //     ]).then(() => {
+        //         console.log('Files loaded');
+        //     })
+        //     .catch(error => {
+        //         console.log(error.body.message);
+        //     });
 
     }
 
 
-    get option() {
-        return [{
-                'label': 'Aura Component',
-                'value': 'aura',
-                'checked': 'true'
-            },
-            {
-                'label': 'LWC',
-                'value': 'lwc'
-            },
-            {
-                'label': 'iFrame',
-                'value': 'iframe'
-            },
-            {
-                'label': 'QR Code',
-                'value': 'QR Code'
-            },
-            {
-                'label': 'Lightbox',
-                'value': 'lightBox'
-            },
-        ]
-    }
+    // get option() {
+    //     return [{
+    //             'label': 'Aura Component',
+    //             'value': 'aura',
+    //             'checked': 'true'
+    //         },
+    //         {
+    //             'label': 'LWC',
+    //             'value': 'lwc'
+    //         },
+    //         {
+    //             'label': 'iFrame',
+    //             'value': 'iframe'
+    //         },
+    //         {
+    //             'label': 'QR Code',
+    //             'value': 'QR Code'
+    //         },
+    //         {
+    //             'label': 'Lightbox',
+    //             'value': 'lightBox'
+    //         },
+    //     ]
+    // }
 
     copyTextFieldHelper(event) {
-        this.copyToClipboard('input', '.urlCopied');
+        this.copyToClipboard('.inputBox', '.urlCopied');
     }
 
 
@@ -133,11 +141,11 @@ export default class Qf_publish extends LightningElement {
             if (elementSelector === '.codestyle') {
                 parentDiv = event.currentTarget.parentNode.parentNode.querySelector('.codestyle');
                 range.selectNode(parentDiv);
-            } else if (elementSelector === 'input') {
-                hiddenInput = this.template.querySelector('input');
+            } else if (elementSelector === '.inputBox') {
+                hiddenInput = this.template.querySelector('.inputBox');
                 range.selectNode(hiddenInput);
             } else {
-            range.selectNode(this.template.querySelector(elementSelector));
+                range.selectNode(this.template.querySelector(elementSelector));
             }
 
             window.getSelection().removeAllRanges();
@@ -154,15 +162,15 @@ export default class Qf_publish extends LightningElement {
             if (copiedTextSelector === '.urlCopied') {
                 component.find("toastCmp").showToastModel("Something went wrong", "error");
             } else {
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: 'Error',
-                    message: 'Something went wrong',
-                    variant: 'error'
-                })
-            );
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Error',
+                        message: 'Something went wrong',
+                        variant: 'error'
+                    })
+                );
+            }
         }
-    }
     }
 
 
@@ -172,10 +180,16 @@ export default class Qf_publish extends LightningElement {
     }
 
     handleRadioChange(event) {
-        const selectedOption = event.detail.value;
+        console.log('handleRadioChange----->', event.target.value);
+        const selectedOption = event.target.value;
 
         if (selectedOption == 'aura') {
             this.usingAura = true;
+            this.aura = true;
+            this.lwc = false;
+            this.iframe = false;
+            this.QRCode = false;
+            this.lightBox = false;
         } else {
             this.usingAura = false;
         }
@@ -183,6 +197,11 @@ export default class Qf_publish extends LightningElement {
 
         if (selectedOption == 'lwc') {
             this.usingLWC = true;
+            this.aura = false;
+            this.lwc = true;
+            this.iframe = false;
+            this.QRCode = false;
+            this.lightBox = false;
         } else {
             this.usingLWC = false;
         }
@@ -190,13 +209,23 @@ export default class Qf_publish extends LightningElement {
 
         if (selectedOption == 'iframe') {
             this.formIFrame = true;
+            this.aura = false;
+            this.lwc = false;
+            this.iframe = true;
+            this.QRCode = false;
+            this.lightBox = false;
         } else {
             this.formIFrame = false;
         }
 
 
-        if (selectedOption == 'QR Code') {
+        if (selectedOption == 'QRCode') {
             this.formQRCode = true;
+            this.aura = false;
+            this.lwc = false;
+            this.iframe = false;
+            this.QRCode = true;
+            this.lightBox = false;
         } else {
             this.formQRCode = false;
         }
@@ -204,11 +233,17 @@ export default class Qf_publish extends LightningElement {
         if (selectedOption == 'lightBox') {
             this.formLightBox = true;
             this.lightBoxOpt = true;
+            this.aura = false;
+            this.lwc = false;
+            this.iframe = false;
+            this.QRCode = false;
+            this.lightBox = true;
         } else {
             this.formLightBox = false;
             this.lightBoxOpt = false;
         }
     }
+
 
     handleLightBoxChange(event) {
         console.log('u r in select lightbox');
@@ -275,5 +310,26 @@ export default class Qf_publish extends LightningElement {
         element.innerHTML = qrCodeGenerated.createSvgTag({});
     }
 
+    errorpopupcall(event) {
+        location.reload();
+    }
+
+    @api showerror() {
+        console.log('this.error_popup => ', this.error_popup);
+        this.error_popup = true;
+        let errordata = {
+            header_type: 'Notification Page',
+            Message: this.message
+        };
+        const showpopup = new CustomEvent('showerrorpopup', {
+            detail: errordata
+        });
+        this.dispatchEvent(showpopup);
+    }
+
+    showerrorpopup(event) {
+        console.log('showerrorpopup', event.detail.Message);
+        this.template.querySelector('c-errorpopup').errormessagee(event.detail.header_type, event.detail.Message);
+    }
 
 }

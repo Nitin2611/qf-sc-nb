@@ -14,6 +14,11 @@ export default class EmailInput extends LightningElement {
     boxClass = "slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-has-focus";
     _selectedValues = [];
     selectedValuesMap = new Map();
+
+    //error_popup
+    @api error_popup = false;
+    message;
+
     renderedCallback(){
         // console.log('print to list',this.listto);
     
@@ -24,6 +29,8 @@ export default class EmailInput extends LightningElement {
             })
             .catch(error => {
                 // console.log( error.body.message );
+                this.message = 'Something Went Wrong In Email Input Page';
+                this.showerror(this.message);
         });
     }
     
@@ -53,6 +60,8 @@ export default class EmailInput extends LightningElement {
             })
             .catch((error) => {
                 console.error("Error:", error);
+                this.message = 'Something Went Wrong In Email Input Page';
+                this.showerror(this.message);
             });
     }
 
@@ -179,4 +188,21 @@ export default class EmailInput extends LightningElement {
     //         input2.setCustomValidity("Form email is required");
     //     input2.reportValidity();
     // }
+
+    errorpopupcall(event){
+        location.reload();
+    }
+
+    @api showerror(){
+        console.log('this.error_popup => ',this.error_popup);
+        this.error_popup = true;
+        let errordata = {header_type: 'Email input error',Message : this.message};
+        const showpopup = new CustomEvent('showerrorpopup',{detail:errordata});
+        this.dispatchEvent(showpopup);
+    }
+    
+    showerrorpopup(event){
+        console.log('showerrorpopup',event.detail.Message);
+        this.template.querySelector('c-errorpopup').errormessagee(event.detail.header_type,event.detail.Message);
+    }
 }

@@ -7,8 +7,7 @@ public class Test_notificationInsertData {
 
         Form__c form = new Form__c();
         form.Name = 'Test';
-        form.Status__c = true;
-        form.Total_Submissions__c = 2;
+        form.Status__c = true;        
         insert form; 
 
         Notification__c n = new Notification__c();
@@ -28,7 +27,7 @@ public class Test_notificationInsertData {
     static void Test_create(){
         Test.startTest();
 
-        Form__c form_data = [SELECT id,Name,Status__c,Total_Submissions__c FROM Form__c WHERE Name = 'Test'];
+        Form__c form_data = [SELECT id,Name,Status__c FROM Form__c WHERE Name = 'Test'];
         Notification__c notification_data = [SELECT ID,To_Recipients__c,CC_Recipients__c,Subject__c,Email_Body__c,Attachment__c,BCC_Recipients__c,Form__c FROM Notification__c WHERE Form__c =: form_data.ID];
 
         notificationInsertData.create(notification_data);
@@ -39,7 +38,7 @@ public class Test_notificationInsertData {
     static void Test_update(){
         Test.startTest();
         
-        Form__c form_data = [SELECT id,Name,Status__c,Total_Submissions__c FROM Form__c WHERE Name = 'Test'];
+        Form__c form_data = [SELECT id,Name,Status__c FROM Form__c WHERE Name = 'Test'];
         Notification__c notification_data = [SELECT ID,To_Recipients__c,CC_Recipients__c,Subject__c,Email_Body__c,Attachment__c,BCC_Recipients__c,Form__c FROM Notification__c WHERE Form__c =: form_data.ID];
 
         Notification__c n1 = new Notification__c();
@@ -59,7 +58,7 @@ public class Test_notificationInsertData {
     @IsTest
     static void Test_getContactList(){
         Test.startTest();    
-        Form__c form_data = [SELECT id,Name,Status__c,Total_Submissions__c FROM Form__c WHERE Name = 'Test'];
+        Form__c form_data = [SELECT id,Name,Status__c FROM Form__c WHERE Name = 'Test'];
 		Notification__c notification_data = [SELECT ID,To_Recipients__c,CC_Recipients__c,Subject__c,Email_Body__c,Attachment__c,BCC_Recipients__c,Form__c FROM Notification__c WHERE Form__c =: form_data.ID];
         
         String form_id = null;

@@ -18,7 +18,7 @@ public without sharing class objectSelection{
                 Schema.DescribeSObjectResult ds = d.getDescribe();
                 if (!ds.isCreateable())
                     continue;
-                if (ds.isCustom() == false && ds.getRecordTypeInfos().size() > 0 && !(QFObjects.contains(ds.getName())))
+                if (ds.isUpdateable() && (ds.isCustom() == false && ds.getRecordTypeInfos().size() > 0 && !(QFObjects.contains(ds.getName()))))
                     Objects.add(ds.getName());
                 else if (ds.isCustom() && !(QFObjects.contains(ds.getName())))
                     Objects.add(ds.getName());
@@ -28,7 +28,7 @@ public without sharing class objectSelection{
             return ParentObjs;
 
         } catch (Exception e){
-            error_handler.insert_errordata(e, 'objectSelection', 'fetchChildObject1');
+            error_handler.insert_errordata(e, 'objectSelection', 'fetchParentObject');
             //throw new AuraHandledException(e.getMessage());
             return null;
         }
@@ -41,13 +41,15 @@ public without sharing class objectSelection{
             Schema.SObjectType convertType = Schema.getGlobalDescribe().get(parent);
             Schema.DescribeSObjectResult R = convertType.getDescribe();
             for (Schema.ChildRelationship cr : R.getChildRelationships()){
-                String temp = String.valueOf(cr.getChildSObject());
-                SObjectList.add(temp) ;
+                if (cr.getChildSObject().getDescribe().isUpdateable()){
+                    String temp = String.valueOf(cr.getChildSObject());
+                    SObjectList.add(temp) ;
+                }
             }
             List<String> ChildObject = new List<String>(SObjectList);
             return ChildObject;
         } catch (Exception e){
-            error_handler.insert_errordata(e, 'objectSelection', 'fetchChildObject1');
+            error_handler.insert_errordata(e, 'objectSelection', 'fetchChildObject');
             //throw new AuraHandledException(e.getMessage());
             return null;
         }
@@ -57,21 +59,21 @@ public without sharing class objectSelection{
     public static Map<String, List<String>> fetchChildObject1(List<String> parentList){
         Map<String, List<String>> SObjectMap = new Map<String, List<String>>();
         try{
-        for (String Par : parentList){
-            List<String> Sobject2 = new List<String>();
-            Schema.SObjectType convertType = Schema.getGlobalDescribe().get(Par);
-            Schema.DescribeSObjectResult R = convertType.getDescribe();
-            for (Schema.ChildRelationship cr : R.getChildRelationships()){
-                if (parentList.contains(String.valueOf(cr.getChildSObject()))){
-                    if (!SObjectMap.containsKey(Par)){
-                        SObjectMap.put(Par, new List<String>());
+            for (String Par : parentList){
+                List<String> Sobject2 = new List<String>();
+                Schema.SObjectType convertType = Schema.getGlobalDescribe().get(Par);
+                Schema.DescribeSObjectResult R = convertType.getDescribe();
+                for (Schema.ChildRelationship cr : R.getChildRelationships()){
+                    if (parentList.contains(String.valueOf(cr.getChildSObject()))){
+                        if (!SObjectMap.containsKey(Par)){
+                            SObjectMap.put(Par, new List<String>());
+                        }
+                        SObjectMap.get(par).add(String.valueOf(cr.getChildSObject()));
                     }
-                    SObjectMap.get(par).add(String.valueOf(cr.getChildSObject()));
                 }
             }
-        }
-        System.debug('SObjectMap>>' + SObjectMap);
-        return SObjectMap;
+            System.debug('SObjectMap>>' + SObjectMap);
+            return SObjectMap;
 
 
         } catch (Exception e){
@@ -85,17 +87,17 @@ public without sharing class objectSelection{
     public static List<String> temp2(List<String> Parent){
         try{
 
-        List<String> Temp2 = new List<String>();
-        List<String> Test = new List<String>();
-        // Test = Parent;
-        Map<String, List<String>> ParentObjects = new Map<String, List<String>>();
-        ParentObjects = fetchChildObject1(Parent);
-        for (String lst : ParentObjects.keySet()){
-            if ((ParentObjects.get(lst)).size() >= 1){
-                Temp2.add(lst);
+            List<String> Temp2 = new List<String>();
+            List<String> Test = new List<String>();
+            // Test = Parent;
+            Map<String, List<String>> ParentObjects = new Map<String, List<String>>();
+            ParentObjects = fetchChildObject1(Parent);
+            for (String lst : ParentObjects.keySet()){
+                if ((ParentObjects.get(lst)).size() >= 1){
+                    Temp2.add(lst);
+                }
             }
-        }
-        return Temp2;
+            return Temp2;
         } catch (Exception e){
             error_handler.insert_errordata(e, 'objectSelection', 'temp2');
             //throw new AuraHandledException(e.getMessage());
@@ -119,7 +121,7 @@ public without sharing class objectSelection{
             }
             return Temp3;
         } catch (Exception e){
-            error_handler.insert_errordata(e, 'objectSelection', 'temp3');
+            error_handler.insert_errordata(e, 'objectSelection', 'saveMapped_object');
             //throw new AuraHandledException(e.getMessage());
             return null;
         }
@@ -157,185 +159,5 @@ public without sharing class objectSelection{
             //throw new AuraHandledException(e.getMessage());
             return null;
         }
-    }
-
-    @AuraEnabled
-    public static Map<String, String> getStandardIconMap(){
-
-        Map<String, String> objectIconMap = new Map<String, String>{'Account' => 'standard:account',
-                                                                    'Address' => 'standard:address',
-                                                                    'AlternativePaymentMethod' => 'standard:payment_gateway',
-                                                                    'Announcement' => 'standard:announcement',
-                                                                    'AppAnalyticsQueryRequest' => 'standard:care_request_reviewer',
-                                                                    'AppointmentTopicTimeSlot' => 'standard:timeslot',
-                                                                    'ApptBundleAggrDurDnscale' => 'standard:event',
-                                                                    'ApptBundleAggrPolicy' => 'standard:aggregation_policy',
-                                                                    'ApptBundleConfig' => 'standard:bundle_config',
-                                                                    'ApptBundlePolicy' => 'standard:bundle_policy',
-                                                                    'ApptBundlePolicySvcTerr' => 'standard:service_territory_policy',
-                                                                    'ApptBundlePropagatePolicy' => 'standard:propagation_policy',
-                                                                    'ApptBundleRestrictPolicy' => 'standard:restriction_policy',
-                                                                    'ApptBundleSortPolicy' => 'standard:sort_policy',
-                                                                    'Asset' => 'standard:asset_object',
-                                                                    'AssetDowntimePeriod' => 'standard:asset_downtime_period',
-                                                                    'AssetRelationship' => 'standard:asset_relationship',
-                                                                    'AssetWarranty' => 'standard:asset_warranty',
-                                                                    'AssociatedLocation' => 'standard:location',
-                                                                    'AttributeDefinition' => 'standard:variation_attribute_setup',
-                                                                    'AuthorizationForm' => 'standard:form',
-                                                                    'AuthorizationFormConsent' => 'standard:form',
-                                                                    'AuthorizationFormDataUse' => 'standard:form',
-                                                                    'AuthorizationFormText' => 'standard:form',
-                                                                    'BusinessBrand' => 'standard:store',
-                                                                    'CalendarView' => 'standard:date_input',
-                                                                    'Campaign' => 'standard:campaign',
-                                                                    'CampaignMember' => 'standard:campaign_members',
-                                                                    'CardPaymentMethod' => 'standard:contract_payment',
-                                                                    'Case' => 'standard:case',
-                                                                    'CollaborationGroup' => 'standard:live_chat',
-                                                                    'CollaborationGroupRecord' => 'standard:live_chat',
-                                                                    'CommSubscription' => 'standard:product_consumed',
-                                                                    'CommSubscriptionChannelType' => 'standard:channel_program_levels',
-                                                                    'CommSubscriptionConsent' => 'standard:product_consumed',
-                                                                    'CommSubscriptionTiming' => 'standard:channel_program_history',
-                                                                    'ConsumptionRate' => 'standard:product_consumed_state',
-                                                                    'ConsumptionSchedule' => 'standard:product_consumed_state',
-                                                                    'Contact' => 'standard:contact',
-                                                                    'ContactPointAddress' => 'standard:address',
-                                                                    'ContactPointConsent' => 'standard:address',
-                                                                    'ContactPointEmail' => 'standard:email',
-                                                                    'ContactPointPhone' => 'standard:call',
-                                                                    'ContactPointTypeConsent' => 'standard:contact',
-                                                                    'ContactRequest' => 'standard:contact_request',
-                                                                    'ContentVersion' => 'standard:file',
-                                                                    'Contract' => 'standard:contract',
-                                                                    'ContractGroupPlan' => 'standard:contract',
-                                                                    'ContractGroupPlanGroupClass' => 'standard:contract',
-                                                                    'ContractLineItem' => 'standard:contract_line_item',
-                                                                    'Customer' => 'standard:customer',
-                                                                    'DataUseLegalBasis' => 'standard:product_consumed',
-                                                                    'DataUsePurpose' => 'standard:product_consumed',
-                                                                    'DigitalWallet' => 'standard:connect_wallet',
-                                                                    'DuplicateRecordItem' => 'custom:custom49',
-                                                                    'DuplicateRecordSet' => 'standard:record',
-                                                                    'EngagementChannelType' => 'standard:channel_programs',
-                                                                    'Entitlement' => 'standard:entitlement',
-                                                                    'EntitlementContact' => 'standard:people',
-                                                                    'Event' => 'standard:event',
-                                                                    'Expense' => 'standard:expense',
-                                                                    'ExpenseReport' => 'standard:expense_report',
-                                                                    'ExpenseReportEntry' => 'standard:expense_report_entry',
-                                                                    'ExpressionFilter' => 'standard:filter',
-                                                                    'ExpressionFilterCriteria' => 'standard:filter_criteria',
-                                                                    'FinanceTransaction' => 'standard:crypto_transaction',
-                                                                    'FlowRecordRelation' => 'standard:flow',
-                                                                    'GroupCensus' => 'standard:groups',
-                                                                    'GroupCensusMember' => 'standard:groups',
-                                                                    'GroupCensusMemberPlan' => 'standard:groups',
-                                                                    'GroupClass' => 'standard:groups',
-                                                                    'GroupClassContribution' => 'standard:groups',
-                                                                    'Idea' => 'standard:solution',
-                                                                    'Image' => 'custom:custom38',
-                                                                    'Individual' => 'standard:individual',
-                                                                    'InsuranceContract' => 'standard:entitlement_policy',
-                                                                    'JobProfile' => 'standard:job_profile',
-                                                                    'Lead' => 'standard:lead',
-                                                                    'LegalEntity' => 'standard:entity',
-                                                                    'ListEmail' => 'standard:list_email',
-                                                                    'ListEmailIndividualRecipient' => 'standard:email',
-                                                                    'ListEmailRecipientSource' => 'standard:email',
-                                                                    'Location' => 'standard:location',
-                                                                    'LocationGroup' => 'standard:location',
-                                                                    'LocationGroupAssignment' => 'standard:location',
-                                                                    'Macro' => 'standard:macros',
-                                                                    'MacroInstruction' => 'standard:macros',
-                                                                    'MaintenanceAsset' => 'standard:maintenance_asset',
-                                                                    'MaintenancePlan' => 'standard:maintenance_plan',
-                                                                    'MaintenanceWorkRule' => 'standard:maintenance_work_rule',
-                                                                    'Opportunity' => 'standard:opportunity',
-                                                                    'Order' => 'standard:orders',
-                                                                    'OrgMetric' => 'standard:dashboard',
-                                                                    'OrgMetricScanResult' => 'standard:dashboard_ea',
-                                                                    'OrgMetricScanSummary' => 'standard:dashboard_component',
-                                                                    'PartyConsent' => 'custom:custom69',
-                                                                    'Payment' => 'standard:contract_payment',
-                                                                    'PaymentAuthAdjustment' => 'standard:contract_payment',
-                                                                    'PaymentAuthorization' => 'standard:contract_payment',
-                                                                    'PaymentGateway' => 'standard:payment_gateway',
-                                                                    'PaymentGatewayLog' => 'standard:payment_gateway',
-                                                                    'PaymentGroup' => 'standard:partner_fund_request',
-                                                                    'PaymentLineInvoice' => 'standard:payment_gateway',
-                                                                    'Pricebook2' => 'standard:pricebook',
-                                                                    'ProcessException' => 'standard:process_exception',
-                                                                    'Product2' => 'standard:product',
-                                                                    'ProductConsumed' => 'standard:product_consumed',
-                                                                    'ProductConsumptionSchedule' => 'standard:product_consumed',
-                                                                    'ProductItem' => 'standard:product_item',
-                                                                    'ProductRequest' => 'standard:product_request',
-                                                                    'ProductRequestLineItem' => 'standard:product_request_line_item',
-                                                                    'ProductRequired' => 'standard:product_required',
-                                                                    'ProductServiceCampaign' => 'standard:product_service_campaign',
-                                                                    'ProductServiceCampaignItem' => 'standard:product_service_campaign_item',
-                                                                    'ProductTransfer' => 'standard:product_transfer',
-                                                                    'ProductWarrantyTerm' => 'standard:product_warranty_term',
-                                                                    'ProfileSkill' => 'standard:skill',
-                                                                    'ProfileSkillEndorsement' => 'standard:skill_entity',
-                                                                    'ProfileSkillUser' => 'standard:skill_entity',
-                                                                    'PromptAction' => 'standard:prompt',
-                                                                    'PromptError' => 'standard:prompt',
-                                                                    'QuickText' => 'standard:quick_text',
-                                                                    'Recommendation' => 'standard:feedback',
-                                                                    'RecommendationResponse' => 'standard:feedback',
-                                                                    'RecordAction' => 'standard:record',
-                                                                    'Refund' => 'standard:contract_payment',
-                                                                    'RefundLinePayment' => 'standard:contract_payment',
-                                                                    'ResourceAbsence' => 'standard:resource_absence',
-                                                                    'ReturnOrder' => 'standard:return_order',
-                                                                    'ReturnOrderLineItem' => 'standard:return_order_line_item',
-                                                                    'SchedulingConstraint' => 'standard:scheduling_constraint',
-                                                                    'Scorecard' => 'standard:scan_card',
-                                                                    'ScorecardAssociation' => 'standard:scan_card',
-                                                                    'ScorecardMetric' => 'standard:scan_card',
-                                                                    'SearchPromotionRule' => 'standard:search',
-                                                                    'Seller' => 'standard:partner_fund_allocation',
-                                                                    'SerializedProduct' => 'standard:serialized_product',
-                                                                    'ServiceAppointment' => 'standard:service_appointment',
-                                                                    'ServiceContract' => 'standard:service_contract',
-                                                                    'ServiceCrew' => 'standard:service_crew',
-                                                                    'ServiceCrewMember' => 'standard:service_crew_member',
-                                                                    'ServiceResource' => 'standard:service_resource',
-                                                                    'ServiceResourcePreference' => 'standard:service_territory',
-                                                                    'ServiceTerritory' => 'standard:service_territory',
-                                                                    'ServiceTerritoryLocation' => 'standard:location',
-                                                                    'SetupAssistantStep' => 'standard:setup_modal',
-                                                                    'Shift' => 'standard:shift',
-                                                                    'ShiftTemplate' => 'standard:shift_template',
-                                                                    'Shipment' => 'standard:shipment',
-                                                                    'ShipmentItem' => 'standard:shipment',
-                                                                    'Solution' => 'standard:solution',
-                                                                    'Task' => 'standard:task',
-                                                                    'TimeSheet' => 'standard:timesheet',
-                                                                    'TimeSheetEntry' => 'standard:timesheet_entry',
-                                                                    'TravelMode' => 'standard:location',
-                                                                    'UnitOfMeasure' => 'custom:custom79',
-                                                                    'UserEmailPreferredPerson' => 'standard:people',
-                                                                    'WarrantyTerm' => 'standard:warranty_term',
-                                                                    'WorkAccess' => 'standard:work_queue',
-                                                                    'WorkBadge' => 'standard:skill_requirement',
-                                                                    'WorkBadgeDefinition' => 'standard:skill_requirement',
-                                                                    'WorkOrder' => 'standard:work_order',
-                                                                    'WorkOrderLineItem' => 'standard:work_order_item',
-                                                                    'WorkPlan' => 'standard:work_plan',
-                                                                    'WorkPlanSelectionRule' => 'standard:work_plan_rule',
-                                                                    'WorkPlanTemplate' => 'standard:work_plan_template',
-                                                                    'WorkPlanTemplateEntry' => 'standard:work_plan_template_entry',
-                                                                    'WorkStep' => 'standard:work_step',
-                                                                    'WorkStepTemplate' => 'standard:work_step_template',
-                                                                    'WorkThanks' => 'standard:thanks',
-                                                                    'WorkType' => 'standard:work_type',
-                                                                    'WorkTypeGroup' => 'standard:work_type_group',
-                                                                    'WorkTypeGroupMember' => 'standard:team_member'};    
-
-        return objectIconMap;
     }
 }
