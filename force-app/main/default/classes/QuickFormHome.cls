@@ -16,24 +16,10 @@ public without sharing class QuickFormHome{
     // # Description: Used to Read All Forms record
     // =================================== -->
     @AuraEnabled
-    // public static Map<Integer,List<Form__c>> getFormRecords(){
-    //     try {
-    //         List<Form__c> forms = [SELECT Id,Name,Total_Submissions__c, Status__c FROM Form__c];
-    //         Integer count = [SELECT Count() FROM Form__c];
-    //         Map<Integer,List<Form__c>> data = new Map<Integer,List<Form__c>>();
-    //         data.put(count,forms);
-    //         return data;
-    //     } catch (Exception e) {
-    //         throw new AuraHandledException(e.getMessage());
-    //     }
-    // }
     //   Edited as per sheet(qf_home.cls - 2 & 3)
-    public static List<Form__c> getFormRecords(){
+    public static List<formwrapper> getFormRecords(){
         try{
-            List<Form__c> forms = [SELECT Id, Name, Total_Submissions__c, Status__c
-                                   FROM Form__c
-                                   ORDER BY LastModifiedDate DESC];
-            return forms;
+            return commonquery(null);
         } catch (Exception e){
             // error_handler.insert_errordata(e,'QuickFormHome','getFormRecords');
             System.debug(e.getMessage());
@@ -49,25 +35,9 @@ public without sharing class QuickFormHome{
     // # Description: Used to Search Form
     // =================================== -->
     @AuraEnabled
-    // public static Map<Integer,List<Form__c>> searchForms(String searchkey){
-    //     try {
-    //         List<Form__c> forms = [SELECT Id, Name, Status__c, Total_Submissions__c FROM Form__c WHERE Name LIKE:'%'+searchkey+'%'];
-    //         Integer count = [SELECT Count() FROM Form__c WHERE Name LIKE:'%'+searchkey+'%'];
-    //         Map<Integer,List<Form__c>> data = new Map<Integer,List<Form__c>>();
-    //         data.put(count,forms);
-    //         return data;
-    //     } catch (Exception e) {
-    //         throw new AuraHandledException(e.getMessage());
-    //     }
-    // }
-    //   Edited as per sheet(qf_home.cls - 2 & 3 & 4)
-    public static List<Form__c> searchForms(String searchkey){
+    public static List<formwrapper> searchForms(String searchkey){
         try{
-            return [SELECT Id, Name, Status__c, Total_Submissions__c
-                    FROM Form__c
-                    WHERE Name LIKE:'%' + searchkey + '%'
-                    order by LastModifiedDate DESC
-                    NULLS LAST];
+            return commonquery(searchkey);
         } catch (Exception e){
             // error_handler.insert_errordata(e,'QuickFormHome','searchForms');
             System.debug(e.getMessage());
@@ -84,14 +54,14 @@ public without sharing class QuickFormHome{
     // =================================== -->
     //   Edited as per sheet(qf_home.cls - 2 & 3 & 5)
     @AuraEnabled
-    public static List<Form__c> getFormsByStatus(Id id, String searchkey){
+    public static List<formwrapper> getFormsByStatus(Id id, String searchkey){
         try{
 
-            Form__c form = [SELECT Id, Name, Status__c, Total_Submissions__c
-                            FROM Form__c
+            Form__c form = [SELECT Id, Name, Status__c, (SELECT Id
+                                                         FROM Form_Submissions__r)
+                            FROM Form__c 
                             WHERE Id = :id
-                            order by LastModifiedDate DESC
-                            NULLS LAST];
+                            order by createdDate DESC];
 
             if (form.Status__c == true){
                 form.Status__c = false;
@@ -100,23 +70,7 @@ public without sharing class QuickFormHome{
             }
             update form;
 
-            // if(searchkey == null || searchkey == '' || searchkey == 'undefined'){
-            // List<Form__c> forms = [SELECT Id, Name, Status__c, Total_Submissions__c FROM Form__c];
-            // return forms;
-            // }
-            // else{
-            // List<Form__c> forms = [SELECT Id, Name, Status__c, Total_Submissions__c FROM Form__c WHERE Name LIKE:'%'+searchkey+'%'];
-            // return forms;
-            // }
-            String searchkeyword = '%' + searchkey + '%';
-            String query = 'SELECT Id, Name, Status__c, Total_Submissions__c FROM Form__c';
-            if (searchkey != null && searchkey != '' && searchkey != 'undefined'){
-                query += ' WHERE Name LIKE :searchkeyword order by LastModifiedDate  DESC NULLS LAST';
-            } else{
-                query += ' order by LastModifiedDate  DESC NULLS LAST ';
-            }
-            List<Form__c> forms = Database.query(query);
-            return forms;
+            return commonquery(searchkey);
 
         } catch (Exception e){
             error_handler.insert_errordata(e, 'QuickFormHome', 'getFormsByStatus');
@@ -134,32 +88,16 @@ public without sharing class QuickFormHome{
     // =================================== -->
     //   Edited as per sheet(qf_home.cls - 2 & 3 & 5)
     @AuraEnabled
-    public static List<Form__c> deleteFormRecord(Id id, String searchkey){
+    public static List<formwrapper> deleteFormRecord(Id id, String searchkey){
         try{
-            Form__c form = [SELECT Id, Name, Status__c, Total_Submissions__c
-                            FROM Form__c
+            Form__c form = [SELECT Id, Name, Status__c, (SELECT Id
+                                                         FROM Form_Submissions__r)
+                            FROM Form__c 
                             WHERE Id = :id
-                            order by LastModifiedDate DESC
-                            NULLS LAST];
+                            order by createdDate DESC];
             delete form;
 
-            // if(searchkey == null || searchkey == '' || searchkey == 'undefined'){
-            //     List<Form__c> forms = [SELECT Id, Name, Status__c, Total_Submissions__c FROM Form__c];
-            //     return forms;
-            //     }
-            //     else{
-            //     List<Form__c> forms = [SELECT Id, Name, Status__c, Total_Submissions__c FROM Form__c WHERE Name LIKE:'%'+searchkey+'%'];
-            //     return forms;
-            //     }
-            String searchkeyword = '%' + searchkey + '%';
-            String query = 'SELECT Id, Name, Status__c, Total_Submissions__c FROM Form__c';
-            if (searchkey != null && searchkey != '' && searchkey != 'undefined'){
-                query += ' WHERE Name LIKE :searchkeyword order by LastModifiedDate  DESC NULLS LAST';
-            } else{
-                query += ' order by LastModifiedDate  DESC NULLS LAST ';
-            }
-            List<Form__c> forms = Database.query(query);
-            return forms;
+            return commonquery(searchkey);
 
         } catch (Exception e){
             error_handler.insert_errordata(e, 'QuickFormHome', 'deleteFormRecord');
@@ -177,24 +115,15 @@ public without sharing class QuickFormHome{
     // =================================== -->
     //   Edited as per sheet(qf_home.cls - 2)
     @AuraEnabled
-    public static List<Form__c> renameFormRecord(Id id, String rename, String searchkey){
+    public static List<formwrapper> renameFormRecord(Id id, String rename, String searchkey){
         try{
             Form__c form = [SELECT Name
                             FROM Form__c
                             WHERE Id = :id
-                            order by LastModifiedDate DESC
-                            NULLS LAST];
+                            order by createdDate DESC];
             form.Name = rename;
             update form;
-            String searchkeyword = '%' + searchkey + '%';
-            String query = 'SELECT Id, Name, Status__c, Total_Submissions__c FROM Form__c';
-            if (searchkey != null && searchkey != '' && searchkey != 'undefined'){
-                query += ' WHERE Name LIKE :searchkeyword order by LastModifiedDate  DESC NULLS LAST';
-            } else{
-                query += ' order by LastModifiedDate  DESC NULLS LAST ';
-            }
-            List<Form__c> forms = Database.query(query);
-            return forms;
+            return commonquery(searchkey);
 
         } catch (Exception e){
             error_handler.insert_errordata(e, 'QuickFormHome', 'renameFormRecord');
@@ -289,11 +218,6 @@ public without sharing class QuickFormHome{
     }
 
     // @AuraEnabled
-    // public static void getformid(String currentformid){
-    //     System.debug('u r in get form id');
-    //     System.debug('Exception form url in get form id: '+ currentformid);
-    //     formid = currentformid;
-    // }
     @AuraEnabled
     public static String siteUrl(String Formid){
         try{
@@ -328,6 +252,44 @@ public without sharing class QuickFormHome{
             System.debug('An exception occurred: ' + e.getMessage());
             return null;
         }
+    }
+
+    // This method is use to send the form list which are present in the org, this is common method used in 5 methods
+    public static List<formwrapper> commonquery(String searchkey){
+        String searchkeyword = '%' + searchkey + '%';
+        String query = 'SELECT Id, Name, Status__c ,(SELECT Id FROM Form_Submissions__r) FROM Form__c';
+        if (searchkey != null && searchkey != '' && searchkey != 'undefined'){
+            query += ' WHERE Name LIKE :searchkeyword order by createdDate  DESC  ';
+        } else{
+            query += ' order by createdDate  DESC   ';
+        }
+        List<Form__c> forms = Database.query(query);
+
+        List<formwrapper> wrapper = new List<formwrapper>();
+        for (Form__c QFform : forms){
+            wrapper.add(new formwrapper(QFform.Form_Submissions__r.size(), QFform));
+        }
+        System.debug(wrapper + ' wrapper');
+        return wrapper;
+    }
+
+    // This wrapper is use to wrap form with it submission count
+    public class formwrapper{
+        @AuraEnabled
+        public Integer submission_count{ get; set; }
+
+        @AuraEnabled
+        public Form__c formlist{ get; set; }
+
+        public formwrapper(Integer count, Form__c form){
+            try{
+                this.submission_count = count;
+                this.formlist = form;
+            } catch (Exception e){
+                throw new AuraHandledException(e.getMessage());
+            }
+        }
+
     }
 
 }

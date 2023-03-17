@@ -5,8 +5,7 @@ public class Test_QuickFormHome {
     static void create_record(){
         Form__c form = new Form__c();
         form.Name = 'Test';
-        form.Status__c = true;
-        form.Total_Submissions__c = 2;
+        form.Status__c = true;        
         form.Mapped_Objects__c = '';
         form.Form_Styling__c = 'demo:0;test:1;check:3';
         form.FormBgID__c = 'test';
@@ -16,8 +15,7 @@ public class Test_QuickFormHome {
         
         Form__c form1 = new Form__c();
         form1.Name = 'Test2';
-        form1.Status__c = false;
-        form1.Total_Submissions__c = 3;
+        form1.Status__c = false;        
         insert form1;
     }
 
@@ -37,7 +35,7 @@ public class Test_QuickFormHome {
     Static void Test_searchForms(){ 
         Test.startTest();
     
-        Form__c form_data = [SELECT ID,Name,Status__c,Total_Submissions__c FROM Form__C WHERE Name = 'Test' LIMIT 1];
+        Form__c form_data = [SELECT ID,Name,Status__c FROM Form__C WHERE Name = 'Test' LIMIT 1];
         
         QuickFormHome.searchForms(form_data.Name);
         
@@ -49,8 +47,8 @@ public class Test_QuickFormHome {
     Static void Test_getFormsByStatus(){ 
         Test.startTest();
     
-        Form__c form_data = [SELECT ID,Name,Status__c,Total_Submissions__c FROM Form__C WHERE Name = 'Test' LIMIT 1];
-        Form__c form_data1 = [SELECT ID,Name,Status__c,Total_Submissions__c FROM Form__C WHERE Name = 'Test2' LIMIT 1];
+        Form__c form_data = [SELECT ID,Name,Status__c FROM Form__C WHERE Name = 'Test' LIMIT 1];
+        Form__c form_data1 = [SELECT ID,Name,Status__c FROM Form__C WHERE Name = 'Test2' LIMIT 1];
         
         QuickFormHome.getFormsByStatus(form_data.ID,'Test');
         QuickFormHome.getFormsByStatus(form_data1.ID,'Test');
@@ -63,8 +61,8 @@ public class Test_QuickFormHome {
     Static void Test_deleteFormRecord(){ 
         Test.startTest();
     
-        Form__c form_data = [SELECT ID,Name,Status__c,Total_Submissions__c FROM Form__C WHERE Name = 'Test' LIMIT 1];
-        Form__c form_data1 = [SELECT ID,Name,Status__c,Total_Submissions__c FROM Form__C WHERE Name = 'Test2' LIMIT 1];
+        Form__c form_data = [SELECT ID,Name,Status__c FROM Form__C WHERE Name = 'Test' LIMIT 1];
+        Form__c form_data1 = [SELECT ID,Name,Status__c FROM Form__C WHERE Name = 'Test2' LIMIT 1];
         
         QuickFormHome.deleteFormRecord(form_data.ID,'Test');
         QuickFormHome.deleteFormRecord(form_data.ID,'Test');
@@ -77,8 +75,8 @@ public class Test_QuickFormHome {
     Static void Test_renameFormRecord(){ 
         Test.startTest();
     
-        Form__c form_data = [SELECT ID,Name,Status__c,Total_Submissions__c FROM Form__C WHERE Name = 'Test' LIMIT 1];
-        Form__c form_data1 = [SELECT ID,Name,Status__c,Total_Submissions__c FROM Form__C WHERE Name = 'Test2' LIMIT 1];
+        Form__c form_data = [SELECT ID,Name,Status__c FROM Form__C WHERE Name = 'Test' LIMIT 1];
+        Form__c form_data1 = [SELECT ID,Name,Status__c FROM Form__C WHERE Name = 'Test2' LIMIT 1];
         
         QuickFormHome.renameFormRecord(form_data1.ID,form_data.Name,'Test');
         QuickFormHome.renameFormRecord(form_data.ID,form_data.Name,'Test');
@@ -119,7 +117,7 @@ public class Test_QuickFormHome {
     static void Test_siteUrl(){
         Test.startTest();
         
-        Form__c form_data2 = [SELECT ID,Name,Status__c,Total_Submissions__c FROM Form__c WHERE Name = 'Test2' LIMIT 1];
+        Form__c form_data2 = [SELECT ID,Name,Status__c FROM Form__c WHERE Name = 'Test2' LIMIT 1];
 
         QuickFormHome.siteUrl(form_data2.id);
         

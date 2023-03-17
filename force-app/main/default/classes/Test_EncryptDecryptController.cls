@@ -5,8 +5,7 @@ public class Test_EncryptDecryptController {
 
         Form__c form = new Form__c();
         form.Name = 'Test';
-        form.Status__c = true;
-        form.Total_Submissions__c = 2;
+        form.Status__c = true;        
         insert form; 
 
         EncryptDecryptController e = new EncryptDecryptController();

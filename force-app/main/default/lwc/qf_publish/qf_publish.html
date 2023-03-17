@@ -26,16 +26,76 @@
     <div class="slds-grid slds-wrap">
         <!--=============================[ Start Left bar]=============================== -->
         <div
-            class="LeftBar slds-col slds-size_1-of-1 slds-medium-size_3-of-12 slds-large-size_2-of-12 slds-p-left_medium slds-p-right_large">
+            class="LeftBar slds-col slds-size_1-of-1 slds-medium-size_3-of-12 slds-large-size_2-of-12">
             <!-- [Title] -->
             <div class="leftPanelTitle">
-                PUBLISHMENT
+                PUBLISH
             </div>
             <!-- [Checkboxes] -->
-            <div class="publishCheckboxes">
+            <!-- <div class="publishCheckboxes">
                 <lightning-radio-group class='checkBoxes' onchange={handleRadioChange} name="radioGroup"
                     options={option} value={publishment_value} data-name='aura' type="radio"></lightning-radio-group>
+            </div> -->
+<!-- ---------------------------------------------------------------------------------------------- -->
+            <div class="newclsrks">
+                <div class="form-check">
+                    <div class="thanks-optiondiv">
+                        <div class="thanks-option">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="aura" value="aura"
+                                onchange={handleRadioChange} checked={aura} />
+                            <label class="form-check-label"> Aura Component</label>
+                        </div>
+                    </div>
+                    <div id="Input0"> </div>
+                </div>
+                <div class="hrLine"></div>
+
+                <div class="form-check">
+                    <div class="thanks-optiondiv">
+                        <div class="thanks-option">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                id="lwc" value="lwc" onchange={handleRadioChange}  checked={lwc} />
+                            <label class="form-check-label" for="ThankYou_Text"> LWC</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="hrLine"></div>
+
+                <div class="form-check">
+                    <div class="thanks-optiondiv">
+                        <div class="thanks-option">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="iframe"
+                                value="iframe" onchange={handleRadioChange} checked={iframe} />
+                            <label class="form-check-label"> iFrame</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="hrLine"></div>
+
+                <div class="form-check">
+                    <div class="thanks-optiondiv">
+                        <div class="thanks-option">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                id="QRCode" value="QRCode" onchange={handleRadioChange}
+                                checked={QRCode} />
+                                <label class="form-check-label"> QR Code</label>
+                        </div>
             </div>
+                </div>
+                <div class="hrLine"></div>
+
+                <div class="form-check">
+                    <div class="thanks-optiondiv">
+                        <div class="thanks-option">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="lightBox"
+                                value="lightBox" onchange={handleRadioChange} checked={lightBox} />
+                            <label class="form-check-label"> Lightbox</label>
+                        </div>
+                    </div>
+                    <div id="Input4"></div>
+                </div>
+            </div>
+<!-- ------------------------------------------------------------ -->
             <!-- [Start light box accordions] -->
 
             <template if:true={lightBoxOpt}>

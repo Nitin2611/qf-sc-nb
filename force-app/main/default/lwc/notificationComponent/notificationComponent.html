@@ -20,6 +20,19 @@
         <c-toast-component></c-toast-component>
         <div class="notification_titel">
             <div class="titel">NOTIFICATION</div>
+            <div class="tableStatusCol">
+                <div class="slds-truncate togglebutton">
+                    <div class="container">
+                        <div class="content">
+                            <label class="switch">
+                                <input type='checkbox' checked={isChecked} onchange={changestatus} />
+                                <small></small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <lightning-helptext class="helptext" content='Please enable this toggle button to send an email notification to the entered email addresses whenever a new submission is made for this form.'></lightning-helptext>
+            </div>
         </div>
         <div class="input_outerbox">
             <div class="input_section">
@@ -193,7 +206,7 @@
                 </div>
             </div>
         </div>
-        <div class="bt-center">
+        <div class="bt-center slds-m-top_small">
             <div class="bt">
                 <input class="qf-standard-button-cancel" type="button" value="Cancel" name="Cancel" onclick={Cancel} />
                 <input class="qf-standard-button" type="button" value="Save" name="Save" onclick={handleSave} />

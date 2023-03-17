@@ -299,8 +299,8 @@ export default class DesignSectionComponent extends LightningElement {
         const cssevent3 = new CustomEvent("getbuttoncss", {
             detail: Array[0]
         });
-        console.log('264 Event:-- ' + cssevent2);
-        this.dispatchEvent(cssevent2);
+        console.log('264 Event:-- ' + cssevent3);
+        this.dispatchEvent(cssevent3);
         //get Styles Metadata
         GetStyles({
                 id: this.recordid
@@ -600,13 +600,13 @@ export default class DesignSectionComponent extends LightningElement {
         if (this.inputfontfamily == null || this.inputfontfamily == undefined) {
             this.inputfontfamily = 'Arial';
         }
-        
+
         this.inputfontweight = (((str.split('font-weight:'))[1].split(';'))[0]);
         console.log('inputfontweight --> ' + this.inputfontweight);
         if (this.inputfontweight == null || this.inputfontweight == undefined) {
             this.inputfontweight = 'Normal';
         }
-        
+
         this.inputfontstyle = (((str.split('font-style:'))[1].split(';'))[0]);
         console.log('inputfontstyle --> ' + this.inputfontstyle);
         if (this.inputfontstyle == null || this.inputfontstyle == undefined) {
@@ -977,22 +977,22 @@ export default class DesignSectionComponent extends LightningElement {
     // Creation of Combobox for Design part
     optionsCreater(Props) {
         try {
-        let options = [];
-        console.log('in optionsCreater', typeof (Props));
-        for (let i = 0; i < Props.length; i++) {
-            // console.log(value:Props[i].Label);
-            // console.log(label:Props[i].Label);
-            options.push({
-                value: Props[i].Label,
-                label: Props[i].Label
+            let options = [];
+            console.log('in optionsCreater', typeof (Props));
+            for (let i = 0; i < Props.length; i++) {
+                // console.log(value:Props[i].Label);
+                // console.log(label:Props[i].Label);
+                options.push({
+                    value: Props[i].Label,
+                    label: Props[i].Label
+                });
+                console.log('in for loop' + Props[i].Label);
+            }
+            options.sort();
+            options.forEach(element => {
+                console.log('check dataq --> ', element);
             });
-            console.log('in for loop' + Props[i].Label);
-        }
-        options.sort();
-        options.forEach(element => {
-            console.log('check dataq --> ', element);
-        });
-        return options;
+            return options;
         } catch (error) {
             this.message = 'Something Went Wrong In Design Section Page';
             this.showerror(this.message);
@@ -1056,7 +1056,10 @@ export default class DesignSectionComponent extends LightningElement {
             if (value > 100) {
                 value = 100;
                 event.target.value = 100;
-                this.formWidth = 100;
+            }
+            if (value < 0) {
+                value = 0;
+                event.target.value = 0;
             }
             value += '%';
         }

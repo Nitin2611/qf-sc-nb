@@ -116,6 +116,7 @@ export default class Quickformfieldcomponent extends LightningElement {
     @api thirdobjvallist = {};
     @api extobjvallist = {};
     @track all_filde_value = {};
+    @track file_upload = {};
     @track fullName = {
         'salutation': '',
         'f_name': '',
@@ -144,6 +145,16 @@ export default class Quickformfieldcomponent extends LightningElement {
     @track dataURL;
     @track convertedDataURI;
     @track sig_filde_id;
+    @track city;
+    @track street;
+    @track state;
+    @track postalcode;
+    @track country;
+    @track referecnereadonly = false;
+
+    //error_popup
+    @api error_popup = false;
+    message;
 
     connectedCallback() {
         this.fieldstype = this.tView.split(',')[1];
@@ -161,6 +172,8 @@ export default class Quickformfieldcomponent extends LightningElement {
                 }
             }).catch(err => {
                 console.log(err);
+                this.message = 'Something Went Wrong In Quick Form Field Component Page';
+                this.showerror(this.message);
             })
 
         this.onfocus = false;
@@ -220,7 +233,9 @@ export default class Quickformfieldcomponent extends LightningElement {
                 }
             }
         } catch (error) {
-            console.log('fielderror' + error);
+            console.log('fielderror =====>>>>>>>>>>>>>>>..' + error);
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
 
         //Label css using style property
@@ -256,13 +271,34 @@ export default class Quickformfieldcomponent extends LightningElement {
             });
             const event1 = CustomEvent('startsppiner');
             this.dispatchEvent(event1);
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
-
+        this.add();
         this.apply_val(); //add by yash
+
 
     }
 
     // add by yash
+    add() {
+        let filde_name = this.fieldmapping;
+        if (filde_name != '' && filde_name != null && filde_name != undefined) {
+            console.log('test add 0 :- ', filde_name);
+            var api_name = filde_name.split('<!@!>');
+            console.log('test add 1 :- ', api_name[0]);
+            console.log('test add 1.2 :- ', api_name[1]);
+            var add_name = api_name[0].split('Address');
+            console.log('test add 2 :- ', add_name[0]);
+            this.street = add_name[0] + 'Street<!@!>' + api_name[1];
+            this.city = add_name[0] + 'City<!@!>' + api_name[1];
+            console.log('city :- ', this.city);
+            this.state = add_name[0] + 'State<!@!>' + api_name[1];
+            this.postalcode = add_name[0] + 'PostalCode<!@!>' + api_name[1];
+            this.country = add_name[0] + 'Country<!@!>' + api_name[1];
+        }
+
+    }
     apply_val() {
         try {
             var tempararyList = this.fieldmapping.split('<!@!>');
@@ -316,21 +352,22 @@ export default class Quickformfieldcomponent extends LightningElement {
                                 // this.selectedmultipicklistvalues.push(m_list[1]);
                             }
 
-                        } else if (this.fildval == 'textarea') {
-                            console.log('u r in textarea');
-                            // console.log(this);
-                            var text_a = nameArr[1];
-                            // let select_name = event.currentTarget.dataset.id;
-                            console.log('nameArr[1]', nameArr[1]);
-                            // console.log('nameArr[2]',nameArr[2]);
-                            // console.log('select_name',select_name);
-                            var field_mapping = this.fieldmapping;
-                            var p_list = this.template.querySelector(`[data-name="${field_mapping}"]`);
-                            console.log('** error variable ===>' + JSON.stringify(p_list));
-                            console.log('** error variable 1 ===>' + p_list.textContent);
-                            p_list.innerHTML = nameArr[1];
-
                         }
+                        // else if (this.fildval == 'textarea') {
+                        //     console.log('u r in textarea');
+                        //     // console.log(this);
+                        //     var text_a = nameArr[1];
+                        //     // let select_name = event.currentTarget.dataset.id;
+                        //     console.log('nameArr[1]', nameArr[1]);
+                        //     // console.log('nameArr[2]',nameArr[2]);
+                        //     // console.log('select_name',select_name);
+                        //     var field_mapping = this.fieldmapping;
+                        //     var p_list = this.template.querySelector(`[data-name="${field_mapping}"]`);
+                        //     console.log('** error variable ===>' + JSON.stringify(p_list));
+                        //     console.log('** error variable 1 ===>' + p_list.textContent);
+                        //     p_list.innerHTML = nameArr[1];
+
+                        // }
 
                         console.log('data object OUTPUT : ', nameArr[1]);
                         console.log('data value OUTPUT : ', nameArr[2]);
@@ -520,6 +557,8 @@ export default class Quickformfieldcomponent extends LightningElement {
                 error
             });
             console.log('above error ==>' + error);
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
     }
     // clos add by yash
@@ -562,6 +601,8 @@ export default class Quickformfieldcomponent extends LightningElement {
                     error
                 });
                 console.log('above error ==>' + error);
+                this.message = 'Something Went Wrong In Quick Form Field Component Page';
+                this.showerror(this.message);
             }
         }
     }
@@ -597,6 +638,8 @@ export default class Quickformfieldcomponent extends LightningElement {
                 error
             });
             console.log('above error ==>' + error);
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
     }
 
@@ -858,7 +901,7 @@ export default class Quickformfieldcomponent extends LightningElement {
     }
 
     get sTruePercent() {
-        if (this.fieldstype == 'PERCENT') {
+        if (this.fieldstype == 'PERCENT' || this.fieldstype == 'INTEGER') {
 
             return true;
         }
@@ -900,6 +943,7 @@ export default class Quickformfieldcomponent extends LightningElement {
                         searchkey: this.searchkey
                     })
                     .then(result => {
+                        this.referecnereadonly = false;
                         if (result.referenceval.length > 0) {
                             this.referencevaling = true;
                             this.referencevalings = false;
@@ -918,6 +962,9 @@ export default class Quickformfieldcomponent extends LightningElement {
                             // }]
                         }
                         return false;
+                    }).catch(error => {
+                        this.message = 'Something Went Wrong In Quick Form Field Component Page';
+                        this.showerror(this.message);
                     });
             } else {
                 this.referencevalue = [];
@@ -927,6 +974,8 @@ export default class Quickformfieldcomponent extends LightningElement {
         } catch (error) {
             console.log('Reference eor' + error);
             this.usrViewBool = false;
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
     }
     closereference(event) {
@@ -934,36 +983,56 @@ export default class Quickformfieldcomponent extends LightningElement {
         this.usrViewBool = false;
     }
     selectreferencevalue(event) {
-        // alert('u r in method');
-        this.template.querySelector('span[class="clearref"]').style.display = 'block';
-        this.searchkey = event.currentTarget.dataset.id;
-        console.log(' this.searchkey  :- ', this.searchkey);
-        let key = event.currentTarget.dataset.name;
-        console.log(' key  :- ', key);
-        let select_name = event.currentTarget.dataset.id;
-        let vale = event.currentTarget.dataset.title;
-        console.log(' vale  :- ', vale);
-        // console.log('test by yash :-',event.target.value);
-        // console.log('test by yash 2:-',event.detail.value);
-        // console.log('test by yash 2:-',event.currentTarget.dataset.title);
+        try {
+            console.log('in the selectreferencevalue ===>');
+            this.referecnereadonly = true;
+            // alert('u r in method');
+            this.template.querySelector('span[class="clearref"]').style.display = 'block';
+            this.searchkey = event.currentTarget.dataset.id;
+            console.log(' this.searchkey  :- ', this.searchkey);
+            let key = event.currentTarget.dataset.name;
+            console.log(' key  :- ', key);
+            let select_name = event.currentTarget.dataset.id;
+            let vale = event.currentTarget.dataset.title;
+            console.log(' vale  :- ', vale);
+            // console.log('test by yash :-',event.target.value);
+            // console.log('test by yash 2:-',event.detail.value);
+            // console.log('test by yash 2:-',event.currentTarget.dataset.title);
 
-        let splitparetan = '<!@!>';
-        let splitparetan_2 = '<QF>';
-        let fulldata = key + splitparetan + 'refernce<QF>' + select_name + splitparetan_2 + vale;
-        console.log('fulldata OUTPUT : ', fulldata);
-        const cssevent1 = new CustomEvent("passfieldvalue", {
-            detail: fulldata
-        });
-        this.dispatchEvent(cssevent1);
-        var error = this.template.querySelector(`[data-id="${key}"]`)
-        error.textContent = ""
-        this.check_vali_next = true;
-        const cssevent3 = new CustomEvent("nextbtvaltrue", {
-            detail: key
-        });
-        this.dispatchEvent(cssevent3);
-        this.usrViewBool = false;
-        
+            let splitparetan = '<!@!>';
+            let splitparetan_2 = '<QF>';
+            let fulldata = key + splitparetan + 'refernce<QF>' + select_name + splitparetan_2 + vale;
+            console.log('fulldata OUTPUT : ', fulldata);
+            // let splitparetan = '<!@!>';
+            let new_fulldata = key + splitparetan + select_name;
+            const csseventaddval = new CustomEvent("addinputvaljosn", {
+                detail: new_fulldata
+            });
+            this.dispatchEvent(csseventaddval);
+            const cssevent1 = new CustomEvent("passfieldvalue", {
+                detail: fulldata
+            });
+            this.dispatchEvent(cssevent1);
+            var error = this.template.querySelector(`[data-id="${key}"]`)
+            error.textContent = ""
+            this.check_vali_next = true;
+            this.usrViewBool = false;
+            const cssevent3 = new CustomEvent("nextbtvaltrue", {
+                detail: key
+            });
+            this.dispatchEvent(cssevent3);
+            this.usrViewBool = false;
+
+        } catch (error) {
+            console.log('in the cathch bloack of  selectreferencevalue===>');
+            console.log('error of above ==>' + error);
+            console.log({
+                error
+            });
+
+        }
+
+
     }
 
     // selectreferencevalue(event) {
@@ -975,8 +1044,11 @@ export default class Quickformfieldcomponent extends LightningElement {
 
     referencevalues(event) {
         try {
-            this.template.querySelector('span[class="clearref"]').style.display = 'block';
             this.searchkey = event.target.value;
+            this.template.querySelector('span[class="clearref"]').style.display = 'block';
+            if (this.searchkey == '' || this.searchkey == null || this.searchkey == undefined) {
+                this.template.querySelector('span[class="clearref"]').style.display = 'none';
+            }
             getreferencevalue({
                     id: this.fieldId,
                     searchkey: this.searchkey
@@ -995,15 +1067,17 @@ export default class Quickformfieldcomponent extends LightningElement {
                         this.usricon = false;
                         this.referencevaling = false;
                         this.referencevalings = true;
-                        // this.referencevalue = [{
-                        //     Id: 'none',
-                        //     Name: 'There is no such records'
-                        // }]
+                        this.referencevalue = [{
+                            Id: 'none',
+                            Name: 'There is no such records'
+                        }]
                     }
                 });
         } catch (error) {
             console.log('Reference error' + error);
             this.usrViewBool = false;
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
     }
     picklistvalues() {
@@ -1022,9 +1096,14 @@ export default class Quickformfieldcomponent extends LightningElement {
                     }
 
 
+                }).catch(error => {
+                    this.message = 'Something Went Wrong In Quick Form Field Component Page';
+                    this.showerror(this.message);
                 });
         } catch (error) {
             console.log('Picklist error' + error);
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
     }
 
@@ -1045,6 +1124,11 @@ export default class Quickformfieldcomponent extends LightningElement {
                 let splitparetan = '<!@!>';
                 let fulldata = key + splitparetan + 'emoji<QF>' + emojiValue;
                 // console.log('fulldata OUTPUT : ',fulldata);
+                let new_fulldata = key + splitparetan + emojiValue;
+                const csseventaddval = new CustomEvent("addinputvaljosn", {
+                    detail: new_fulldata
+                });
+                this.dispatchEvent(csseventaddval);
                 const cssevent1 = new CustomEvent("passfieldvalue", {
                     detail: fulldata
                 });
@@ -1054,6 +1138,8 @@ export default class Quickformfieldcomponent extends LightningElement {
             console.log('In the catch part of emojiRatingValue ==>', {
                 error
             });
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
     }
 
@@ -1301,7 +1387,56 @@ export default class Quickformfieldcomponent extends LightningElement {
 
     //////////////////////////////FileUpload - Start////////////////////////////////////////////////////////
 
+    //retrieve canvase and context
+    knn() {
+        canvasElement = this.template.querySelector('canvas');
+        ctx = canvasElement.getContext("2d");
+        // super();
+        this.template.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        this.template.addEventListener('mousedown', this.handleMouseDown.bind(this));
+        this.template.addEventListener('mouseup', this.handleMouseUp.bind(this));
+        this.template.addEventListener('mouseout', this.handleMouseOut.bind(this));
+    }
+    knns(event) {
+        ctx.globalCompositeOperation = "destination-over";
+        ctx.fillStyle = "#FFF"; //white
+        ctx.fillRect(0, 0, canvasElement.width, canvasElement.height);
 
+        //convert to png image as dataURL
+        this.dataURL = canvasElement.toDataURL("image/png");
+        //convert that as base64 encoding
+        this.convertedDataURI = this.dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+        console.log('OUTPUT : convertedDataURI', this.convertedDataURI);
+        console.log('yfeguygfu :- ', this.convertedDataURI);
+
+
+
+        let key = event.target.dataset.name;
+        var sig_fildeArr = key.split('<!@!>');
+        this.sig_filde_id = sig_fildeArr[0];
+        console.log(' in chi filde_id :- ' + this.sig_filde_id);
+        let splitparetan = '<!@!>';
+        let vale = '';
+        var pera_m = {
+            con_id: this.convertedDataURI,
+            filde_id: this.sig_filde_id,
+        };
+        let fulldata = key + splitparetan + vale;
+        const cssevent_sing = new CustomEvent("sigconverteddataurl", {
+            detail: pera_m
+        });
+        this.dispatchEvent(cssevent_sing);
+        let new_fulldata = key + splitparetan + vale;
+        const csseventaddval = new CustomEvent("addinputvaljosn", {
+            detail: new_fulldata
+        });
+        this.dispatchEvent(csseventaddval);
+        const cssevent1 = new CustomEvent("passfieldvalue", {
+            detail: fulldata
+
+        });
+        this.dispatchEvent(cssevent1);
+    }
 
 
 
@@ -1318,6 +1453,8 @@ export default class Quickformfieldcomponent extends LightningElement {
             console.log({
                 error
             });
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
     }
 
@@ -1327,6 +1464,8 @@ export default class Quickformfieldcomponent extends LightningElement {
     uploadHelper(event) {
         try {
             const file = event.target.files[0];
+            let key = event.target.dataset.name;
+            // alert('si :- ',file.size);
             if (file.size > this.MAX_FILE_SIZE) {
                 this.fileName = 'Alert : File size cannot exceed ' + this.MAX_FILE_SIZE + ' bytes.\n' + ' Selected file size: ' + file.size;
                 return;
@@ -1338,29 +1477,33 @@ export default class Quickformfieldcomponent extends LightningElement {
                 const base64 = 'base64,';
                 const dataStart = fileContents.indexOf(base64) + base64.length;
                 const encodedFileContents = fileContents.substring(dataStart);
-                this.uploadProcess(file, encodedFileContents);
+                this.uploadProcess(file, encodedFileContents, key);
             };
             reader.readAsDataURL(file);
         } catch (error) {
             console.log({
                 error
             });
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
     }
 
-    uploadProcess(file, fileContents) {
+    uploadProcess(file, fileContents, key) {
         try {
             let startPosition = 0;
             let endPosition = Math.min(fileContents.length, startPosition + this.CHUNK_SIZE);
-            this.uploadInChunk(file, fileContents, startPosition, endPosition, '');
+            this.uploadInChunk(file, fileContents, startPosition, endPosition, key, '');
         } catch (error) {
             console.log({
                 error
             });
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
     }
 
-    uploadInChunk(file, fileContents, startPosition, endPosition, attachId) {
+    uploadInChunk(file, fileContents, startPosition, endPosition, key, attachId) {
         try {
             const getchunk = fileContents.substring(startPosition, endPosition);
             const params = {
@@ -1369,48 +1512,40 @@ export default class Quickformfieldcomponent extends LightningElement {
                 base64Data: encodeURIComponent(getchunk),
                 contentType: file.type,
             };
-            saveFile(params)
-                .then(result => {
-                    if (!result) {
-                        console.log("Something Went Wrong In Save Data, Please Reload Page");
-                    } else {
-                        const fieldData = result;
-                        // Event For pass data to preview
-                        const fId = this.fId;
-                        const fieldLabel = this.FieldAttribute.Label__c;
-                        const requiredField = this.FieldAttribute.Required_Field__c;
-                        const target = [fId, fieldLabel, fieldData, requiredField];
-                        const previewEvent = new CustomEvent('preview', {
-                            detail: {
-                                formFieldData: target
-                            }
-                        });
-                        this.dispatchEvent(previewEvent);
-                    }
-                    this.dispatchEvent(
-                        new ShowToastEvent({
-                            title: 'Success',
-                            message: 'Attachment created Successfully',
-                            variant: 'success',
-                        }),
-                    );
-                })
-                .catch(error => {
-                    console.log({
-                        error
-                    });
-                    this.dispatchEvent(
-                        new ShowToastEvent({
-                            title: 'Error creating Attachment record',
-                            message: error.body.message,
-                            variant: 'error',
-                        }),
-                    );
-                });
+            // let key = event.target.dataset.name;
+            var upload_fildeArr = key.split('<!@!>');
+            this.sig_filde_id = upload_fildeArr[0];
+            console.log(' in chi filde_id :- ' + this.sig_filde_id);
+            let splitparetan = '<!@!>';
+            let vale = '';
+            var pera_m = {
+                con_id: encodeURIComponent(getchunk),
+                filde_id: this.sig_filde_id,
+                fileName: file.name,
+                contentType: file.type
+            };
+            let fulldata = key + splitparetan + encodeURIComponent(getchunk);
+            const file_upload = new CustomEvent("fileuploadpra", {
+                detail: pera_m
+            });
+            this.dispatchEvent(file_upload);
+            let new_fulldata = key + splitparetan + encodeURIComponent(getchunk);
+            const csseventaddval = new CustomEvent("addinputvaljosn", {
+                detail: new_fulldata
+            });
+            this.dispatchEvent(csseventaddval);
+            const cssevent1 = new CustomEvent("passfieldvalue", {
+                detail: fulldata
+
+            });
+            this.dispatchEvent(cssevent1);
+
         } catch (error) {
             console.log({
                 error
             });
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
     }
     selectedvalues(event) {
@@ -1443,6 +1578,8 @@ export default class Quickformfieldcomponent extends LightningElement {
             }
         } catch (error) {
             console.log(error + 'selected error');
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
     }
     unselectedvalues(event) {
@@ -1475,40 +1612,52 @@ export default class Quickformfieldcomponent extends LightningElement {
             }
         } catch (error) {
             console.log(error + 'unselected error');
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
     }
     rightarrowmulti(event) {
         try {
 
 
-        let splitparetan = '<!@!>';
-        let sel_val = event.currentTarget.dataset.name;
-        sel_val = sel_val + splitparetan + 'm_pick<QF>';
-        console.log('tetsss: - ', sel_val);
-        let splitparetan_2 = '<QF>';
+            let splitparetan = '<!@!>';
+            let sel_val = event.currentTarget.dataset.name;
+            let new_sel_val = event.currentTarget.dataset.name;
+            sel_val = sel_val + splitparetan + 'm_pick<QF>';
+            new_sel_val = new_sel_val + splitparetan + 'm_pick<QF>';
+            console.log('tetsss: - ', sel_val);
+            let splitparetan_2 = '<QF>';
 
-        for (let i = 0; i < this.selmultipicklistvalues.length; i++) {
-            this.template.querySelector('div[data-id="' + this.selmultipicklistvalues[i].value + '"]').style.display = 'none';
-        }
-        for (var j = 0; j < this.selmultipicklistvalues.length; j++) {
-            for (var i = 0; i < this.picklistvalue.length; i++) {
-                if (this.picklistvalue[i].value == this.selmultipicklistvalues[j].value) {
-                    this.selectedmultipicklistvalues.push(this.selmultipicklistvalues[j]);
-                    let cur_val = this.selmultipicklistvalues[j].value;
-                    let cur_key = this.selmultipicklistvalues[j].key;
-                    console.log('cur_val ', cur_val);
-                    sel_val = sel_val + cur_val + '<?QF>' + cur_key + splitparetan_2;
-                    console.log('sel_val :- ', sel_val);
-                    this.picklistvalue.splice(i, 1);
+            for (let i = 0; i < this.selmultipicklistvalues.length; i++) {
+                this.template.querySelector('div[data-id="' + this.selmultipicklistvalues[i].value + '"]').style.display = 'none';
+            }
+            for (var j = 0; j < this.selmultipicklistvalues.length; j++) {
+                for (var i = 0; i < this.picklistvalue.length; i++) {
+                    if (this.picklistvalue[i].value == this.selmultipicklistvalues[j].value) {
+                        this.selectedmultipicklistvalues.push(this.selmultipicklistvalues[j]);
+                        let cur_val = this.selmultipicklistvalues[j].value;
+                        let cur_key = this.selmultipicklistvalues[j].key;
+                        console.log('cur_val ', cur_val);
+                        sel_val = sel_val + cur_val + '<?QF>' + cur_key + splitparetan_2;
+                        new_sel_val = new_sel_val + cur_val;
+                        console.log('new_sel_val :- ', new_sel_val)
+                        console.log('sel_val :- ', sel_val);
+                        this.picklistvalue.splice(i, 1);
+                    }
                 }
             }
-        }
-        this.selmultipicklistvalues = [];
-        const cssevent1 = new CustomEvent("passfieldvalue", {
-            detail: sel_val
-        });
+            this.selmultipicklistvalues = [];
+            let new_fulldata = new_sel_val;
+            console.log(' new_fulldata  :- ', new_fulldata);
+            const csseventaddval = new CustomEvent("addinputvaljosn", {
+                detail: new_fulldata
+            });
+            this.dispatchEvent(csseventaddval);
+            const cssevent1 = new CustomEvent("passfieldvalue", {
+                detail: sel_val
+            });
             console.log('Nimit test 1');
-        this.dispatchEvent(cssevent1);
+            this.dispatchEvent(cssevent1);
             console.log('Nimit test 2');
         } catch (error) {
             console.log('Rightarrowerror ', JSON.stringify(error));
@@ -1517,7 +1666,9 @@ export default class Quickformfieldcomponent extends LightningElement {
     leftarrowmulti(event) {
         let splitparetan = '<!@!>';
         let sel_val = event.currentTarget.dataset.name;
+        let new_sel_val = event.currentTarget.dataset.name;
         sel_val = sel_val + splitparetan + 'm_pick<QF>';
+        new_sel_val = new_sel_val + splitparetan;
         console.log('tetsss: - ', sel_val);
         let splitparetan_2 = '<QF>';
         for (let i = 0; i < this.selmultipicklistvalues.length; i++) {
@@ -1536,9 +1687,15 @@ export default class Quickformfieldcomponent extends LightningElement {
             let cur_key = this.selectedmultipicklistvalues[i].key;
             console.log('cur_val ', cur_val);
             sel_val = sel_val + cur_val + '<?QF>' + cur_key + splitparetan_2;
+            new_sel_val = new_sel_val + cur_val;
             console.log('sel_val :- ', sel_val);
         }
         this.selmultipicklistvalues = [];
+        let new_fulldata = key + splitparetan + new_sel_val;
+        const csseventaddval = new CustomEvent("addinputvaljosn", {
+            detail: new_fulldata
+        });
+        this.dispatchEvent(csseventaddval);
         const cssevent1 = new CustomEvent("passfieldvalue", {
             detail: sel_val
         });
@@ -1576,29 +1733,7 @@ export default class Quickformfieldcomponent extends LightningElement {
         this.dispatchEvent(cssevent3);
 
     }
-    // add_all_filde_value(key, value) {
-    //     let testt = 'no';
-    //     let ind;
-    //     var keyArr = key.split('<!@!>');
-    //     for (let i = 0; i < this.all_filde_value.length; i++) {
-    //         if (this.all_filde_value[i] == keyArr[0]) {
-    //             console.log('u r in for loop if ');
-    //             testt = 'yes'
-    //             ind = i;
-    //         }
-    //     }
-    //     if (testt == 'yes') {
-    //         console.log(' u r in testt if');
-    //         this.all_filde_value[ind] = value;
 
-    //         } else {
-    //         console.log(' u r in testt else');
-    //         this.all_filde_value[keyArr[0]] = value;
-
-    //     }
-    //     console.log('new json :- ', JSON.stringify(this.all_filde_value));
-
-    // }
     OnFieldClick(event) {
         console.log('test by tyash for val :- ', this.validation.Field_Validations__c);
         console.log('u r in onchange : ');
@@ -1618,6 +1753,11 @@ export default class Quickformfieldcomponent extends LightningElement {
             console.log('fulldata OUTPUT : ', fulldata);
 
             // this.add_all_filde_value(key, f_data);
+            let new_fulldata = key + splitparetan + vale;
+            const csseventaddval = new CustomEvent("addinputvaljosn", {
+                detail: new_fulldata
+            });
+            this.dispatchEvent(csseventaddval);
 
             const cssevent1 = new CustomEvent("passfieldvalue", {
                 detail: fulldata
@@ -1625,34 +1765,53 @@ export default class Quickformfieldcomponent extends LightningElement {
             this.dispatchEvent(cssevent1);
             var error = this.template.querySelector(`[data-id="${key}"]`)
             error.textContent = ""
-            this.check_vali_next = true;
             const cssevent3 = new CustomEvent("nextbtvaltrue", {
                 detail: key
             });
             this.dispatchEvent(cssevent3);
             // this.remove_error_msg(key,vale);
         } else if (fild_teye == 'text') {
-            if (this.minimum > vale.length) {
-                var msg = 'Please enter a minimum ' + this.minimum + ' chater.';
-                this.Set_error_msg(msg, key);
+            if (event.target.dataset.type == 'phone') {
+                console.log('in phone field.');
+                const regexPattern = /^[0-9+\-\s]{0,15}$/;
+                const isInputValid = regexPattern.test(vale);
+                console.log('isInputValid --> ' + isInputValid);
+                if (!isInputValid) {
+                    console.log('phone field value before -> ' + event.target.value);
+                    event.target.value = vale.slice(0, -1);
+                    console.log('phone field value after -> ' + event.traget.value);
+                }
             } else {
-                // let splitparetan = '<!@!>';
-                // let fulldata = key + splitparetan + vale;
-                // console.log('fulldata OUTPUT : ', fulldata);
-                // const cssevent1 = new CustomEvent("passfieldvalue", {
-                //     detail: fulldata
-                // });
-                // this.dispatchEvent(cssevent1);
-                // var error = this.template.querySelector(`[data-id="${key}"]`)
-                // error.textContent = ""
-                // this.check_vali_next = true;
-                // const cssevent3 = new CustomEvent("nextbtvaltrue", {
-                //     detail: key
-                // });
-                // this.dispatchEvent(cssevent3);
-                var text_val = vale + '<QF>';
-                // this.add_all_filde_value(key, vale);
-                this.remove_error_msg(key, text_val);
+
+                if (this.minimum > vale.length) {
+                    var msg = 'Please enter a minimum ' + this.minimum + ' chater.';
+                    this.Set_error_msg(msg, key);
+                } else {
+                    // let splitparetan = '<!@!>';
+                    // let fulldata = key + splitparetan + vale;
+                    // console.log('fulldata OUTPUT : ', fulldata);
+                    // const cssevent1 = new CustomEvent("passfieldvalue", {
+                    //     detail: fulldata
+                    // });
+                    // this.dispatchEvent(cssevent1);
+                    // var error = this.template.querySelector(`[data-id="${key}"]`)
+                    // error.textContent = ""
+                    // this.check_vali_next = true;
+                    // const cssevent3 = new CustomEvent("nextbtvaltrue", {
+                    //     detail: key
+                    // });
+                    // this.dispatchEvent(cssevent3);
+                    var text_val = vale + '<QF>';
+                    // this.add_all_filde_value(key, vale);
+
+                    let splitparetan = '<!@!>';
+                    let fulldata = key + splitparetan + vale;
+                    const csseventaddval = new CustomEvent("addinputvaljosn", {
+                        detail: fulldata
+                    });
+                    this.dispatchEvent(csseventaddval);
+                    this.remove_error_msg(key, text_val);
+                }
             }
         } else if (fild_teye == 'number') {
             let min_val = event.target.min;
@@ -1680,6 +1839,11 @@ export default class Quickformfieldcomponent extends LightningElement {
                 let splitparetan = '<!@!>';
                 let fulldata = key + splitparetan + vale;
                 console.log('fulldata OUTPUT : ', fulldata);
+                let new_fulldata = key + splitparetan + vale;
+                const csseventaddval = new CustomEvent("addinputvaljosn", {
+                    detail: new_fulldata
+                });
+                this.dispatchEvent(csseventaddval);
                 const cssevent1 = new CustomEvent("passfieldvalue", {
                     detail: fulldata
                 });
@@ -1715,6 +1879,11 @@ export default class Quickformfieldcomponent extends LightningElement {
                     let splitparetan = '<!@!>';
                     let fulldata = key + splitparetan + vale;
                     console.log('fulldata OUTPUT : ', fulldata);
+                    let new_fulldata = key + splitparetan + vale;
+                    const csseventaddval = new CustomEvent("addinputvaljosn", {
+                        detail: new_fulldata
+                    });
+                    this.dispatchEvent(csseventaddval);
                     const cssevent1 = new CustomEvent("passfieldvalue", {
                         detail: fulldata
                     });
@@ -1733,6 +1902,11 @@ export default class Quickformfieldcomponent extends LightningElement {
                     let splitparetan = '<!@!>';
                     let fulldata = key + splitparetan + vale;
                     console.log('fulldata OUTPUT : ', fulldata);
+                    let new_fulldata = key + splitparetan + vale;
+                    const csseventaddval = new CustomEvent("addinputvaljosn", {
+                        detail: new_fulldata
+                    });
+                    this.dispatchEvent(csseventaddval);
                     const cssevent1 = new CustomEvent("passfieldvalue", {
                         detail: fulldata
                     });
@@ -1762,6 +1936,11 @@ export default class Quickformfieldcomponent extends LightningElement {
                     let splitparetan = '<!@!>';
                     let fulldata = key + splitparetan + vale;
                     console.log('fulldata OUTPUT : ', fulldata);
+                    let new_fulldata = key + splitparetan + vale;
+                    const csseventaddval = new CustomEvent("addinputvaljosn", {
+                        detail: new_fulldata
+                    });
+                    this.dispatchEvent(csseventaddval);
                     const cssevent1 = new CustomEvent("passfieldvalue", {
                         detail: fulldata
                     });
@@ -1789,6 +1968,11 @@ export default class Quickformfieldcomponent extends LightningElement {
                 let splitparetan = '<!@!>';
                 let fulldata = key + splitparetan + vale;
                 console.log('fulldata OUTPUT : ', fulldata);
+                let new_fulldata = key + splitparetan + vale;
+                const csseventaddval = new CustomEvent("addinputvaljosn", {
+                    detail: new_fulldata
+                });
+                this.dispatchEvent(csseventaddval);
                 const cssevent1 = new CustomEvent("passfieldvalue", {
                     detail: fulldata
                 });
@@ -1808,6 +1992,12 @@ export default class Quickformfieldcomponent extends LightningElement {
             console.log('min val :- ', min);
             console.log('max val :- ', max);
             console.log('vale val :- ', vale);
+            const date = new Date(vale); // assuming the input datetime is in UTC format
+            const offset = new Date().getTimezoneOffset(); // get the local time zone offset in minutes
+            const offsetHours = Math.abs(Math.floor(offset / 60)).toString().padStart(2, '0'); // convert offset to hours and pad with leading zeros if necessary
+            const offsetMinutes = Math.abs(offset % 60).toString().padStart(2, '0'); // get the remaining minutes of the offset and pad with leading zeros if necessary
+            const offsetSign = offset >= 0 ? '-' : '+'; // determine the sign of the offset
+            const isoString = date.toISOString().replace('Z', `${offsetSign}${offsetHours}:${offsetMinutes}`);
             const valdatetime = new Date(vale);
             if (min != '' && max != '') {
                 var min_date_time = min.split('T');
@@ -1827,7 +2017,13 @@ export default class Quickformfieldcomponent extends LightningElement {
                     var msg = 'Please enter a date betwin ' + mindatetime + ' to ' + maxdatetime;
                     this.Set_error_msg(msg, key);
                 } else {
-                    this.remove_error_msg(key, vale);
+                    let splitparetan = '<!@!>';
+                    let fulldata = key + splitparetan + isoString;
+                    const csseventaddval = new CustomEvent("addinputvaljosn", {
+                        detail: fulldata
+                    });
+                    this.dispatchEvent(csseventaddval);
+                    this.remove_error_msg(key, isoString);
                 }
             } else if (min != '' && max == '') {
                 var min_date_time = min.split('T');
@@ -1839,7 +2035,13 @@ export default class Quickformfieldcomponent extends LightningElement {
                     var msg = 'Please enter a date above ' + mindatetime;
                     this.Set_error_msg(msg, key);
                 } else {
-                    this.remove_error_msg(key, vale);
+                    let splitparetan = '<!@!>';
+                    let fulldata = key + splitparetan + isoString;
+                    const csseventaddval = new CustomEvent("addinputvaljosn", {
+                        detail: fulldata
+                    });
+                    this.dispatchEvent(csseventaddval);
+                    this.remove_error_msg(key, isoString);
                 }
 
             } else if (min == '' && max != '') {
@@ -1852,11 +2054,23 @@ export default class Quickformfieldcomponent extends LightningElement {
                     var msg = 'Please enter a date before ' + maxdatetime;
                     this.Set_error_msg(msg, key);
                 } else {
-                    this.remove_error_msg(key, vale);
+                    let splitparetan = '<!@!>';
+                    let fulldata = key + splitparetan + isoString;
+                    const csseventaddval = new CustomEvent("addinputvaljosn", {
+                        detail: fulldata
+                    });
+                    this.dispatchEvent(csseventaddval);
+                    this.remove_error_msg(key, isoString);
                 }
 
             } else {
-                this.remove_error_msg(key, vale);
+                let splitparetan = '<!@!>';
+                let fulldata = key + splitparetan + isoString;
+                const csseventaddval = new CustomEvent("addinputvaljosn", {
+                    detail: fulldata
+                });
+                this.dispatchEvent(csseventaddval);
+                this.remove_error_msg(key, isoString);
             }
         } else if (fild_teye == 'email') {
             var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -1878,6 +2092,11 @@ export default class Quickformfieldcomponent extends LightningElement {
                     let splitparetan = '<!@!>';
                     let fulldata = key + splitparetan + vale;
                     console.log('fulldata OUTPUT : ', fulldata);
+                    let new_fulldata = key + splitparetan + vale;
+                    const csseventaddval = new CustomEvent("addinputvaljosn", {
+                        detail: new_fulldata
+                    });
+                    this.dispatchEvent(csseventaddval);
                     const cssevent1 = new CustomEvent("passfieldvalue", {
                         detail: fulldata
                     });
@@ -1903,6 +2122,7 @@ export default class Quickformfieldcomponent extends LightningElement {
             }
 
         } else if (fild_teye == 'textarea') {
+
             if (this.minimum > vale.length) {
                 // alert('pls enter min chater');
                 var error = this.template.querySelector(`[data-id="${key}"]`)
@@ -1918,8 +2138,13 @@ export default class Quickformfieldcomponent extends LightningElement {
                 this.dispatchEvent(cssevent2);
             } else {
                 let splitparetan = '<!@!>';
-                let fulldata = key + splitparetan + 'textarea<QF>' + vale;
+                let fulldata = key + splitparetan + vale;
                 console.log('fulldata OUTPUT : ', fulldata);
+                let new_fulldata = key + splitparetan + vale;
+                const csseventaddval = new CustomEvent("addinputvaljosn", {
+                    detail: new_fulldata
+                });
+                this.dispatchEvent(csseventaddval);
                 const cssevent1 = new CustomEvent("passfieldvalue", {
                     detail: fulldata
                 });
@@ -1939,6 +2164,11 @@ export default class Quickformfieldcomponent extends LightningElement {
                 let splitparetan = '<!@!>';
                 let fulldata = key + splitparetan + vale;
                 console.log('fulldata OUTPUT : ', fulldata);
+                let new_fulldata = key + splitparetan + vale;
+                const csseventaddval = new CustomEvent("addinputvaljosn", {
+                    detail: new_fulldata
+                });
+                this.dispatchEvent(csseventaddval);
                 const cssevent1 = new CustomEvent("passfieldvalue", {
                     detail: fulldata
                 });
@@ -1962,10 +2192,35 @@ export default class Quickformfieldcomponent extends LightningElement {
                 this.dispatchEvent(cssevent2);
             }
 
+        } else if (fild_teye == 'time') {
+            console.log('tetstdcv:-');
+            // const isoString = valenow.toISOString().slice(0, 11) + '00:45:00.000Z';
+            // console.log('isoString :- ',isoString);
+            // var onlytime = isoString.split('T');
+            // console.log('onlytime :- ',onlytime[1]);
+            let fulltime = vale + ':00.000Z';
+            let splitparetan = '<!@!>';
+            let fulldata = key + splitparetan + fulltime;
+            console.log('fulldata OUTPUT : ', fulldata);
+            let new_fulldata = key + splitparetan + fulltime;
+            const csseventaddval = new CustomEvent("addinputvaljosn", {
+                detail: new_fulldata
+            });
+            this.dispatchEvent(csseventaddval);
+            const cssevent1 = new CustomEvent("passfieldvalue", {
+                detail: fulldata
+            });
+            this.dispatchEvent(cssevent1);
+
         } else {
             let splitparetan = '<!@!>';
             let fulldata = key + splitparetan + vale;
             console.log('fulldata OUTPUT : ', fulldata);
+            let new_fulldata = key + splitparetan + vale;
+            const csseventaddval = new CustomEvent("addinputvaljosn", {
+                detail: new_fulldata
+            });
+            this.dispatchEvent(csseventaddval);
             const cssevent1 = new CustomEvent("passfieldvalue", {
                 detail: fulldata
             });
@@ -1993,7 +2248,8 @@ export default class Quickformfieldcomponent extends LightningElement {
                 error
             });
             console.log('above error ==>' + error);
-
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
     }
     full_name(event) {
@@ -2007,6 +2263,7 @@ export default class Quickformfieldcomponent extends LightningElement {
             let ne2 = this.fullName['f_name'];
             let ne3 = this.fullName['s_name'];
             let FullName = 'fullname<QF>' + ne + '<QF>' + ne2 + '<QF>' + ne3;
+            let new_fullname = ne + ne2 + ne3;
             // console.log(' ne4 :-',FullName);
             var nameArr = FullName.split('<QF>');
             // console.log('data key OUTPUT : ',nameArr[0]);
@@ -2016,12 +2273,19 @@ export default class Quickformfieldcomponent extends LightningElement {
             let splitparetan = '<!@!>';
             let fulldata = key + splitparetan + FullName;
             // console.log('fulldata OUTPUT : ',fulldata);
+            let new_fulldata = key + splitparetan + new_fullname;
+            const csseventaddval = new CustomEvent("addinputvaljosn", {
+                detail: new_fulldata
+            });
+            this.dispatchEvent(csseventaddval);
             const cssevent1 = new CustomEvent("passfieldvalue", {
                 detail: fulldata
             });
             this.dispatchEvent(cssevent1);
         } catch (error) {
             console.log('OUTPUT : Yash 1', error);
+            this.message = 'Something Went Wrong In Quick Form Field Component Page';
+            this.showerror(this.message);
         }
     }
     address(event) {
@@ -2036,6 +2300,7 @@ export default class Quickformfieldcomponent extends LightningElement {
         let zipcode = this.Address['zipcode'];
         let country = this.Address['country'];
         let FullAdd = 'add<QF>' + street + '<QF>' + city + '<QF>' + state + '<QF>' + zipcode + '<QF>' + country;
+        let new_fulladd = street + city + state + zipcode + country;
         console.log(' ne4 :-', FullAdd);
         var nameArr = FullAdd.split('<QF>');
         console.log('data key OUTPUT : ', nameArr[0]);
@@ -2045,6 +2310,11 @@ export default class Quickformfieldcomponent extends LightningElement {
         let splitparetan = '<!@!>';
         let fulldata = key + splitparetan + FullAdd;
         // console.log('fulldata OUTPUT : ',fulldata);
+        let new_fulldata2 = key + splitparetan + new_fulladd;
+        const csseventaddval = new CustomEvent("addinputvaljosn", {
+            detail: new_fulldata2
+        });
+        this.dispatchEvent(csseventaddval);
         const cssevent1 = new CustomEvent("passfieldvalue", {
             detail: fulldata
         });
@@ -2063,10 +2333,16 @@ export default class Quickformfieldcomponent extends LightningElement {
         let splitparetan2 = 'redio<QF>';
         let fulldata = key + splitparetan + splitparetan2 + radio_val;
         // console.log('fulldata OUTPUT : ',fulldata);
+        let new_fulldata = key + splitparetan + radio_val;
+        const csseventaddval = new CustomEvent("addinputvaljosn", {
+            detail: new_fulldata
+        });
+        this.dispatchEvent(csseventaddval);
         const cssevent1 = new CustomEvent("passfieldvalue", {
             detail: fulldata
         });
         this.dispatchEvent(cssevent1);
+
     }
     check_box(event) {
         // alert('yash');
@@ -2083,14 +2359,21 @@ export default class Quickformfieldcomponent extends LightningElement {
         }
         console.log('chek val :- ', JSON.stringify(this.chexk_val_list));
         let full_cheh_val;
+        let new_full_cheh_val;
         for (let i = 0; i < this.chexk_val_list.length; i++) {
             full_cheh_val = full_cheh_val + '<QF>' + this.chexk_val_list[i];
+            new_full_cheh_val = new_full_cheh_val + this.chexk_val_list[i];
         }
         console.log(' full_cheh_val:- ', full_cheh_val);
         let key = event.target.dataset.name;
         let splitparetan = '<!@!>';
         let fulldata = key + splitparetan + 'chk_box<QF>' + full_cheh_val;
         // console.log('fulldata OUTPUT : ',fulldata);
+        let new_fulldata = key + splitparetan + new_full_cheh_val;
+        const csseventaddval = new CustomEvent("addinputvaljosn", {
+            detail: new_fulldata
+        });
+        this.dispatchEvent(csseventaddval);
         const cssevent1 = new CustomEvent("passfieldvalue", {
             detail: fulldata
         });
@@ -2104,9 +2387,62 @@ export default class Quickformfieldcomponent extends LightningElement {
         }
         return this.termsAndConditionValue;
     }
+
     clearreference() {
         this.template.querySelector('span[class="clearref"]').style.display = 'none';
         this.searchkey = '';
         this.usrViewBool = false;
+    }
+
+    errorpopupcall(event) {
+        location.reload();
+    }
+
+    @track errordata;
+    showerror() {
+        this.error_popup = true;
+        console.log('this.error_popup => ', this.error_popup);
+
+        this.errordata = {
+            header_type: 'Quick From Field',
+            Message: this.message
+        };
+        console.log('Message OUTPUT : ', this.errordata.header_type);
+        console.log('Message OUTPUT : ', this.errordata.Message);
+
+        const showpopup = new CustomEvent('showerrorpopup', {
+            detail: this.errordata
+        });
+        this.dispatchEvent(showpopup);
+        // this.show = true;
+
+        console.log('OUTPUT error poup show ==>>>>>>>....>>>>>>>>>>>>>>>: ');
+    }
+    @api
+    showerrorpopup(event) {
+        console.log('showerrorpopup', event.detail.Message);
+
+        this.template.querySelector('c-errorpopup').errormessagee(event.detail.header_type, event.detail.Message);
+    }
+
+    optionhover(event) {
+        console.log('event:- ', {
+            event
+        });
+        console.log(' event traget:- ', JSON.stringify(event.target));
+        var bcolor = this.hovercssproperty.split('background-color:')[1].split(';')[0];
+        event.target.style = 'background-color:' + bcolor;
+    }
+
+    optionblur(event) {
+        console.log('event:- ', {
+            event
+        });
+        console.log(' event traget:- ', JSON.stringify(event.target));
+        var Array = this.template.querySelectorAll('.usrnameClass');
+        Array.forEach(element => {
+            // event.target.style = 'background-color:transparent';
+            element.style = 'background-color:transparent';
+        });
     }
 }

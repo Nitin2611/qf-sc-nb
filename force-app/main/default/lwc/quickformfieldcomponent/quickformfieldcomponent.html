@@ -230,15 +230,6 @@
         <template if:true={isFullView}></template>
     </template>
 
-    <!-- RichText -->
-    <template if:true={isTrueRichText}>
-        <template if:true={isFieldCompView}>
-            <div class="slds-box_xx-small fieldOutlines isSelected">
-                <lightning-icon class="icon" icon-name="utility:display_rich_text" alternative-text="HTML BLock"
-                    title="Short Text" size="small"></lightning-icon> Rich Text
-            </div>
-        </template>
-    </template>
 
     <!--page break-->
     <template if:true={isTruePageBreak}>
@@ -333,9 +324,8 @@
                             </div>
                         </template>
                         <textarea data-name={fieldmapping} onmousemove={handlehover} onmouseout={handleblur}
-                            onfocusin={handlefocus} onblur={handleblur1} disabled={isdisabled} class="slds-input"
-                            value={fildval} onchange={OnFieldClick} placeholder={placeholder} maxlength={maximum}
-                            minlength={minimum}></textarea>
+                            onfocusin={handlefocus} onblur={handleblur1} disabled={isdisabled} class="slds-input textarea2"
+                            value={fildval} onchange={OnFieldClick} placeholder={placeholder}></textarea>
                         <span data-id={fieldmapping}></span>
 
                     </label>
@@ -518,9 +508,9 @@
                             </div>
                         </template>
                         <div class="slds-form-element__control">
-                            <input data-name={fieldmapping} onmousemove={handlehover} onmouseout={handleblur}
-                                onfocusin={handlefocus} onblur={handleblur1} placeholder={placeholder} type='tel'
-                                value={fildval} onchange={OnFieldClick} pattern="^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$"
+                            <input data-name={fieldmapping} onmousemove={handlehover} onmouseout={handleblur} data-type="phone"
+                                onfocusin={handlefocus} onblur={handleblur1} placeholder={placeholder} type='text'
+                                value={fildval} onkeyup={OnFieldClick} pattern="^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$"
                                 class="slds-input" disabled={isdisabled} />
                             <span data-id={fieldmapping}></span>
                         </div>
@@ -646,7 +636,7 @@
                         </template>
                         <div class="slds-form-element__control">
                             <input data-name={fieldmapping} onmousemove={handlehover} onmouseout={handleblur}
-                                onfocusin={handlefocus} onblur={handleblur1} class={fieldId} placeholder={placeholder}
+                                onfocusin={handlefocus} onblur={handleblur1} class="slds-input" placeholder={placeholder}
                                 type="checkbox" value={fildval} name={tView} options={CheckBoxOp}
                                 pattern={fieldValidations} message-when-pattern-mismatch={fieldAttributeValue}
                                 onchange={OnFieldClick} key={value} disabled={isdisabled}></input>
@@ -681,38 +671,38 @@
                             <div class="slds-form slds-form_stacked">
                                 <div class="slds-form-element">
                                     <div class="areatext slds-form-element__control">
-                                        <textarea data-name={fieldmapping} onmousemove={handlehover}
+                                        <textarea data-name={street} onmousemove={handlehover}
                                             onmouseout={handleblur} onfocusin={handlefocus} onblur={handleblur1}
-                                            disabled={isdisabled} data-id="street-address" class="slds-input"
-                                            placeholder="Street" onchange={address} name="street"> </textarea>
+                                            disabled={isdisabled} data-id="street-address" class="slds-input textarea1"
+                                            placeholder="Street" onchange={OnFieldClick} name="street">{fildval}</textarea>
                                     </div>
                                 </div>
                                 <div class="slds-form-element flex">
                                     <div class="slds-form-element__control leftfield">
-                                        <input data-name={fieldmapping} onmousemove={handlehover}
+                                        <input data-name={city} onmousemove={handlehover}
                                             onmouseout={handleblur} onfocusin={handlefocus} onblur={handleblur1}
-                                            disabled={isdisabled} type="text" data-id="city" onchange={address}
-                                            name="city" class="slds-input" placeholder="City" />
+                                            disabled={isdisabled} type="text" data-id="city" onchange={OnFieldClick}
+                                            name="city" class="slds-input" placeholder="City" value={fildval} />
                                     </div>
                                     <div class="slds-form-element__control rightfield">
-                                        <input data-name={fieldmapping} onmousemove={handlehover}
+                                        <input data-name={state} onmousemove={handlehover}
                                             onmouseout={handleblur} onfocusin={handlefocus} onblur={handleblur1}
-                                            disabled={isdisabled} type="text" data-id="state" onchange={address}
-                                            name="state" class="slds-input" placeholder="State" />
+                                            disabled={isdisabled} type="text" data-id="state" onchange={OnFieldClick}
+                                            name="state" class="slds-input" placeholder="State" value={fildval} />
                                     </div>
                                 </div>
                                 <div class="slds-form-element flex">
                                     <div class="slds-form-element__control leftfield">
-                                        <input data-name={fieldmapping} onmousemove={handlehover}
+                                        <input data-name={postalcode} onmousemove={handlehover}
                                             onmouseout={handleblur} onfocusin={handlefocus} onblur={handleblur1}
-                                            disabled={isdisabled} type="text" data-id="zip-code" onchange={address}
-                                            name="zipcode" class="slds-input" placeholder="Zip Code" />
+                                            disabled={isdisabled} type="text" data-id="zip-code" onchange={OnFieldClick}
+                                            name="zipcode" class="slds-input" placeholder="Zip Code" value={fildval} />
                                     </div>
                                     <div class="slds-form-element__control rightfield">
-                                        <input data-name={fieldmapping} onmousemove={handlehover}
+                                        <input data-name={country} onmousemove={handlehover}
                                             onmouseout={handleblur} onfocusin={handlefocus} onblur={handleblur1}
-                                            disabled={isdisabled} type="text" data-id="country" onchange={address}
-                                            name="country" class="slds-input" placeholder="Country" />
+                                            disabled={isdisabled} type="text" data-id="country" onchange={OnFieldClick}
+                                            name="country" class="slds-input" placeholder="Country" value={fildval} />
                                     </div>
                                 </div>
                             </div>
@@ -776,9 +766,9 @@
                         <div class="slds-form-element__control">
                             <span class="deleteicon">
                                 <input ref={searchInputRef} onmousemove={handlehover} onmouseout={handleblur}
-                                    onkeypress={referencevalues} onfocusin={handlefocus} onclick={getreferncevalue}
+                                    onkeyup={referencevalues} onfocusin={handlefocus} onclick={getreferncevalue}
                                     data-title="REFERENCE" value={searchkey} data-id={fieldId} data-name={fieldmapping}
-                                    onblur={handleblur1} disabled={isdisabled} type="search" onchange={OnFieldClick}
+                                    onblur={handleblur1} disabled={isdisabled} readonly={referecnereadonly} type="search" onchange={OnFieldClick}
                                     class="slds-input nosubmit fieldcancel " />
                                 <span class="clearref" onclick={clearreference}><img src={blackcross} alt=""></span>
                             </span>
@@ -844,7 +834,7 @@
                         </template>
                         <div class="slds-form-element__control">
                             <div class="multipicklist">
-                                <div class="dropuser slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-dropdown_left"
+                                <div class="dropuser slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-dropdown_left slds-input"
                                     style="">
                                     <ul class="slds-listbox slds-listbox_vertical slds-dropdown_length-5 slds-dropdown_fluid customClass"
                                         tabindex="0" role="presentation" style="height:100px;">
@@ -852,16 +842,16 @@
                                             <li key={option.value} data-id={option.value} role="presentation"
                                                 class="listbox-item slds-listbox__item" data-name={option.key}
                                                 onclick={selectedvalues} value={option.value} title={option.key}>
-                                                <div id={option.value}
+                                                <div id={option.value} onmouseover={optionhover} onmouseout={optionblur}
                                                     class="usrnameClass slds-media slds-listbox__option slds-listbox__option_plain slds-media_small"
                                                     role="option">
                                                     <span class="slds-media__figure slds-listbox__option-icon">
-                                                        <div data-id={option.value} class="tickicons">
+                                                        <div data-id={option.value} class="tickicons ">
                                                             <img src={multitick} alt="">
                                                         </div>
                                                     </span>
-                                                    <span class="slds-truncate">
-                                                        <span>{option.key}</span>
+                                                    <span class="slds-truncate transparentbg">
+                                                        <span class="transparentbg">{option.key}</span>
                                                     </span>
                                                 </div>
                                             </li>
@@ -876,7 +866,7 @@
                                             src={multileft} alt=""> </div>
                                 </div>
 
-                                <div class="dropuser slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-dropdown_left"
+                                <div class="dropuser slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-dropdown_left slds-input" 
                                     style="">
                                     <ul class="slds-listbox slds-listbox_vertical slds-dropdown_length-5 slds-dropdown_fluid customClass"
                                         tabindex="0" role="presentation" style="height:100px;">
@@ -885,7 +875,7 @@
                                                 class="listbox-item slds-listbox__item" data-name={option.key}
                                                 data-id={option.value} onclick={unselectedvalues} value={option.value}
                                                 title={option.key}>
-                                                <div id={option.value}
+                                                <div id={option.value} onmouseover={optionhover} onmouseout={optionblur}
                                                     class="usrnameClass slds-media slds-listbox__option slds-listbox__option_plain slds-media_small"
                                                     role="option">
                                                     <span class="slds-media__figure slds-listbox__option-icon">
@@ -893,8 +883,8 @@
                                                             <img src={multitick} alt="">
                                                         </div>
                                                     </span>
-                                                    <span class="slds-truncate">
-                                                        <span>{option.key}</span>
+                                                    <span class="slds-truncate transparentbg">
+                                                        <span class="transparentbg">{option.key}</span>
                                                     </span>
                                                 </div>
                                             </li>
@@ -1056,7 +1046,9 @@
                                 <textarea data-name={fieldmapping} onmousemove={handlehover} onmouseout={handleblur}
                                     onfocusin={handlefocus} onchange={address} onblur={handleblur1}
                                     data-id="street-address" disabled={isdisabled} id="street-address" name="street"
-                                    class="slds-input" value='yashshah' placeholder="Street"></textarea>
+                                    class="slds-input" placeholder="Street">
+                                    {fildval}
+                                </textarea>
                             </div>
                         </div>
                         <div class="slds-form-element flex">
@@ -1117,7 +1109,7 @@
                         </div>
                     </template>
                     <input data-name={fieldmapping} onmousemove={handlehover} onmouseout={handleblur}
-                        onfocusin={handlefocus} onblur={handleblur1} class={fieldId} placeholder={placeholder}
+                        onfocusin={handlefocus} onblur={handleblur1} class="slds-input" placeholder={placeholder}
                         type="text" value={fildval} pattern={fieldValidations}
                         message-when-pattern-mismatch={fieldAttributeValue} onchange={OnFieldClick}
                         disabled={isdisabled}></input>
@@ -1145,9 +1137,9 @@
                         </div>
                     </template>
                     <textarea data-name={fieldmapping} onmousemove={handlehover} onmouseout={handleblur} type="text"
-                        onfocusin={handlefocus} onblur={handleblur1} class={fieldId} placeholder={placeholder}
+                        onfocusin={handlefocus} onblur={handleblur1} class='slds-input textarea2' placeholder={placeholder}
                         value={fildval} pattern={fieldValidations} message-when-pattern-mismatch={fieldAttributeValue}
-                        onchange={OnFieldClick} disabled={isdisabled}></textarea>
+                        onchange={OnFieldClick} disabled={isdisabled}> {fildval} </textarea>
                     <span data-id={fieldmapping}></span>
                 </template>
             </template>
@@ -1209,7 +1201,7 @@
                         <template for:each={salutationvalue} for:item="value">
                             <div id={PageId} key={value} style="display: flex;gap:8px;">
                                 <input data-name={fieldmapping} data-id={value} onmousemove={handlehover}
-                                    onmouseout={handleblur} onfocusin={handlefocus} onblur={handleblur1} class={fieldId}
+                                    onmouseout={handleblur} onfocusin={handlefocus} onblur={handleblur1} class="slds-input"
                                     placeholder={placeholder} type="checkbox" value={value} name={tView}
                                     options={CheckBoxOp} pattern={fieldValidations}
                                     message-when-pattern-mismatch={fieldAttributeValue} onchange={check_box} key={value}
@@ -1242,7 +1234,7 @@
                     <template for:each={salutationvalue} for:item="value">
                         <div id={PageId} key={value} style="display: flex;gap:8px;">
                             <input data-name={fieldmapping} data-id={value} onmousemove={handlehover}
-                                onmouseout={handleblur} onfocusin={handlefocus} onblur={handleblur1} class={fieldId}
+                                onmouseout={handleblur} onfocusin={handlefocus} onblur={handleblur1} class="slds-input"
                                 placeholder={placeholder} type="radio" value={value} name={tView} options={CheckBoxOp}
                                 pattern={fieldValidations} message-when-pattern-mismatch={fieldAttributeValue}
                                 onchange={radiobutton} key={value} disabled={isdisabled}></input> <label
@@ -1271,9 +1263,8 @@
                             </template>
                         </div>
                     </template>
-                    <input onmousemove={handlehover} onmouseout={handleblur} onfocusin={handlefocus}
-                        onblur={handleblur1} class={fieldId} type="file" name="file" label="Upload File"
-                        onchange={OnFieldClick} data-id="username" disabled={isdisabled}></input>
+                    <lightning-input onclick={OnFieldClick} type="file"
+                    name="file" accept=".png , .jpeg , .jpg, .PDF " data-id="username" disabled={isdisabled} class="backclass"></lightning-input>
                 </template>
             </template>
         </template>
@@ -1361,9 +1352,9 @@
                         </div>
                     </template>
                     <div class="slds-form-element__control">
-                        <input data-name={fieldmapping} onmousemove={handlehover} onmouseout={handleblur}
+                        <input data-name={fieldmapping} onmousemove={handlehover} onmouseout={handleblur} data-type="phone"
                             onfocusin={handlefocus} onblur={handleblur1} class='slds-input' placeholder={placeholder}
-                            type="tel" pattern="^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$" value={fildval} onchange={OnFieldClick} disabled={isdisabled}></input>
+                            type="phone" pattern="^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$" value={fildval} onkeyup={OnFieldClick} disabled={isdisabled}></input>
                         <span data-id={fieldmapping}></span>
                     </div>
                 </template>
@@ -1650,7 +1641,7 @@
                     </template>
                     <div id={PageId} style="display: flex;gap:8px;">
                         <input data-name={fieldmapping} data-id="tands" onmousemove={handlehover} onmouseout={handleblur} onfocusin={handlefocus}
-                            onblur={handleblur1} type="checkbox" variant="standard" onchange={check_box}
+                            onblur={handleblur1} type="checkbox" variant="standard" onchange={check_box} class="slds-input"
                             checked={isTermsAndConditionChecked} value="tands"></input>  
                         <lightning-formatted-rich-text value={displayText} style="display:flex; align-items: center;"></lightning-formatted-rich-text>
                     </div>
@@ -1749,28 +1740,6 @@
             </template>
         </template>
 
-        <!-- RichText -->
-        <template if:true={isTrueRichText}>
-            <template if:true={isFullView}>
-                <template if:true={FieldShown}>
-                    <template if:true={labelcheck}>
-                        <div class="labeldiv">
-                            <template if:true={isReqired}>
-                                <label class="slds-form-element__label">
-                                    <abbr class="slds-required" title="required">* </abbr>
-                                </label>
-                            </template>
-                            <label>
-                                {labelvalue}
-                            </label>
-                        </div>
-                    </template>
-                    <div class="outrichstyle" onchange={OnFieldClick}>
-                        <lightning-formatted-rich-text value='<b>hello</b>'></lightning-formatted-rich-text>
-                    </div>
-                </template>
-            </template>
-        </template>
-
+        
     </template>
 </template>

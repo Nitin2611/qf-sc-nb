@@ -1,5 +1,11 @@
-import { api, track, LightningElement } from 'lwc';
-import { loadStyle } from 'lightning/platformResourceLoader';
+import {
+    api,
+    LightningElement,
+    track
+} from 'lwc';
+import {
+    loadStyle
+} from 'lightning/platformResourceLoader';
 import QuickBotLogo from '@salesforce/resourceUrl/QuickBotLogo';
 import QuickBotBody from '@salesforce/resourceUrl/QuickBotBody';
 import QuickBot_Cross from '@salesforce/resourceUrl/QuickBot_Cross';
@@ -21,29 +27,45 @@ export default class QuickBot extends LightningElement {
     quickbotsubject;
     email_msg = true;
     header = quickbotheader;
+
+    //error_popup
+    @api error_popup = false;
+    message;
+
+
     get bgimg() {
         return `background-image:url(${QuickBotBody});background-repeat: no-repeat; background-size: cover;`;
     }
 
     connectedCallback() {
         this.spinnerdatatable = true;
-        window.setTimeout(() => { this.spinnerdatatable = false; }, 4000);
+        window.setTimeout(() => {
+            this.spinnerdatatable = false;
+        }, 4000);
         this.first_icon = true;
-        window.setTimeout(() => { this.first_icon = true; }, 4000);
+        window.setTimeout(() => {
+            this.first_icon = true;
+        }, 4000);
         this.wel_message = false;
-        window.setTimeout(() => { this.wel_message = true; }, 4000);
+        window.setTimeout(() => {
+            this.wel_message = true;
+        }, 4000);
         this.feedback_form = false;
-        window.setTimeout(() => { this.feedback_form = true; }, 5500);
+        window.setTimeout(() => {
+            this.feedback_form = true;
+        }, 5500);
     }
 
     renderedCallback() {
         // console.log('print to list',this.listto);
         Promise.all([
-            loadStyle(this, QuickBotCSS)
-        ]).then(() => {
-            console.log('check');
-        })
+                loadStyle(this, QuickBotCSS)
+            ]).then(() => {
+                console.log('check');
+            })
             .catch(error => {
+                this.message = 'Something Went Wrong In QuickBot Page';
+                this.showerror(this.message);
                 // console.log( error.body.message );
             });
     }
@@ -71,23 +93,33 @@ export default class QuickBot extends LightningElement {
             console.log('validation', validation);
             this.email_msg = false;
             console.log('validation', validation);
-        }
-        else {
+        } else {
             console.log('validation', validation);
             this.email_msg = true;
             console.log('selectedValues:- ', this.quickbotemail);
             console.log('selectedValues:- ' + typeof this.quickbotemail);
-            sendemail({ name: this.quickbotname, email: this.quickbotemail, subject: this.quickbotsubject, body: this.quickbotmessage })
+            sendemail({
+                    name: this.quickbotname,
+                    email: this.quickbotemail,
+                    subject: this.quickbotsubject,
+                    body: this.quickbotmessage
+                })
                 .then(result => {
                     this.emailsend = true;
-                    this.dispatchEvent(new CustomEvent('botclose', { detail: this.emailsend }));
+                    this.dispatchEvent(new CustomEvent('botclose', {
+                        detail: this.emailsend
+                    }));
                     this.dispatchEvent(new CustomEvent('success'));
                     console.log('send email', result);
                 }).catch(error => {
                     this.emailsend = false;
-                    this.dispatchEvent(new CustomEvent('botclose', { detail: this.emailsend }));
+                    this.dispatchEvent(new CustomEvent('botclose', {
+                        detail: this.emailsend
+                    }));
                     this.dispatchEvent(new CustomEvent('error'));
                     console.log('Send Email Error ==>', error);
+                    this.message = 'Something Went Wrong In Quick Bot Page';
+                    this.showerror(this.message);
                 });
         }
         console.log('quickbotname -->', this.quickbotname);
@@ -99,4 +131,27 @@ export default class QuickBot extends LightningElement {
     quickboe_close() {
         this.dispatchEvent(new CustomEvent('botclose'));
     }
+
+    errorpopupcall(event) {
+        location.reload();
+    }
+
+    @api showerror() {
+        console.log('this.error_popup => ', this.error_popup);
+        this.error_popup = true;
+        let errordata = {
+            header_type: 'Fiedback Form error',
+            Message: this.message
+        };
+        const showpopup = new CustomEvent('showerrorpopup', {
+            detail: errordata
+        });
+        this.dispatchEvent(showpopup);
+    }
+
+    showerrorpopup(event) {
+        console.log('showerrorpopup', event.detail.Message);
+        this.template.querySelector('c-errorpopup').errormessagee(event.detail.header_type, event.detail.Message);
+    }
+
 }

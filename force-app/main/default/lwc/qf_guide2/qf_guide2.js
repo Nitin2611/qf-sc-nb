@@ -19,6 +19,10 @@ export default class Qf_guide2 extends LightningElement {
   error_toast = true;
   // @api siteId;
 
+  //error_popup
+  @api error_popup = false;
+  message;
+  
   connectedCallback() {
     this.spinnerdatatable = true;
     this.getSiteDetails();
@@ -45,11 +49,15 @@ export default class Qf_guide2 extends LightningElement {
           .catch(error => {
             console.log(error);
             this.spinnerdatatable = false;
+            this.message = 'Something Went Wrong In qf_guid2';
+            this.showerror(this.message);
           });
       })
       .catch(error => {
         console.error(error);
         this.spinnerdatatable = false;
+        this.message = 'Something Went Wrong In qf_guid2';
+        this.showerror(this.message);
       });
   }
 
@@ -155,6 +163,8 @@ export default class Qf_guide2 extends LightningElement {
       window.open(baseUrl, '_blank');
     } catch (error) {
       console.error(error);
+      this.message = 'Something Went Wrong In qf_guid2';
+      this.showerror(this.message);
     }
   }
   tabing() {
@@ -167,5 +177,21 @@ export default class Qf_guide2 extends LightningElement {
     });
     this.template.querySelector('[data-tab-id="' + target + '"]').classList.add("active-tab");
     this.template.querySelector('[data-id="' + target + '"]').classList.add("active-tab-content");
+  }
+  errorpopupcall(event){
+      location.reload();
+  }
+
+  @api showerror(){
+      console.log('this.error_popup => ',this.error_popup);
+      this.error_popup = true;
+      let errordata = {header_type: 'Notification Page',Message : this.message};
+      const showpopup = new CustomEvent('showerrorpopup',{detail:errordata});
+      this.dispatchEvent(showpopup);
+  }
+
+  showerrorpopup(event){
+      console.log('showerrorpopup',event.detail.Message);
+      this.template.querySelector('c-errorpopup').errormessagee(event.detail.header_type,event.detail.Message);
   }
 }

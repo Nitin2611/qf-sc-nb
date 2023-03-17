@@ -14,6 +14,12 @@ export default class EmailInputCC extends LightningElement {
     boxClass = "slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-has-focus";
     _selectedValues = [];
     selectedValuesMap = new Map();
+
+    //error_popup
+    @api error_popup = false;
+    message;
+
+    
     // connectedCallback(){
     //     console.log('print to list',this.listto);
 
@@ -26,6 +32,8 @@ export default class EmailInputCC extends LightningElement {
                 // console.log( 'icon' );
             })
             .catch(error => {
+                this.message = 'Something Went Wrong In Email Input CC Page';
+                this.showerror(this.message);
                 // console.log( error.body.message );
         });
     }
@@ -60,6 +68,8 @@ export default class EmailInputCC extends LightningElement {
             })
             .catch((error) => {
                 console.error("Error:", error);
+                this.message = 'Something Went Wrong In Email Input CC Page';
+                this.showerror(this.message);
             });
     }
 
@@ -166,5 +176,22 @@ export default class EmailInputCC extends LightningElement {
                 this.selectedValues = [...this.selectedValuesMap.keys()];
                 // this.selectedValues=value;
                 }
+    }
+
+    errorpopupcall(event){
+        location.reload();
+    }
+
+    @api showerror(){
+        console.log('this.error_popup => ',this.error_popup);
+        this.error_popup = true;
+        let errordata = {header_type: 'Email InputCC',Message : this.message};
+        const showpopup = new CustomEvent('showerrorpopup',{detail:errordata});
+        this.dispatchEvent(showpopup);
+    }
+    
+    showerrorpopup(event){
+        console.log('showerrorpopup',event.detail.Message);
+        this.template.querySelector('c-errorpopup').errormessagee(event.detail.header_type,event.detail.Message);
     }
 }
