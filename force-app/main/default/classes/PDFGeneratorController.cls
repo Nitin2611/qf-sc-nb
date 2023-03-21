@@ -95,6 +95,8 @@ public without sharing class PDFGeneratorController {
             }
             System.debug('*** mapofOtherObjectData ==>' + mapofOtherObjectData);
             
+            Set<Id> contentVersionIdOfFiles = new Set<Id>();
+
             for (String key : mapofOtherObjectData.keySet()) {
                 if (key == 'sobjectType') {
                     mapofExtraFieldsData.put(key, mapofOtherObjectData.get(key));
@@ -107,6 +109,7 @@ public without sharing class PDFGeneratorController {
                         } else if (ff.Id == key && ff.Name.Contains('QFFILEUPLOAD')) {
                             System.debug('in the QFFILEUPLOAD part ==>' + ff.Name);
                             mapofFileUploadData.put(key, mapofOtherObjectData.get(key));
+                            contentVersionIdOfFiles.add(mapofOtherObjectData.get(key));
                             isFileupload = true;
                         } else if (ff.Id == key){
                             System.debug('in the else part ==>' + ff.Name);
@@ -124,7 +127,23 @@ public without sharing class PDFGeneratorController {
                     }
                 }
             }
-            
+            System.debug('*** contentVersionIdOfFiles ==>' + contentVersionIdOfFiles);
+            List<contentDocument> contentDocList = new List<contentDocument>();
+            contentDocList = [SELECT Id, Title, LatestPublishedVersionId FROM contentDocument WHERE LatestPublishedVersionId IN : contentVersionIdOfFiles];
+            System.debug('*** contentDocList sixe ==>' + contentDocList.size() + ' --- contentDocList ==>' + contentDocList);
+
+            Map<String, String> fileUploadTitles = new Map<String, String>();
+            for (String key : mapofFileUploadData.keySet()) {
+                System.debug('**key ==>' + key);
+                for (contentDocument cd : contentDocList) {
+                    if (cd.LatestPublishedVersionId == mapofFileUploadData.get(key)) {
+                        // here adding Salesforce URL to map to show in PDF
+                        mapofFileUploadData.put(key, URL.getSalesforceBaseUrl().toExternalForm() + '/' + cd.Id);
+                        fileUploadTitles.put(key, cd.Title);
+                    }
+                }
+            }
+
             // For first object
             Map<String, String> firstObjectLbl = new Map<String, String>();
             firstObjectLbl = genrateLabelMap(mapofFirstObjectData,formFildsList );
@@ -144,6 +163,7 @@ public without sharing class PDFGeneratorController {
             System.debug('*** firstObjectLbl ==>' + firstObjectLbl);
             System.debug('*** secondObjectLbl ==>' + secondObjectLbl);
             System.debug('*** thirdObjectLbl ==>' + thirdObjectLbl);
+            System.debug('*** fileUploadTitles ==>' + fileUploadTitles);
 
 
             // getting list of pages of the submited form
@@ -163,6 +183,7 @@ public without sharing class PDFGeneratorController {
             formData.firstObjectFieldLabelsMap = firstObjectLbl;
             formData.secondObjectFieldLabelsMap = secondObjectLbl;
             formData.thirdObjectFieldLabelsMap = thirdObjectLbl;
+            formData.contentDocumentTitleMap = fileUploadTitles;
             
         } catch (Exception e) {
             System.debug('In the catch block of getPagesOfForm ==>');
@@ -226,6 +247,7 @@ public without sharing class PDFGeneratorController {
         public Map<String, String> firstObjectFieldLabelsMap {get; set;} // Map of submitted data's Labes of first object
         public Map<String, String> secondObjectFieldLabelsMap {get; set;} // Map of submitted data's Labes of second object
         public Map<String, String> thirdObjectFieldLabelsMap {get; set;} // Map of submitted data's Labes of thirdd object
+        public Map<String, String> contentDocumentTitleMap {get; set;} // Map of contentDocument's label of uploaded fiels
     }
 
 }

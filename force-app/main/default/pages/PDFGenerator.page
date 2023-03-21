@@ -195,9 +195,8 @@
                                     <div class="mr-t"></div>
                                     <tr>
                                         <td class="field-txt sign-lbl">{!formData.otherObjectFieldLabelsMap[field]}</td>
-                                        <td> : &nbsp;</td>
-                                        <td class="field-txt-data file-box">
-                                            <apex:image styleClass="img-cls" url="/sfc/servlet.shepherd/version/download/{!formData.fileUploadFieldMap[field]}"/>
+                                        <td class="field-txt-data"> : 
+                                            <a href="{!formData.fileUploadFieldMap[field]}" target="_blank">{!formData.contentDocumentTitleMap[field]}</a>
                                         </td>
                                     </tr>
                                 </apex:outputPanel>
