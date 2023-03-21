@@ -16,6 +16,7 @@
                     content: element(footer);
                 }
             }
+
             .main-pdf-div {
                 padding: 16px;
             }
@@ -44,7 +45,7 @@
 
             .field-txt {
                 font-weight: 600;
-                min-width: 150px;
+                min-width: 200px;
             }
 
             .field-txt-data {
@@ -58,14 +59,40 @@
                 text-align: center;
                 font-weight: 600;
             }
-            .image{
-                height: 200px;
-                width: 200px;
+
+            .img-sign{
+                height: 110px;
+                width: 127px;
             }
 
             .img-cls {
-                height: 300px;
-                width : 350px;
+                height: 180px;
+                width : 280px;
+            }
+
+            .file-box {
+                height: 200px;
+                width: 300px;
+                border: 1px solid #000000;
+            }
+
+            .sign-box {
+                height: 118px;
+                width: 172px;
+                border: 1px solid #000000;
+            }
+
+            .mr-b {
+                height: 8px;
+            }
+
+            .mr-t {
+                height: 4px;
+            }
+
+            .sign-lbl {
+                display:flex !important;
+                align-items: flex-start !important;
             }
 
         </style>
@@ -82,11 +109,11 @@
                 <!-- First Object Data -->
                 <apex:outputPanel rendered="{!isFirstObject}">
                     <div class="page-data">
-                        <div class="pg-obj-titile">{!formData.firstObjectFieldMap['sobjectType']}</div>
+                        <div class="pg-obj-titile">{!formData.firstObjectFieldLabelsMap['sobjectType']}</div>
                         <apex:repeat value="{!formData.firstObjectFieldMap}" var="field">
                             <apex:outputPanel rendered="{!field !='sobjectType'}">
                                 <tr>
-                                    <td class="field-txt">{!field}</td>
+                                    <td class="field-txt">{!formData.firstObjectFieldLabelsMap[field]}</td>
                                     <td class="field-txt-data"> : {!formData.firstObjectFieldMap[field]}</td>
                                 </tr>
                             </apex:outputPanel>
@@ -98,11 +125,11 @@
                 <!-- Second Object Data -->
                 <apex:outputPanel rendered="{!isSecondObject}">
                     <div class="page-data">
-                        <div class="pg-obj-titile">{!formData.secondObjectFieldMap['sobjectType']}</div>
+                        <div class="pg-obj-titile">{!formData.secondObjectFieldLabelsMap['sobjectType']}</div>
                         <apex:repeat value="{!formData.secondObjectFieldMap}" var="field">
                             <apex:outputPanel rendered="{!field !='sobjectType'}">
                                 <tr>
-                                    <td class="field-txt">{!field}</td>
+                                    <td class="field-txt">{!formData.secondObjectFieldLabelsMap[field]}</td>
                                     <td class="field-txt-data"> : {!formData.secondObjectFieldMap[field]}</td>
                                 </tr>
                             </apex:outputPanel>
@@ -114,11 +141,11 @@
                 <!-- Third Object Data -->
                 <apex:outputPanel rendered="{!isThirdObject}">
                     <div class="page-data">
-                        <div class="pg-obj-titile">{!formData.thirdObjectFieldMap['sobjectType']}</div>
+                        <div class="pg-obj-titile">{!formData.thirdObjectFieldLabelsMap['sobjectType']}</div>
                         <apex:repeat value="{!formData.thirdObjectFieldMap}" var="field">
                             <apex:outputPanel rendered="{!field !='sobjectType'}">
                                 <tr>
-                                    <td class="field-txt">{!field}</td>
+                                    <td class="field-txt">{!formData.thirdObjectFieldLabelsMap[field]}</td>
                                     <td class="field-txt-data"> : {!formData.thirdObjectFieldMap[field]}</td>
                                 </tr>
                             </apex:outputPanel>
@@ -146,12 +173,15 @@
                         <div class="page-data">
                             <apex:repeat value="{!formData.signatureFieldMap}" var="field">
                                 <apex:outputPanel rendered="{!field !='sobjectType'}">
+                                    <div class="mr-t"></div>
                                     <tr>
-                                        <td class="field-txt">{!formData.otherObjectFieldLabelsMap[field]}</td>
-                                        <td class="field-txt-data">
-                                            <apex:image url="/sfc/servlet.shepherd/version/download/{!formData.signatureFieldMap[field]}"/>
+                                        <td class="field-txt sign-lbl">{!formData.otherObjectFieldLabelsMap[field]}</td>
+                                        <td> : &nbsp;</td>
+                                        <td class="field-txt-data sign-box">
+                                            <apex:image styleClass="img-sign" url="/sfc/servlet.shepherd/version/download/{!formData.signatureFieldMap[field]}"/>
                                         </td>
                                     </tr>
+                                    <div class="mr-b"></div>
                                 </apex:outputPanel>
                             </apex:repeat>
                         </div>
@@ -162,9 +192,11 @@
                         <div class="page-data">
                             <apex:repeat value="{!formData.fileUploadFieldMap}" var="field">
                                 <apex:outputPanel rendered="{!field !='sobjectType'}">
+                                    <div class="mr-t"></div>
                                     <tr>
-                                        <td class="field-txt">{!formData.otherObjectFieldLabelsMap[field]}</td>
-                                        <td class="field-txt-data">
+                                        <td class="field-txt sign-lbl">{!formData.otherObjectFieldLabelsMap[field]}</td>
+                                        <td> : &nbsp;</td>
+                                        <td class="field-txt-data file-box">
                                             <apex:image styleClass="img-cls" url="/sfc/servlet.shepherd/version/download/{!formData.fileUploadFieldMap[field]}"/>
                                         </td>
                                     </tr>
