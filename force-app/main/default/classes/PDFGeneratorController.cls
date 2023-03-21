@@ -44,6 +44,11 @@ public without sharing class PDFGeneratorController {
             Form_Submission__c formSubmissionRecord = [SELECT Id, Name, Form__c, Form__r.Name, First_object_data__c, Second_object_data__c, Third_object_data__c, Other_fields_data__c FROM Form_Submission__c WHERE Id =: submissionId];
             fromSubmisionData = formSubmissionRecord;
 
+            // getting formfields of form in to list
+            List<Form_Fields__c> formFildsList = new List<Form_Fields__c>();
+            formFildsList = [SELECT Id, Name, Form__c, Form_Page__c, Field_Label__c, Mapped_Obj__c, Field_Mapping__c FROM Form_Fields__c WHERE Form__c =: formSubmissionRecord.Form__c];
+            System.debug('*** formFildsList Size ==>' + formFildsList.size() + ' -- formFildsList ==>' + formFildsList);
+
             // Stroring First object fields submitted data into Map<String, String>
             mapofFirstObject = (Map<String, Object>)JSON.deserializeUntyped(formSubmissionRecord.First_object_data__c);
             for (String key : mapofFirstObject.keySet()) {
@@ -54,6 +59,7 @@ public without sharing class PDFGeneratorController {
                 isFirstObject = true;
             }
             System.debug('*** mapofFirstObjectData ==>' + mapofFirstObjectData);
+            // objectsFieldLabels.put(mapofFirstObjectData.get('sobjectType'));
 
             // Stroring Second object fields submitted data into Map<String, String>
             mapofSecondObject = (Map<String, Object>)JSON.deserializeUntyped(formSubmissionRecord.Second_object_data__c);
@@ -88,12 +94,7 @@ public without sharing class PDFGeneratorController {
                 isOtherObject = true;
             }
             System.debug('*** mapofOtherObjectData ==>' + mapofOtherObjectData);
-
             
-            List<Form_Fields__c> formFildsList = new List<Form_Fields__c>();
-            formFildsList = [SELECT Id, Name, Form__c, Form_Page__c, Field_Label__c FROM Form_Fields__c WHERE Form__c =: formSubmissionRecord.Form__c];
-            System.debug('*** formFildsList Size ==>' + formFildsList.size() + ' -- formFildsList ==>' + formFildsList);
-
             for (String key : mapofOtherObjectData.keySet()) {
                 if (key == 'sobjectType') {
                     mapofExtraFieldsData.put(key, mapofOtherObjectData.get(key));
@@ -123,11 +124,26 @@ public without sharing class PDFGeneratorController {
                     }
                 }
             }
+            
+            // For first object
+            Map<String, String> firstObjectLbl = new Map<String, String>();
+            firstObjectLbl = genrateLabelMap(mapofFirstObjectData,formFildsList );
+
+            // for second object
+            Map<String, String> secondObjectLbl = new Map<String, String>();
+            secondObjectLbl = genrateLabelMap(mapofSecondObjectData,formFildsList );
+
+            // for third object
+            Map<String, String> thirdObjectLbl = new Map<String, String>();
+            thirdObjectLbl = genrateLabelMap(mapofThirdObjectData,formFildsList );
 
             System.debug('*** mapofSignatureData ==>' + mapofSignatureData);
             System.debug('*** mapofFileUploadData ==>' + mapofFileUploadData);
             System.debug('*** mapofExtraFieldsData ==>' + mapofExtraFieldsData);
             System.debug('*** mapofOtherFieldsLabelData ==>' + mapofOtherFieldsLabelData);
+            System.debug('*** firstObjectLbl ==>' + firstObjectLbl);
+            System.debug('*** secondObjectLbl ==>' + secondObjectLbl);
+            System.debug('*** thirdObjectLbl ==>' + thirdObjectLbl);
 
 
             // getting list of pages of the submited form
@@ -144,11 +160,55 @@ public without sharing class PDFGeneratorController {
             formData.signatureFieldMap = mapofSignatureData;
             formData.fileUploadFieldMap = mapofFileUploadData;
             formData.otherObjectFieldLabelsMap = mapofOtherFieldsLabelData;
+            formData.firstObjectFieldLabelsMap = firstObjectLbl;
+            formData.secondObjectFieldLabelsMap = secondObjectLbl;
+            formData.thirdObjectFieldLabelsMap = thirdObjectLbl;
             
         } catch (Exception e) {
             System.debug('In the catch block of getPagesOfForm ==>');
             System.debug('--Line number ==>' + e.getLineNumber() + '-- Message ==>' + e.getMessage());
             System.debug(e);
+        }
+    }
+
+    //Genrating Label Map for fields
+    public Map<String, String> genrateLabelMap(Map<String, String> objectDataMap, List<Form_Fields__c> formFildsList) {
+        Map<String, String> objLabelMap = new Map<String, String>();
+        try {
+            for (String key : objectDataMap.keySet()) {
+                if (key == 'sobjectType') {
+                    // here puting object label name in mao instead od api name
+                    objLabelMap.put(key,genrateObjectLabel(objectDataMap.get('sobjectType')));
+                } else {
+                    for (Form_Fields__c ff : formFildsList) {
+                        if (ff.Mapped_Obj__c == objectDataMap.get('sobjectType')) {
+                            // Here ff.Field_Mapping__c like (LastName<!@!>Contact)
+                            String[] splitString = ff.Field_Mapping__c.split('<!@!>');
+                            objLabelMap.put(splitString[0], ff.Field_Label__c);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.debug('In the catch block of genrateLabelMap ==>');
+            System.debug('--Line number ==>' + e.getLineNumber() + '-- Message ==>' + e.getMessage());
+            System.debug(e);
+        }
+        return objLabelMap;
+    }
+
+    //Genrating Object Label using object API Name
+    public String genrateObjectLabel(String objectApiName) {
+        try {
+            Schema.DescribeSObjectResult describeResult = Schema.getGlobalDescribe().get(objectApiName).getDescribe();
+            String objectLabel = describeResult.getLabel();
+            System.debug('Object Label ==> ' + objectLabel);
+            return objectLabel;
+        } catch (Exception e) {
+            System.debug('In the catch block of genrateObjectLabel ==>');
+            System.debug('--Line number ==>' + e.getLineNumber() + '-- Message ==>' + e.getMessage());
+            System.debug(e);
+            return objectApiName;
         }
     }
 
@@ -163,6 +223,9 @@ public without sharing class PDFGeneratorController {
         public Map<String, String> signatureFieldMap {get; set;} // Map of submitted data of other object
         public Map<String, String> fileUploadFieldMap {get; set;} // Map of submitted data of other object
         public Map<String, String> otherObjectFieldLabelsMap {get; set;} // Map of submitted data's Labes of other object
+        public Map<String, String> firstObjectFieldLabelsMap {get; set;} // Map of submitted data's Labes of first object
+        public Map<String, String> secondObjectFieldLabelsMap {get; set;} // Map of submitted data's Labes of second object
+        public Map<String, String> thirdObjectFieldLabelsMap {get; set;} // Map of submitted data's Labes of thirdd object
     }
 
 }
